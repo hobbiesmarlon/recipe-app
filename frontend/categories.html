@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Categories</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin href="https://fonts.gstatic.com/" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#f48525",
+              "background-light": "#f8f7f5",
+              "background-dark": "#221810",
+            },
+            fontFamily: {
+              display: ["Plus Jakarta Sans", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "1rem",
+              xl: "1.5rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-background-light dark:bg-background-dark text-[#111827] dark:text-white">
+
+    <header class="py-4">
+      <div class="mx-auto max-w-2xl px-4">
+        <div class="flex items-center justify-between">
+          <div class="w-6"></div>
+          <h1 class="text-lg font-bold">Categories</h1>
+          <div class="w-10"></div>
+        </div>
+      </div>
+    </header>
+
+    <main class="px-4 space-y-6 mx-auto max-w-2xl pb-24">
+      <div class="space-y-8 pt-6">
+        <section>
+          <h2 class="text-2xl font-bold">Meals</h2>
+          <div class="mt-3 flex space-x-4 overflow-x-auto pb-4 -mr-4 pr-10 [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+            <div class="w-40 flex-shrink-0 space-y-2">
+              <div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDjoelberBs8Fo3VSD3DmAY49iH4_t2Knn-KuV1lksyOnrRWky0p_-PGB_YyKE4WqghpElvpDa_DXlM51A4yLlBJ8cUZ6AF2oC3FIWsQy6RYNaxDVmc5effPsWSqc6ExEcyy3aKTvoDjjtmbAr2o2HWxBtl1eG5ODqMn24zBUq0zEDe9BvtYbKrHm1BHmhacPIVXWlDm-h6NlB5IlKry6DoHhplqPdMl7hg00qhk7ykVj6Iuh2lYAsiZKRsfX-GmYWzdFKaOBsId-s");'></div>
+              <p class="text-sm font-medium">Pasta Perfection</p>
+            </div>
+            <div class="w-40 flex-shrink-0 space-y-2">
+              <div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCAq8PcmypVd9IYAG12BH1YMNSbD-fVYkXwqQ8GZMWK150uBlOUduwxyzb_c1mdQazi66F3k1GrICsI7XPs7jINIEQJ-z9nYbCWCV53yGtF3rep85swuXp_OwXSlEEGQe75mdsi27PCotPeNq8qYbyHWCX5Y5JVl8TsQmgwyxhc2M6eSVXMvsZR-hP1C--_H0i0VeQNd1qGew_AkcSCizC57EcGGie-7iaQch4OxoOt8KxQVx4TQRnBXp8rbjIUGx8zEblcdOWyCcY");'></div>
+              <p class="text-sm font-medium">Asian Delights</p>
+            </div>
+            <div class="w-40 flex-shrink-0 space-y-2">
+              <div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuANOHjQx8va6piCmwC0uHa6jMwMZuZ72kga8deZYIWAz5LhgttIDLBcWEex-WlrK0oGiHGpk-vpeJ9B3VzTsv1GNatn5BokWIf2WFgTLlNhswOVVpqsgowokSCFpTveRyOoHYbz0TghJ1b14XMWYYJTFH6t0ansdz7Y_RnIijyFa3yoy29pXT8i6Is9sTs0siXo22KxplqX0zJqP0X2qCQRQAoZdIttTB2Wy6WFBEoVVBXGhMQoKn2bb15El5vzESsG0yTR59IQZdc");'></div>
+              <p class="text-sm font-medium">Seafood Sensations</p>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2 class="text-2xl font-bold">Desserts</h2>
+          <div class="mt-3 flex space-x-4 overflow-x-auto pb-4 -mr-4 pr-10 [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+            <div class="w-40 flex-shrink-0 space-y-2">
+              <div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCeNS3P0mRNoo9NUJpQlyi_fdFSh9Hs8ZCJj5L3A95KVT2JkYBNt6If3-i561Oe1LSAmUqD2SMQn10LrfNJ95lT5g5XEtxDoxtlgx673eY7ibE32ZtV_AjMv8YSTe7gTk6JVOen_RgoTStjYgc8YKuX91qQBX0YjuCdPB6s5dqpNnaf2M26qtHUUFh1PfYN9esFTxM7uKnbRe07p_oxisLElrhzqs38iSoPbK9BYxNKtKTS8S52YI3rv8fQJF7whenv3SqeyG2ScJM");'></div>
+              <p class="text-sm font-medium">Chocolate Indulgence</p>
+            </div>
+            <div class="w-40 flex-shrink-0 space-y-2">
+              <div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB2JPdayOYnHhnswDTtIYM_MgxIX15pETas7cWb3xEvcCb4dGMFvvHDYedWUhQQ8y_ZsBeoN-tYiVZO4ulGBwoHKGGnyF1ixJ8SuZjoPETzqz5bfNe_1VeMEo7PAlow6VQ0SdpvpS6e3L9Yo1t1VoPFFUxBFaD0Q8i4CwngCuAe3fG1ziXYkm2YuBG8slTBhTaka6dfN4jW5nlxdQn4ORXP02Qs-mCkkKn0akEEzSfZ2oEuR0Y7R89KYCgQkguaZiqRUoGkVnIVbdw");'></div>
+              <p class="text-sm font-medium">Fruity Freshness</p>
+            </div>
+            <div class="w-40 flex-shrink-0 space-y-2">
+              <div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC3a4BYtD7np2rprMbEmAU30KmFKlFPHoxbh0zPvdDyVhAOTBAPW6kUL4l7-ZZnDS-rhF6YZnCnHlpGXAwLpQCNWlXvfsyEIhU04maR7KqDwWO4VLpwYQDkqSZ94IoSlnU4EwK7sviZ7UXMTsgCpLB4qkEZDHmbaFCmKNTCgAjjRBllMG-S3JThg3-vef02JyIzQXyY5dfohlARNg9vBIXaDeiLVRdXCjLdJhW0xJiSWHDL0laCXg6fbQBvn_mLp9DGL58Ll874uLs");'></div>
+              <p class="text-sm font-medium">Frozen Treats</p>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2 class="text-2xl font-bold">Baking</h2>
+          <div class="mt-3 flex space-x-4 overflow-x-auto pb-4 -mr-4 pr-10 [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+            <div class="w-40 flex-shrink-0 space-y-2">
+              <div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB84xw7t8VgGsjH2ZIllKa0TLFvcfg7dcmiuZHJtAaZ76jUEfuqOgDdqC33X_CLtJh8HblfxWjONkshmXP0gf2tww8Oepg-Y22rCxGI9zHgmj7KAS5kCKns5DE7Ai_EEI3Vrs7J0z8ZFLB3E_UlNuBk6PVhYyheywqNEBhzD-eK42st44ooagR5erLiyWtzCILI04tKSBup5ZqEu6HKyYTTNdG4j_xWu8xPcqwQ-ecI_3gf2GEFos1x1yJOU4zR8KoXP_rWvSjqzxY");'></div>
+              <p class="text-sm font-medium">Homemade Breads</p>
+            </div>
+            <div class="w-40 flex-shrink-0 space-y-2">
+              <div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBbZHrCtcOj4M79bzkftochqnq1jFZUixf0Pf90wvUO2zzgi98RrtMIqIutd_rbbIFXvknvjnv9wOBbM7l0ZiS5ORVLgbzbxqHAuaNueQ5SFjL0Qlcgci8acjLda1RwvzvH0QD62HFs_onfKuaDI0p3rYYqKwW9gzC_1_L1bkfPiwnSoDLHLwbyTr-nJK4XxcCwJPp3Qb0u6c0P_mOdpT1C2ZK_vc6Rr6bV4G7sRohGbx7kQdyd3u5yLM492P_T5E4fv8koixIe1j0");'></div>
+              <p class="text-sm font-medium">Cookie Creations</p>
+            </div>
+            <div class="w-40 flex-shrink-0 space-y-2">
+              <div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC1V4MglmPKFWtcoMWz61ybjmkk9y1BnCCbFaUxxK3-zc5wsO7H2I_UP2d8yqwMCrMcdAXJshXmpfRdhbK3wEbQMrjNiQlUmKls3vt3p7RP3-_nwEnLqWTGcHxJxoZEFoeilD8ERQpIgMNmgtwMf6D3_eV9N-3ro8li5Nl4H-iElTH5cEiOZFlvuJvwm0fsFzypdD9DxyOBHTJYntN_blERWDd9DTZirRSAEqtLNVvLD1Ld6TQoyyWDu_EGc8qjJcjQLzsGBDY927k");'></div>
+              <p class="text-sm font-medium">Morning Muffins</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="fixed bottom-0 left-0 right-0 border-t border-primary/20 dark:border-primary/30 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm pb-safe">
+      <nav class="mx-auto max-w-2xl flex h-20 items-center justify-around px-4">
+        <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="discovery-feed.html">
+          <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M240,64V192a16,16,0,0,1-16,16H160a24,24,0,0,0-24,24,8,8,0,0,1-16,0,24,24,0,0,0-24-24H32a16,16,0,0,1-16-16V64A16,16,0,0,1,32,48H88a32,32,0,0,1,32,32v88a8,8,0,0,0,16,0V80a32,32,0,0,1,32-32h56A16,16,0,0,1,240,64Z"></path>
+          </svg>
+          <p class="text-xs font-medium">Recipes</p>
+        </a>
+        <a class="flex flex-col items-center justify-end flex-1 gap-1 text-primary" href="categories.html">
+          <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M80,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H88A8,8,0,0,1,80,64Zm136,56H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,64H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16ZM44,52A12,12,0,1,0,56,64,12,12,0,0,0,44,52Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,116Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,180Z"></path>
+          </svg>
+          <p class="text-xs font-bold">Categories</p>
+        </a>
+        <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="recipe-basic-info.html">
+          <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+          </svg>
+          <p class="text-xs font-medium">Add</p>
+        </a>
+        <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="categories-browsing.html">
+          <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+          </svg>
+          <p class="text-xs font-medium">Search</p>
+        </a>
+        <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="user-profile.html">
+          <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+          </svg>
+          <p class="text-xs font-medium">Profile</p>
+        </a>
+      </nav>
+    </footer>
+  </body>
+</html>

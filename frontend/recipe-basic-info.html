@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta charset="utf-8"/>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<title>Stitch Design</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#ec6d13",
+            "background-light": "#f8f7f6",
+            "background-dark": "#221810",
+          },
+          fontFamily: {
+            display: ["Plus Jakarta Sans"],
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px"
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="stylesheet" href="../shared.css" />
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-gray-100">
+<div class="flex h-screen flex-col justify-between">
+<div class="flex-grow">
+<header class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 p-4">
+<a href="discovery-feed.html" class="text-primary" aria-label="Close">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+</svg>
+</a>
+<h1 class="text-xl font-bold">Add Basic Information</h1>
+<div class="w-6"></div>
+</header>
+<!-- Page Indicators (4 steps) -->
+<!-- Page Indicators (4 steps) -->
+<div class="flex w-full flex-row items-center justify-center gap-3 py-4" role="progressbar" aria-label="Step progress" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1">
+  <div class="h-2 w-2 rounded-full progress-dot progress-dot--active" aria-hidden="true"></div>
+  <div class="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
+  <div class="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
+  <div class="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
+</div>
+<main class="p-4 space-y-6 mx-auto max-w-2xl">
+<div class="space-y-2">
+<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Recipe Image</label>
+<div class="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 p-6 text-center bg-gray-50 dark:bg-gray-800/20">
+<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Drag and drop your image here</p>
+<p class="text-xs text-gray-500 dark:text-gray-500">or</p>
+<button class="mt-2 rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-primary dark:text-primary-light shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600" type="button">Upload a file</button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-medium text-gray-700 dark:text-gray-300" for="recipe-name">Recipe Name</label>
+<input class="h-14 w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400" id="recipe-name" placeholder="e.g. Spicy Chicken Curry" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-medium text-gray-700 dark:text-gray-300" for="description">Description</label>
+<textarea class="w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary min-h-[120px] resize-none dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400" id="description" placeholder="A short and sweet description of your delicious recipe..."></textarea>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-sm font-medium text-gray-700 dark:text-gray-300" for="prep-time">Prep Time</label>
+<div class="flex items-center rounded-lg bg-stone-200/50 dark:bg-stone-800/50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary">
+<input class="h-14 w-full rounded-l-lg border-0 bg-transparent p-4 text-stone-900 placeholder:text-stone-500 focus:ring-0 dark:text-stone-100" id="prep-time" placeholder="30" type="number"/>
+<div class="relative">
+<select class="form-select appearance-none rounded-r-lg border-0 bg-transparent py-4 pl-2 pr-8 font-medium text-stone-900 dark:text-stone-300 focus:ring-0">
+<option>minutes</option>
+<option>hours</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
+<svg class="h-4 w-4 fill-current" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"></path>
+</svg>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-medium text-gray-700 dark:text-gray-300" for="servings">Servings</label>
+<input class="h-14 w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400" id="servings" placeholder="e.g. 4" type="number"/>
+</div>
+</div>
+
+
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-700 dark:text-gray-300">
+<svg class="h-5 w-5 fill-current" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"></path>
+</svg>
+</div>
+</div>
+</div>
+</main>
+</div>
+<div class="p-4">
+<a href="recipe-ingredients.html" class="w-full rounded-xl bg-primary py-4 text-center font-bold text-white transition-opacity hover:opacity-90 block">Next</a>
+</div>
+<footer class="fixed bottom-0 left-0 right-0 z-10 bg-background-light dark:bg-background-dark p-4 border-t border-border-light dark:border-border-dark">
+  <div class="mx-auto max-w-2xl">
+    <a href="recipe-ingredients.html" class="h-12 w-full rounded-full bg-primary text-white font-bold text-base leading-normal flex items-center justify-center gap-2">
+      Next Step
+      <span class="material-symbols-outlined text-base">arrow_forward</span>
+    </a>
+  </div>
+</footer>
+</div>
+
+</body></html>

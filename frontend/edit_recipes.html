@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect" />
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Epilogue%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#f47b25",
+            "background-light": "#f8f7f5",
+            "background-dark": "#221710",
+          },
+          fontFamily: { display: ["Epilogue"] },
+          borderRadius: { DEFAULT: "0.5rem", lg: "1rem", xl: "1.5rem", full: "9999px" },
+        },
+      },
+    };
+  </script>
+  <title>My Recipes — Stitch</title>
+  <style>body{min-height:max(884px,100dvh);}</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+  <div class="relative flex min-h-screen w-full flex-col justify-between overflow-x-hidden">
+    <div class="flex-grow">
+      <header class="py-4 sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+        <div class="mx-auto max-w-2xl px-4 flex items-center justify-between">
+          <a href="code.html" class="flex items-center gap-3 text-primary">
+            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg>
+            <span class="font-bold">My Recipes</span>
+          </a>
+          <a href="edit_profile.html" class="text-sm font-medium text-primary">Edit profile</a>
+        </div>
+      </header>
+
+      <main class="px-4 space-y-6 mx-auto max-w-2xl pb-32">
+        <section class="pt-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-bold text-background-dark dark:text-background-light">Your recipes</h2>
+            <a href="#new" id="newRecipeBtn" class="rounded-full bg-primary px-3 py-2 text-sm font-bold text-white">+ New</a>
+          </div>
+
+          <div id="recipesGrid" class="mt-4 grid grid-cols-2 gap-4">
+            <!-- Example recipe cards -->
+            <div class="flex flex-col gap-3">
+              <div class="aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
+                <img class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3VAhvxDsk0s_zP5LK4UULTnmbF0PVt6bzCbDlIzDFEDH8NcX48UcH9p3btzkM3rRDFh28RZC2yIg2xacHF1V-5vldpucjt2L4a8inoIg8RRBUd-5852QGPy3EbCzucSmMXIL9MR2Z2GG76Rpi2ep2uL1rrfwjKFr2DGEVoY99uoSL_k6FSGjtQ-7G-MndmwsHtLKblOPCJk1HpSdHyWLAjjPgX1SDWOWY7q3W7UZJPKPR-rUpUhouu_uXpEH5yvr0QvrzGf8HvrI" alt="Breakfast Ideas"/>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium text-background-dark dark:text-background-light">Breakfast Ideas</p>
+                  <p class="text-xs text-subtle-dark dark:text-subtle-light">30 min • Easy</p>
+                </div>
+                <div class="flex gap-2">
+                  <button class="px-3 py-2 rounded-lg border border-primary/20 text-primary text-sm" data-action="edit">Edit</button>
+                  <button class="px-3 py-2 rounded-lg bg-red-100 text-red-700 text-sm" data-action="delete">Delete</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+              <div class="aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
+                <img class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGuWoHpRwfw07lzD-OOW6f7WcXSj0qn0rVEWOM25qO9x2BLMFSsftZf48-41-_7bfrEwu1NE-W7OHY0brgo30Ynx1UXypwDuxdCryigzmTSn13K7pChFkEbm1SYQPtRYXjxVeUXJInf1sK5KB5vp-sIbb6fX6nykWD5NBwlvjhrqPFDuZqT-War-AZMEfx4R4P7nwLPyfJUP6QOY1l7ofErS5iOj_CEyx83WHtBmgrTsWN3EugaHavO1y3l_-EGwj3i6NJXLvnM_8" alt="Quick Dinners"/>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium text-background-dark dark:text-background-light">Quick Dinners</p>
+                  <p class="text-xs text-subtle-dark dark:text-subtle-light">25 min • Medium</p>
+                </div>
+                <div class="flex gap-2">
+                  <button class="px-3 py-2 rounded-lg border border-primary/20 text-primary text-sm" data-action="edit">Edit</button>
+                  <button class="px-3 py-2 rounded-lg bg-red-100 text-red-700 text-sm" data-action="delete">Delete</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="fixed bottom-0 left-0 right-0 border-t border-primary/20 dark:border-primary/30 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-sm pb-safe">
+      <nav class="mx-auto max-w-2xl flex h-20 items-center justify-around px-4">
+        <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="discovery-feed.html">
+          <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M240,64V192a16,16,0,0,1-16,16H160a24,24,0,0,0-24,24,8,8,0,0,1-16,0,24,24,0,0,0-24-24H32a16,16,0,0,1-16-16V64A16,16,0,0,1,32,48H88a32,32,0,0,1,32,32v88a8,8,0,0,0,16,0V80a32,32,0,0,1,32-32h56A16,16,0,0,1,240,64Z"/></svg>
+          <p class="text-xs font-medium">Recipes</p>
+        </a>
+        <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="categories.html">
+          <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M80,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H88A8,8,0,0,1,80,64Zm136,56H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,64H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16ZM44,52A12,12,0,1,0,56,64,12,12,0,0,0,44,52Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,116Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,180Z"/></svg>
+          <p class="text-xs font-medium">Categories</p>
+        </a>
+        <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="recipe-basic-info.html">
+          <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>
+          <p class="text-xs font-medium">Add</p>
+        </a>
+        <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="categories-browsing.html">
+          <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+          </svg>
+          <p class="text-xs font-medium">Search</p>
+        </a>
+        <a class="flex flex-col items-center justify-end flex-1 gap-1 text-primary" href="user-profile.html">
+          <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg>
+          <p class="text-xs font-bold">Profile</p>
+        </a>
+      </nav>
+    </footer>
+  </div>
+
+  <script>
+    // Simple client-only handlers for demo
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      const card = btn.closest('.flex.flex-col');
+      const title = card && card.querySelector('p.font-medium')?.textContent;
+      if (action === 'edit') {
+        alert('Edit (mock) — ' + (title || 'recipe'));
+      } else if (action === 'delete') {
+        if (confirm('Delete "' + (title || 'this recipe') + '"?')) {
+          card.remove();
+        }
+      }
+    });
+
+    document.getElementById('newRecipeBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('Create new recipe (mock).');
+    });
+  </script>
+</body>
+</html>

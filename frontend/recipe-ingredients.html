@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add Ingredients</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec6d13",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221810",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="../shared.css" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-stone-900 dark:text-stone-200">
+<div class="relative flex h-auto min-h-screen w-full flex-col justify-between overflow-x-hidden">
+<div class="flex-grow">
+<header class="sticky top-0 z-10 flex items-center justify-between bg-background-light/80 p-4 pb-3 backdrop-blur-sm dark:bg-background-dark/80">
+<a href="recipe-basic-info.html" class="flex h-10 w-10 items-center justify-center rounded-full text-primary" aria-label="Back">
+    <span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="flex-1 text-center text-lg font-bold">Add Ingredients</h1>
+<div class="w-10"></div>
+</header>
+<!-- underline to match other pages -->
+<div class="border-t border-gray-200 dark:border-gray-800"></div>
+<!-- Page Indicators (4 steps) -->
+<div class="flex w-full flex-row items-center justify-center gap-3 py-4" role="progressbar" aria-label="Step progress" aria-valuemin="1" aria-valuemax="4" aria-valuenow="2">
+    <div class="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
+    <div class="h-2 w-2 rounded-full progress-dot progress-dot--active" aria-hidden="true"></div>
+    <div class="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
+    <div class="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
+</div>
+<main class="p-4 mx-auto max-w-2xl">
+<div class="space-y-4">
+<div>
+<label class="sr-only" for="ingredient-name">Ingredient name</label>
+<input class="h-14 w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400" id="ingredient-name" placeholder="Ingredient name" type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex-1">
+<label class="sr-only" for="quantity">Quantity</label>
+<input class="h-14 w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400" id="quantity" placeholder="Quantity" type="number"/>
+</div>
+<div class="flex-1">
+<label class="sr-only" for="unit">Unit</label>
+<input class="h-14 w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400" id="unit" placeholder="Unit (e.g., g, ml, cup)" type="text"/>
+</div>
+</div>
+<fieldset class="rounded-lg bg-stone-200/50 p-1.5 dark:bg-stone-800/50">
+<legend class="sr-only">Measurement Type</legend>
+<div class="grid grid-cols-3 gap-1">
+<div>
+<input checked="" class="peer sr-only" id="weight" name="measurement-type" type="radio" value="weight"/>
+<label class="flex cursor-pointer items-center justify-center rounded-md py-2 text-sm font-medium text-stone-600 transition-colors peer-checked:bg-primary peer-checked:text-white dark:text-stone-400" for="weight">Weight</label>
+</div>
+<div>
+<input class="peer sr-only" id="volume" name="measurement-type" type="radio" value="volume"/>
+<label class="flex cursor-pointer items-center justify-center rounded-md py-2 text-sm font-medium text-stone-600 transition-colors peer-checked:bg-primary peer-checked:text-white dark:text-stone-400" for="volume">Volume</label>
+</div>
+<div>
+<input class="peer sr-only" id="count" name="measurement-type" type="radio" value="count"/>
+<label class="flex cursor-pointer items-center justify-center rounded-md py-2 text-sm font-medium text-stone-600 transition-colors peer-checked:bg-primary peer-checked:text-white dark:text-stone-400" for="count">Count</label>
+</div>
+</div>
+</fieldset>
+<button class="flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-primary/20 text-primary transition-colors hover:bg-primary/30 dark:bg-primary/30 dark:hover:bg-primary/40">
+<span class="material-symbols-outlined">add</span>
+<span class="font-bold">Add Ingredient</span>
+</button>
+</div>
+<div class="mt-8">
+<h2 class="text-lg font-bold text-stone-900 dark:text-stone-200">Ingredients List</h2>
+<ul class="mt-4 space-y-3">
+<li class="flex items-center justify-between rounded-lg bg-stone-200/50 p-3 dark:bg-stone-800/50">
+<div class="flex items-center gap-3">
+<button class="text-stone-500 dark:text-stone-400">
+<span class="material-symbols-outlined">drag_indicator</span>
+</button>
+<p class="font-medium text-stone-800 dark:text-stone-200">250g <span class="text-stone-600 dark:text-stone-400">All-Purpose Flour</span></p>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex h-8 w-8 items-center justify-center rounded-full text-stone-600 hover:bg-stone-300/50 dark:text-stone-400 dark:hover:bg-stone-700/50">
+<span class="material-symbols-outlined text-base">edit</span>
+</button>
+<button class="flex h-8 w-8 items-center justify-center rounded-full text-stone-600 hover:bg-stone-300/50 dark:text-stone-400 dark:hover:bg-stone-700/50">
+<span class="material-symbols-outlined text-base">delete</span>
+</button>
+</div>
+</li>
+<li class="flex items-center justify-between rounded-lg bg-stone-200/50 p-3 dark:bg-stone-800/50">
+<div class="flex items-center gap-3">
+<button class="text-stone-500 dark:text-stone-400">
+<span class="material-symbols-outlined">drag_indicator</span>
+</button>
+<p class="font-medium text-stone-800 dark:text-stone-200">2 <span class="text-stone-600 dark:text-stone-400">Large Eggs</span></p>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex h-8 w-8 items-center justify-center rounded-full text-stone-600 hover:bg-stone-300/50 dark:text-stone-400 dark:hover:bg-stone-700/50">
+<span class="material-symbols-outlined text-base">edit</span>
+</button>
+<button class="flex h-8 w-8 items-center justify-center rounded-full text-stone-600 hover:bg-stone-300/50 dark:text-stone-400 dark:hover:bg-stone-700/50">
+<span class="material-symbols-outlined text-base">delete</span>
+</button>
+</div>
+</li>
+</ul>
+</div>
+</main>
+</div>
+<footer class="fixed bottom-0 left-0 right-0 z-10 bg-background-light dark:bg-background-dark p-4 border-t border-border-light dark:border-border-dark">
+    <div class="mx-auto max-w-2xl">
+        <a href="recipe-instructions.html" class="h-12 w-full rounded-full bg-primary text-white font-bold text-base leading-normal flex items-center justify-center gap-2">
+            Next Step
+            <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+    </div>
+</footer>
+</div>
+
+</body></html>
