@@ -1,0 +1,109 @@
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: recipe_app
+      POSTGRES_USER: postgres
+    volumes:
+      - recipe-app_pgdata:/var/lib/postgresql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5432"
+    networks:
+      - recipe_net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:admin@db:5432/recipe_app
+      - MINIO_ENDPOINT=http://minio:9000
+      - CELERY_BROKER_URL=sqs://x:x@sqs:9324
+      - AWS_ACCESS_KEY_ID=x
+      - AWS_SECRET_ACCESS_KEY=x
+      - AWS_REGION=us-east-1
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - minio
+      - sqs
+    networks:
+      - recipe_net
+
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    # Use -P solo for asyncio stability and lower memory footprint
+    command: celery -A app.celery_app worker --loglevel=info -P solo
+    volumes:
+      - ./backend:/app
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:admin@db:5432/recipe_app
+      - MINIO_ENDPOINT=http://minio:9000
+      - CELERY_BROKER_URL=sqs://x:x@sqs:9324
+      - AWS_ACCESS_KEY_ID=x
+      - AWS_SECRET_ACCESS_KEY=x
+      - AWS_REGION=us-east-1
+    depends_on:
+      - db
+      - minio
+      - sqs
+    networks:
+      - recipe_net
+
+  sqs:
+    image: softwaremill/elasticmq-native
+    ports:
+      - "9324:9324"
+      - "9325:9325"
+    networks:
+      - recipe_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: recipe_frontend
+    restart: always
+    ports:
+      - "3000:5173"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    networks:
+      - recipe_net
+
+  minio:
+    image: minio/minio
+    container_name: recipe_minio
+    restart: always
+    command: server --console-address ":9001" /data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # MinIO console
+    volumes:
+      - minio_data:/data
+    networks:
+      - recipe_net
+
+networks:
+  recipe_net:
+
+volumes:
+  recipe-app_pgdata:
+  frontend_node_modules:
+  minio_data:

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Filter Recipes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#ec6d13",
+              "background-light": "#F8F9FA",
+              "background-dark": "#1a1a1a",
+              "surface-light": "#ffffff",
+              "surface-dark": "#2c2c2c",
+              "text-light": "#343A40",
+              "text-dark": "#e0e0e0",
+              "text-muted-light": "#6c757d",
+              "text-muted-dark": "#9e9e9e",
+              "border-light": "#e9ecef",
+              "border-dark": "#424242",
+            },
+            fontFamily: {
+              "display": ["Plus Jakarta Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+            boxShadow: {
+                'subtle': '0 4px 12px 0 rgba(0, 0, 0, 0.05)',
+                'subtle-dark': '0 4px 12px 0 rgba(0, 0, 0, 0.15)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+            font-size: 20px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+<div class="relative flex min-h-screen w-full flex-col">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-10 flex items-center border-b border-border-light dark:border-border-dark bg-background-light/80 dark:bg-background-dark/80 p-4 backdrop-blur-sm">
+<a href="categories.html" class="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5">
+<span class="material-symbols-outlined text-text-light dark:text-text-dark">close</span>
+</a>
+<h1 class="flex-1 text-center text-lg font-bold tracking-tight">Filter Recipes</h1>
+<button class="px-3 py-1.5 text-sm font-semibold text-primary hover:text-orange-700 dark:hover:text-orange-300">Reset</button>
+</header>
+<main class="flex-grow p-4 pb-24 sm:p-6 sm:pb-32">
+<div class="mx-auto max-w-2xl space-y-6">
+  <!-- Ingredient Card (collapsible) -->
+<details class="rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
+  <summary class="flex cursor-pointer items-center justify-between gap-4 p-4">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-2xl">nutrition</span>
+      <h2 class="text-lg font-bold">Ingredients</h2>
+    </div>
+    <span class="material-symbols-outlined text-primary">expand_more</span>
+  </summary>
+  <div class="px-4 pb-4 pt-1">
+    <div class="relative mb-4">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted-light dark:text-text-muted-dark">search</span>
+      <input class="w-full rounded-full border-gray-200 bg-gray-100 dark:bg-white/10 dark:border-border-dark py-2.5 pl-10 pr-4 text-sm focus:border-primary focus:ring-primary dark:placeholder-text-muted-dark" placeholder="Search ingredients..." type="text"/>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Chicken</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Beef</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Fish</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Pasta</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Liver</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Eggs</button>
+    </div>
+  </div>
+</details>
+<!-- Meal Type Card (collapsible) -->
+<details class="rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark" open>
+  <summary class="flex cursor-pointer items-center justify-between gap-4 p-4">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-2xl">restaurant_menu</span>
+      <h2 class="text-lg font-bold">Meal Type</h2>
+    </div>
+    <span class="material-symbols-outlined text-primary">expand_more</span>
+  </summary>
+  <div class="px-4 pb-4 pt-1">
+    <div class="flex flex-wrap gap-2">
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Breakfast</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Lunch</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Dinner</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Snack</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Appetizer</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Dessert</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Sauce</button>
+    </div>
+  </div>
+</details>
+<!-- Cooking Method Card (collapsible) -->
+<details class="rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
+  <summary class="flex cursor-pointer items-center justify-between gap-4 p-4">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-2xl">skillet</span>
+      <h2 class="text-lg font-bold">Cooking Method</h2>
+    </div>
+    <span class="material-symbols-outlined text-primary">expand_more</span>
+  </summary>
+  <div class="px-4 pb-4 pt-1">
+    <div class="flex flex-wrap gap-2">
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Bake</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Fry</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Grill</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Roast</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Slow Cook</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">No-Cook</button>
+    </div>
+  </div>
+</details>
+<!-- Dietary Card (collapsible) -->
+<details class="rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
+  <summary class="flex cursor-pointer items-center justify-between gap-4 p-4">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-2xl">eco</span>
+      <h2 class="text-lg font-bold">Dietary</h2>
+    </div>
+    <span class="material-symbols-outlined text-primary">expand_more</span>
+  </summary>
+  <div class="px-4 pb-4 pt-1">
+    <div class="flex flex-wrap gap-2">
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Vegetarian</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Vegan</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Gluten-Free</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Dairy-Free</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Low-Carb</button>
+    </div>
+  </div>
+</details>
+
+<!-- Flavour Card (collapsible) -->
+<details class="rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
+  <summary class="flex cursor-pointer items-center justify-between gap-4 p-4">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-2xl">local_dining</span>
+      <h2 class="text-lg font-bold">Flavour</h2>
+    </div>
+    <span class="material-symbols-outlined text-primary">expand_more</span>
+  </summary>
+  <div class="px-4 pb-4 pt-1">
+    <div class="flex flex-wrap gap-2">
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Sweet</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Savory</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Spicy</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Sour</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Bitter</button>
+    </div>
+  </div>
+</details>
+<!-- Budget and Ease Card (collapsible) -->
+<details class="rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
+  <summary class="flex cursor-pointer items-center justify-between gap-4 p-4">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-2xl">savings</span>
+      <h2 class="text-lg font-bold">Budget and Ease</h2>
+    </div>
+    <span class="material-symbols-outlined text-primary">expand_more</span>
+  </summary>
+  <div class="px-4 pb-4 pt-1">
+    <div class="flex flex-wrap gap-2">
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Budget Friendly</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Beginner Friendly</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Low Effort</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">30 Minutes or Less</button>
+    </div>
+  </div>
+</details>
+<!-- Drinks (collapsible) -->
+<details class="rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
+  <summary class="flex cursor-pointer items-center justify-between gap-4 p-4">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-2xl">savings</span>
+      <h2 class="text-lg font-bold">Drninks</h2>
+    </div>
+    <span class="material-symbols-outlined text-primary">expand_more</span>
+  </summary>
+  <div class="px-4 pb-4 pt-1">
+    <div class="flex flex-wrap gap-2">
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Cocktail</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Mocktail</button>
+            <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Coffee/Tea</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Juice</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Milkshake</button>
+      <button class="flex h-10 items-center justify-center gap-x-2 rounded-full bg-gray-100 dark:bg-white/10 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-white/20">Smoothie</button>
+    </div>
+  </div>
+</details>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-10">
+  <div class="mx-auto max-w-2xl px-4 pb-24">
+    <button class="w-full rounded-full bg-primary py-4 text-base font-bold text-white shadow-lg shadow-primary/30 hover:bg-orange-700 dark:shadow-primary/50">Show Recipes</button>
+  </div>
+  <footer class="border-t border-border-light dark:border-border-dark bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm pb-safe">
+    <nav class="mx-auto max-w-2xl flex h-20 items-center justify-around px-4">
+      <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="discovery-feed.html">
+        <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M240,64V192a16,16,0,0,1-16,16H160a24,24,0,0,0-24,24,8,8,0,0,1-16,0,24,24,0,0,0-24-24H32a16,16,0,0,1-16-16V64A16,16,0,0,1,32,48H88a32,32,0,0,1,32,32v88a8,8,0,0,0,16,0V80a32,32,0,0,1,32-32h56A16,16,0,0,1,240,64Z"></path>
+        </svg>
+        <p class="text-xs font-medium">Recipes</p>
+      </a>
+      <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="categories.html">
+        <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M80,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H88A8,8,0,0,1,80,64Zm136,56H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,64H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16ZM44,52A12,12,0,1,0,56,64,12,12,0,0,0,44,52Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,116Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,180Z"></path>
+        </svg>
+        <p class="text-xs font-medium">Categories</p>
+      </a>
+      <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="recipe-basic-info.html">
+        <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+        </svg>
+        <p class="text-xs font-medium">Add</p>
+      </a>
+      <a class="flex flex-col items-center justify-end flex-1 gap-1 text-primary" href="categories-browsing.html">
+        <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+        </svg>
+        <p class="text-xs font-bold">Search</p>
+      </a>
+      <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="user-profile.html">
+        <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+        </svg>
+        <p class="text-xs font-medium">Profile</p>
+      </a>
+    </nav>
+  </footer>
+</div>
+</div>
+<script>
+  // Function to calculate and update padding
+  function updateMainPadding() {
+    const main = document.querySelector('main');
+    const contentDiv = main.querySelector('.mx-auto.max-w-2xl');
+    const fixedBottomDiv = document.querySelector('.fixed.bottom-0');
+    
+    if (!contentDiv || !fixedBottomDiv) return;
+    
+    // Get actual heights
+    const contentHeight = contentDiv.scrollHeight;
+    const bottomBarHeight = fixedBottomDiv.offsetHeight;
+    const mainPaddingTop = parseInt(window.getComputedStyle(main).paddingTop);
+    
+    // Calculate total needed padding
+    const totalNeeded = contentHeight + bottomBarHeight + mainPaddingTop + 16; // 16px extra buffer
+    
+    main.style.paddingBottom = totalNeeded + 'px';
+  }
+  
+  // Toggle button selection on click (only filter buttons, not action buttons)
+  document.querySelectorAll('main details button').forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      // Toggle the selected state
+      const isSelected = this.classList.contains('bg-primary/10') && this.classList.contains('ring-2');
+      
+      if (isSelected) {
+        // Remove selected state
+        this.classList.remove('bg-primary/10', 'ring-2', 'ring-primary', 'font-semibold', 'text-primary');
+        this.classList.add('bg-gray-100', 'dark:bg-white/10', 'font-medium', 'text-text-light', 'dark:text-text-dark');
+      } else {
+        // Add selected state
+        this.classList.remove('bg-gray-100', 'dark:bg-white/10', 'font-medium', 'text-text-light', 'dark:text-text-dark');
+        this.classList.add('bg-primary/10', 'ring-2', 'ring-primary', 'font-semibold', 'text-primary');
+      }
+      
+      // Recalculate padding after button click
+      setTimeout(updateMainPadding, 50);
+    });
+  });
+  
+  // Listen for expand/collapse on details elements
+  document.querySelectorAll('main details').forEach(details => {
+    details.addEventListener('toggle', () => {
+      // Wait for animation to complete
+      setTimeout(updateMainPadding, 300);
+    });
+  });
+  
+  // Initial padding update
+  window.addEventListener('load', updateMainPadding);
+  updateMainPadding();
+</script>
+</body></html>

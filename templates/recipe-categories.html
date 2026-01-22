@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Step 4: Categorize Your Recipe</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#ec6d13",
+              "background-light": "#FEFDFB",
+              "background-dark": "#1a1817",
+              "text-light": "#1b130d",
+              "text-dark": "#f5f2f0",
+              "border-light": "#e7d9cf",
+              "border-dark": "#3a322c",
+              "card-light": "#FFFFFF",
+              "card-dark": "#2c2621",
+              "chip-light": "#f3ece7",
+              "chip-dark": "#3a322c",
+            },
+            fontFamily: {
+              "display": ["Plus Jakarta Sans", "Noto Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+  <link rel="stylesheet" href="../shared.css" />
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<!-- Top App Bar -->
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10 border-b border-border-light dark:border-border-dark">
+<a href="recipe-instructions.html" class="text-text-light dark:text-text-dark flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5">
+  <span class="material-symbols-outlined text-primary">arrow_back</span>
+</a>
+<h2 class="text-text-light dark:text-text-dark text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Add Recipe Category</h2>
+<div class="size-10"></div> <!-- Spacer to balance the header -->
+</header>
+<!-- Page Indicators (4 steps) -->
+<!-- Page Indicators (4 steps) -->
+<div class="flex w-full flex-row items-center justify-center gap-3 py-4" role="progressbar" aria-label="Step progress" aria-valuemin="1" aria-valuemax="4" aria-valuenow="4">
+  <div class="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
+  <div class="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
+  <div class="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
+  <div class="h-2 w-2 rounded-full progress-dot progress-dot--active" aria-hidden="true"></div>
+</div>
+<main class="flex-grow p-4 pb-28 sm:p-6 sm:pb-32">
+  <div class="mx-auto max-w-2xl space-y-6">
+<!-- Headline Text -->
+<!-- (removed -- page title now in header) -->
+<!-- Accordions with Chips -->
+<div class="flex flex-col gap-4">
+<!-- Meal Type Section -->
+<details class="flex flex-col rounded-lg border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark group">
+<summary class="flex cursor-pointer list-none items-center justify-between gap-4 p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">restaurant_menu</span>
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal">Meal Type</p>
+</div>
+<span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-300">expand_more</span>
+</summary>
+<div class="px-4 pb-4 pt-1">
+<div class="flex gap-2 flex-wrap">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Breakfast</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Lunch</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Dinner</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Snack</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Appetizer</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Dessert</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Drink</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Sauce</button>
+</div>
+</div>
+</details>
+<!-- Cooking Method Section -->
+<details class="flex flex-col rounded-lg border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark group">
+<summary class="flex cursor-pointer list-none items-center justify-between gap-4 p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">skillet</span>
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal">Cooking Method</p>
+</div>
+<span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-300">expand_more</span>
+</summary>
+<div class="px-4 pb-4 pt-1">
+<div class="flex gap-2 flex-wrap">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Baking</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Frying</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Grilling</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Roasting</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">No-Cook</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Slow Cook</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Steam</button>
+</div>
+</div>
+</details>
+<!-- Dietary Section -->
+<details class="flex flex-col rounded-lg border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark group">
+<summary class="flex cursor-pointer list-none items-center justify-between gap-4 p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">eco</span>
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal">Dietary</p>
+</div>
+<span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-300">expand_more</span>
+</summary>
+<div class="px-4 pb-4 pt-1">
+<div class="flex gap-2 flex-wrap">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Vegetarian</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Vegan</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Gluten-Free</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Dairy-Free</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Nut-Free</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Low-Carb</button>
+</div>
+</div>
+</details>
+<!-- Flavour Section -->
+<details class="flex flex-col rounded-lg border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark group">
+<summary class="flex cursor-pointer list-none items-center justify-between gap-4 p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">local_dining</span>
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal">Flavour</p>
+</div>
+<span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-300">expand_more</span>
+</summary>
+<div class="px-4 pb-4 pt-1">
+<div class="flex gap-2 flex-wrap">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Sweet</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Savory</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Spicy</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Sour</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Bitter</button>
+</div>
+</div>
+</details>
+<!-- Budget and Ease Section -->
+<details class="flex flex-col rounded-lg border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark group">
+<summary class="flex cursor-pointer list-none items-center justify-between gap-4 p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">savings</span>
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal">Budget and Ease</p>
+</div>
+<span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-300">expand_more</span>
+</summary>
+<div class="px-4 pb-4 pt-1">
+<div class="flex gap-2 flex-wrap">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Budget Friendly</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Beginner Friendly</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">Low Effort</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 text-sm font-medium text-text-light dark:text-text-dark bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20">30 Minutes or Less</button>
+</div>
+</div>
+</details>
+</div>
+</main>
+<!-- Bottom Navigation Buttons -->
+<footer class="fixed bottom-0 left-0 right-0 z-10 bg-background-light dark:bg-background-dark p-4 border-t border-border-light dark:border-border-dark">
+  <div class="mx-auto max-w-2xl">
+    <button class="w-full rounded-full bg-primary py-4 text-base font-bold text-white shadow-lg shadow-primary/30 hover:bg-orange-700 dark:shadow-primary/50 flex items-center justify-center gap-2">Publish Recipe <span class="material-symbols-outlined">check</span></button>
+  </div>
+</footer>
+</div>
+<script>
+  // Toggle button selection on click (only filter buttons, not action buttons)
+  document.querySelectorAll('main details button').forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      // Toggle the selected state
+      const isSelected = this.classList.contains('bg-primary/10') && this.classList.contains('ring-2');
+      
+      if (isSelected) {
+        // Remove selected state
+        this.classList.remove('bg-primary/10', 'ring-2', 'ring-offset-2', 'ring-primary', 'ring-offset-card-light', 'dark:ring-offset-card-dark', 'font-semibold', 'text-primary');
+        this.classList.add('bg-gray-100', 'dark:bg-white/10', 'font-medium', 'text-text-light', 'dark:text-text-dark');
+      } else {
+        // Add selected state
+        this.classList.remove('bg-gray-100', 'dark:bg-white/10', 'font-medium', 'text-text-light', 'dark:text-text-dark');
+        this.classList.add('bg-primary/10', 'ring-2', 'ring-offset-2', 'ring-primary', 'ring-offset-card-light', 'dark:ring-offset-card-dark', 'font-semibold', 'text-primary');
+      }
+    });
+  });
+</script>
+</body></html>

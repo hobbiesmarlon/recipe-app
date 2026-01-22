@@ -1,0 +1,23 @@
+fastapi
+uvicorn[standard]
+SQLAlchemy>=1.4
+asyncpg
+alembic
+pydantic
+python-jose[cryptography]   # for JWT
+passlib[bcrypt]
+httpx
+boto3
+python-multipart
+celery[sqs]
+python-dotenv
+rapidfuzz     # for local dev matching if needed
+pytest
+pytest-asyncio
+pydantic-settings
+alembic
+PyJWT
+faker
+ffmpeg-python
+pillow
+requests

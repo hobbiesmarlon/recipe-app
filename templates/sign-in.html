@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Connect Twitter</title>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec6d13",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221810",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-black dark:text-white">
+<div class="relative flex min-h-screen w-full flex-col justify-between overflow-x-hidden">
+    <div class="flex-grow">
+        <header class="py-4 sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+            <div class="mx-auto max-w-2xl px-4 flex items-center justify-between">
+                <button class="p-2">
+                    <span class="material-symbols-outlined text-black dark:text-white">close</span>
+                </button>
+                <h1 class="text-lg font-bold text-center flex-grow -ml-10">Connect Twitter</h1>
+                <div class="w-10"></div>
+            </div>
+        </header>
+
+        <main class="flex flex-col items-center justify-center text-center px-4 mx-auto max-w-2xl flex-grow">
+<div class="mb-8">
+<svg class="mx-auto text-primary" fill="none" height="64" viewBox="0 0 24 24" width="64" xmlns="http://www.w3.org/2000/svg">
+<path d="M22.937 5.104c-.84.373-1.744.624-2.684.736a4.703 4.703 0 0 0 2.053-2.585 9.404 9.404 0 0 1-2.968 1.134 4.693 4.693 0 0 0-8.005 4.278A13.31 13.31 0 0 1 1.76 3.42a4.693 4.693 0 0 0 1.45 6.265 4.658 4.658 0 0 1-2.124-.587v.06c0 2.33 1.657 4.273 3.856 4.713a4.7 4.7 0 0 1-2.118.08 4.695 4.695 0 0 0 4.38 3.258 9.42 9.42 0 0 1-5.83 2.01c-.378 0-.752-.022-1.12-.066a13.25 13.25 0 0 0 7.187 2.106c8.623 0 13.336-7.145 13.336-13.336 0-.203-.005-.405-.014-.606a9.545 9.545 0 0 0 2.34-2.428z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-2xl font-bold mb-2">Connect your Twitter account</h2>
+<p class="text-base text-black/70 dark:text-white/70 mb-8">
+                It helps with identity and familiarity, allowing users and visitors to recognize creators from X.
+            </p>
+<button class="w-full max-w-sm bg-primary text-white font-bold py-3 px-5 rounded-lg">
+                Connect to Twitter
+            </button>
+<div class="flex items-center w-full max-w-sm my-6">
+<div class="flex-grow border-t border-black/20 dark:border-white/20"></div>
+<span class="flex-shrink mx-4 text-black/60 dark:text-white/60">or</span>
+<div class="flex-grow border-t border-black/20 dark:border-white/20"></div>
+</div>
+<div class="w-full max-w-sm space-y-4">
+<button class="w-full bg-[#4285F4] text-white font-bold py-3 px-5 rounded-lg flex items-center justify-center">
+<svg class="mr-2" fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_105_274)"><path d="M19.82 10.2244C19.82 9.52438 19.75 8.84438 19.63 8.18438H10.2V11.9644H15.65C15.42 13.2244 14.77 14.3244 13.82 15.0244V17.4744H16.92C18.79 15.8244 19.82 13.2744 19.82 10.2244Z" fill="white"></path><path d="M10.2001 20.0001C12.9601 20.0001 15.2901 19.1101 16.9201 17.4701L13.8201 15.0201C12.9201 15.6201 11.7101 16.0001 10.2001 16.0001C7.38008 16.0001 4.96008 14.0101 4.13008 11.3901H0.960083V13.9201C2.58008 17.3801 6.09008 20.0001 10.2001 20.0001Z" fill="white"></path><path d="M4.12992 11.39C3.93992 10.84 3.82992 10.25 3.82992 9.64998C3.82992 9.04998 3.93992 8.45998 4.12992 7.90998V5.37998H0.959917C0.349917 6.61998 0.00991738 7.99998 0.00991738 9.64998C0.00991738 11.3 0.349917 12.68 0.959917 13.92L4.12992 11.39Z" fill="white"></path><path d="M10.2001 3.9999C11.6401 3.9999 12.8201 4.4999 13.7601 5.3899L16.9801 2.1699C15.2801 0.639901 12.9601 -0.000100095 10.2001 -0.000100095C6.09008 -0.000100095 2.58008 2.6199 0.960083 6.0799L4.13008 8.6099C4.96008 5.9899 7.38008 3.9999 10.2001 3.9999Z" fill="white"></path></g><defs><clipPath id="clip0_105_274"><rect fill="white" height="20" width="20"></rect></clipPath></defs></svg>
+Sign up with Google
+</button>
+
+</div>
+        </main>
+    </div>
+
+    <footer class="fixed bottom-0 left-0 right-0 border-t border-primary/20 dark:border-primary/30 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm pb-safe">
+        <nav class="mx-auto max-w-2xl flex h-20 items-center justify-around px-4">
+            <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="discovery-feed.html">
+                <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M240,64V192a16,16,0,0,1-16,16H160a24,24,0,0,0-24,24,8,8,0,0,1-16,0,24,24,0,0,0-24-24H32a16,16,0,0,1-16-16V64A16,16,0,0,1,32,48H88a32,32,0,0,1,32,32v88a8,8,0,0,0,16,0V80a32,32,0,0,1,32-32h56A16,16,0,0,1,240,64Z"></path>
+                </svg>
+                <p class="text-xs font-medium">Recipes</p>
+            </a>
+            <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="categories.html">
+                <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M80,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H88A8,8,0,0,1,80,64Zm136,56H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,64H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16ZM44,52A12,12,0,1,0,56,64,12,12,0,0,0,44,52Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,116Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,180Z"></path></svg>
+                <p class="text-xs font-medium">Categories</p>
+            </a>
+            <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="recipe-basic-info.html">
+                <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
+                <p class="text-xs font-medium">Add</p>
+            </a>
+            <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="categories-browsing.html">
+          <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+          </svg>
+          <p class="text-xs font-medium">Search</p>
+        </a>
+            <a class="flex flex-col items-center justify-end flex-1 gap-1 text-subtle-light dark:text-subtle-dark hover:text-primary dark:hover:text-primary" href="user-profile.html">
+                <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path></svg>
+                <p class="text-xs font-medium">Profile</p>
+            </a>
+        </nav>
+    </footer>
+</div>
+</body></html>
