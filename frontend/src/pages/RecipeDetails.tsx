@@ -8,26 +8,26 @@ const RecipeDetails: React.FC = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  const minSwipeDistance = 50;
+  const minSwipeDistance = 35;
 
   const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
   };
 
-  const onTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX);
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStart === null) return;
+    
+    const touchEnd = e.changedTouches[0].clientX;
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
     
+    // Reset start point
+    setTouchStart(null);
+
     if (isLeftSwipe && activeTab === 'ingredients') {
       setActiveTab('instructions');
-    }
-    if (isRightSwipe && activeTab === 'instructions') {
+    } else if (isRightSwipe && activeTab === 'instructions') {
       setActiveTab('ingredients');
     }
   };
@@ -86,29 +86,25 @@ const RecipeDetails: React.FC = () => {
         
         {/* Navigation & Actions */}
         <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-10">
-          <Link to="/" className="p-2 rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/40 transition-colors">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
+          <Link to="/" className="text-white hover:text-primary transition-all active:scale-95">
+            <span className="material-symbols-rounded text-[28px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">arrow_back</span>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
              <button 
               onClick={handleShare}
-              className="p-2 rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/40 transition-colors"
+              className="text-white hover:text-primary transition-all active:scale-95"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.368a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
-              </svg>
+              <span className="material-symbols-rounded text-[28px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">share</span>
             </button>
             <button 
               onClick={() => setIsLiked(!isLiked)}
-              className="transition-transform active:scale-95"
+              className="transition-transform active:scale-95 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]"
             >
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 viewBox="0 0 24 24" 
-                fill={isLiked ? 'currentColor' : 'rgba(0,0,0,0.5)'} 
-                className={`w-8 h-8 transition-colors ${
+                fill={isLiked ? 'currentColor' : 'none'} 
+                className={`w-7 h-7 transition-colors ${
                   isLiked 
                     ? 'text-primary' 
                     : 'text-white stroke-white'
@@ -152,7 +148,7 @@ const RecipeDetails: React.FC = () => {
           <div className="sticky top-0 z-20 bg-background-light dark:bg-background-dark flex border-b border-gray-200 dark:border-gray-700 mb-6 pt-2">
             <button
               onClick={() => setActiveTab('ingredients')}
-              className={`flex-1 pb-3 text-sm font-bold text-center transition-colors ${
+              className={`flex-1 pb-3 text-sm font-bold text-center transition-all duration-300 ${
                 activeTab === 'ingredients'
                   ? 'border-b-2 border-primary text-primary'
                   : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
@@ -162,7 +158,7 @@ const RecipeDetails: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('instructions')}
-              className={`flex-1 pb-3 text-sm font-bold text-center transition-colors ${
+              className={`flex-1 pb-3 text-sm font-bold text-center transition-all duration-300 ${
                 activeTab === 'instructions'
                   ? 'border-b-2 border-primary text-primary'
                   : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
@@ -174,17 +170,17 @@ const RecipeDetails: React.FC = () => {
 
           {/* Content */}
           <div 
-            className="animate-fadeIn min-h-[200px]"
+            key={activeTab}
+            className="animate-fadeIn min-h-[200px] touch-pan-y"
             onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
           >
             {activeTab === 'ingredients' ? (
               <ul className="space-y-3 pb-6">
                 {recipe.ingredients.map((item, index) => (
-                  <li key={index} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                  <li key={index} className="flex items-start gap-3 p-3 border-b border-gray-100 dark:border-gray-800 last:border-0">
                     <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0"></span>
-                    <span className="text-gray-800 dark:text-gray-200">{item}</span>
+                    <span className="text-gray-800 dark:text-gray-200 font-medium">{item}</span>
                   </li>
                 ))}
               </ul>

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router';
+import { DesktopNav } from '../components/DesktopNav';
 
 const Layout: React.FC = () => {
   const location = useLocation();
@@ -15,13 +16,12 @@ const Layout: React.FC = () => {
     themeClass = 'theme-browsing';
   }
 
-  // Update body class for global theme background if needed, 
-  // but better to wrap the app content.
-  // We apply the class to the main wrapper.
-
   return (
-    <div className={`min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display transition-colors duration-200 ${themeClass}`}>
-      <Outlet />
+    <div className={`min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display transition-colors duration-200 flex flex-col ${themeClass}`}>
+      <DesktopNav />
+      <div className="flex-1">
+        <Outlet />
+      </div>
     </div>
   );
 };

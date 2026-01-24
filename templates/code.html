@@ -2,132 +2,300 @@
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Stitch Design</title>
-<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<title>Recipe Discovery</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
+<script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#f48525",
-                        "background-light": "#f8f7f5",
-                        "background-dark": "#221810",
+                        primary: "#F28C28", // Orange from screenshot
+                        "background-light": "#F9FAFB", // Very light gray for page bg
+                        "background-dark": "#111827", // Dark gray for dark mode
+                        "surface-light": "#FFFFFF", // White for cards/nav
+                        "surface-dark": "#1F2937", // Darker gray for cards/nav
+                        "text-light": "#1F2937",
+                        "text-dark": "#F3F4F6",
+                        "muted-light": "#6B7280",
+                        "muted-dark": "#9CA3AF",
                     },
                     fontFamily: {
-                        "display": ["Plus Jakarta Sans"]
+                        display: ["Poppins", "sans-serif"],
                     },
-                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                    borderRadius: {
+                        DEFAULT: "1rem", // Soft rounded corners
+                    },
                 },
             },
-        }
+        };
     </script>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
-  </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-[#111827] dark:text-white">
-<div class="relative flex h-auto min-h-screen w-full flex-col justify-between overflow-x-hidden">
-<div class="flex-grow">
-<header class="sticky top-0 z-10 flex items-center justify-between border-b border-black/10 dark:border-white/10 bg-background-light/80 dark:bg-background-dark/80 p-4 backdrop-blur-sm">
-<h1 class="flex-1 text-center text-lg font-bold">Categories</h1>
-<button class="flex h-10 w-10 items-center justify-center rounded-full text-black dark:text-white">
-<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
-<path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
-</svg>
+<style>html { scroll-behavior: smooth; }::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #4B5563; }.material-symbols-rounded {
+            vertical-align: middle;
+            font-size: 1.25rem;
+        }
+        .icon-lg { font-size: 1.5rem; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display transition-colors duration-300">
+<nav class="sticky top-0 z-50 bg-surface-light/90 dark:bg-surface-dark/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-20">
+<div class="flex-shrink-0 flex items-center gap-2 cursor-pointer">
+<span class="material-symbols-rounded text-primary icon-lg">menu_book</span>
+<span class="text-2xl font-bold text-gray-900 dark:text-white">CookBook</span>
+</div>
+<div class="hidden md:flex flex-1 max-w-lg mx-8">
+<div class="relative w-full">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-rounded text-muted-light dark:text-muted-dark">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2.5 border-none rounded-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-muted-light dark:placeholder-muted-dark focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-700 transition-all shadow-inner" placeholder="Search recipes, ingredients, chefs..." type="text"/>
+</div>
+</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-primary font-medium flex items-center gap-1" href="#">
+<span class="material-symbols-rounded">restaurant_menu</span> Recipes
+                    </a>
+<a class="text-muted-light dark:text-muted-dark hover:text-primary dark:hover:text-primary transition-colors font-medium flex items-center gap-1" href="#">
+<span class="material-symbols-rounded">category</span> Categories
+                    </a>
+<a class="text-muted-light dark:text-muted-dark hover:text-primary dark:hover:text-primary transition-colors font-medium flex items-center gap-1" href="#">
+<span class="material-symbols-rounded">add_circle</span> Add Recipe
+                    </a>
+<div class="relative ml-2">
+<button class="flex items-center gap-2 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+<img alt="User Profile" class="h-10 w-10 rounded-full object-cover border-2 border-white dark:border-gray-600 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgZUy9lKqsq6OEgx6Yl1Y7bLUWYcvCyVMj3do-zz4JOAByEmwb6fo98gcI9YAL94Gc6bP8xAbKEg0MRcSIyr2H9oR3zeA-06QAK2hdyRPJgJd4jMJtsQR487ELuGs0Ax0jU1B30zVJbpIStNBZMoP_mlPVyf6vIEWTR6MGF5SgdX9FODwGTPZPp7ksM4Yrlzxs9ZIJkqoI7ZCAXiGQ3NzpQxTuuMI2AKoHTNNrC_iIpuH5imuEQlWmadVug-EQiUYKh_-4x02LdpEl"/>
 </button>
-</header>
-<main class="pb-24">
-<div class="space-y-8 pt-6">
-<section>
-<h2 class="px-4 text-2xl font-bold">Meals</h2>
-<div class="mt-3 flex space-x-4 overflow-x-auto pl-4 pr-6 pb-4 [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
-<div class="w-40 flex-shrink-0 space-y-2">
-<div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDjoelberBs8Fo3VSD3DmAY49iH4_t2Knn-KuV1lksyOnrRWky0p_-PGB_YyKE4WqghpElvpDa_DXlM51A4yLlBJ8cUZ6AF2oC3FIWsQy6RYNaxDVmc5effPsWSqc6ExEcyy3aKTvoDjjtmbAr2o2HWxBtl1eG5ODqMn24zBUq0zEDe9BvtYbKrHm1BHmhacPIVXWlDm-h6NlB5IlKry6DoHhplqPdMl7hg00qhk7ykVj6Iuh2lYAsiZKRsfX-GmYWzdFKaOBsId-s");'></div>
-<p class="text-sm font-medium">Pasta Perfection</p>
-</div>
-<div class="w-40 flex-shrink-0 space-y-2">
-<div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCAq8PcmypVd9IYAG12BH1YMNSbD-fVYkXwqQ8GZMWK150uBlOUduwxyzb_c1mdQazi66F3k1GrICsI7XPs7jINIEQJ-z9nYbCWCV53yGtF3rep85swuXp_OwXSlEEGQe75mdsi27PCotPeNq8qYbyHWCX5Y5JVl8TsQmgwyxhc2M6eSVXMvsZR-hP1C--_H0i0VeQNd1qGew_AkcSCizC57EcGGie-7iaQch4OxoOt8KxQVx4TQRnBXp8rbjIUGx8zEblcdOWyCcY");'></div>
-<p class="text-sm font-medium">Asian Delights</p>
-</div>
-<div class="w-40 flex-shrink-0 space-y-2">
-<div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuANOHjQx8va6piCmwC0uHa6jMwMZuZ72kga8deZYIWAz5LhgttIDLBcWEex-WlrK0oGiHGpk-vpeJ9B3VzTsv1GNatn5BokWIf2WFgTLlNhswOVVpqsgowokSCFpTveRyOoHYbz0TghJ1b14XMWYYJTFH6t0ansdz7Y_RnIijyFa3yoy29pXT8i6Is9sTs0siXo22KxplqX0zJqP0X2qCQRQAoZdIttTB2Wy6WFBEoVVBXGhMQoKn2bb15El5vzESsG0yTR59IQZdc");'></div>
-<p class="text-sm font-medium">Seafood Sensations</p>
 </div>
 </div>
-</section>
-<section>
-<h2 class="px-4 text-2xl font-bold">Desserts</h2>
-<div class="mt-3 flex space-x-4 overflow-x-auto pl-4 pr-6 pb-4 [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
-<div class="w-40 flex-shrink-0 space-y-2">
-<div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCeNS3P0mRNoo9NUJpQlyi_fdFSh9Hs8ZCJj5L3A95KVT2JkYBNt6If3-i561Oe1LSAmUqD2SMQn10LrfNJ95lT5g5XEtxDoxtlgx673eY7ibE32ZtV_AjMv8YSTe7gTk6JVOen_RgoTStjYgc8YKuX91qQBX0YjuCdPB6s5dqpNnaf2M26qtHUUFh1PfYN9esFTxM7uKnbRe07p_oxisLElrhzqs38iSoPbK9BYxNKtKTS8S52YI3rv8fQJF7whenv3SqeyG2ScJM");'></div>
-<p class="text-sm font-medium">Chocolate Indulgence</p>
-</div>
-<div class="w-40 flex-shrink-0 space-y-2">
-<div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB2JPdayOYnHhnswDTtIYM_MgxIX15pETas7cWb3xEvcCb4dGMFvvHDYedWUhQQ8y_ZsBeoN-tYiVZO4ulGBwoHKGGnyF1ixJ8SuZjoPETzqz5bfNe_1VeMEo7PAlow6VQ0SdpvpS6e3L9Yo1t1VoPFFUxBFaD0Q8i4CwngCuAe3fG1ziXYkm2YuBG8slTBhTaka6dfN4jW5nlxdQn4ORXP02Qs-mCkkKn0akEEzSfZ2oEuR0Y7R89KYCgQkguaZiqRUoGkVnIVbdw");'></div>
-<p class="text-sm font-medium">Fruity Freshness</p>
-</div>
-<div class="w-40 flex-shrink-0 space-y-2">
-<div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC3a4BYtD7np2rprMbEmAU30KmFKlFPHoxbh0zPvdDyVhAOTBAPW6kUL4l7-ZZnDS-rhF6YZnCnHlpGXAwLpQCNWlXvfsyEIhU04maR7KqDwWO4VLpwYQDkqSZ94IoSlnU4EwK7sviZ7UXMTsgCpLB4qkEZDHmbaFCmKNTCgAjjRBllMG-S3JThg3-vef02JyIzQXyY5dfohlARNg9vBIXaDeiLVRdXCjLdJhW0xJiSWHDL0laCXg6fbQBvn_mLp9DGL58Ll874uLs");'></div>
-<p class="text-sm font-medium">Frozen Treats</p>
+<div class="md:hidden flex items-center">
+<button class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none">
+<span class="material-symbols-rounded icon-lg">menu</span>
+</button>
 </div>
 </div>
-</section>
-<section>
-<h2 class="px-4 text-2xl font-bold">Baking</h2>
-<div class="mt-3 flex space-x-4 overflow-x-auto pl-4 pr-6 pb-4 [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
-<div class="w-40 flex-shrink-0 space-y-2">
-<div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB84xw7t8VgGsjH2ZIllKa0TLFvcfg7dcmiuZHJtAaZ76jUEfuqOgDdqC33X_CLtJh8HblfxWjONkshmXP0gf2tww8Oepg-Y22rCxGI9zHgmj7KAS5kCKns5DE7Ai_EEI3Vrs7J0z8ZFLB3E_UlNuBk6PVhYyheywqNEBhzD-eK42st44ooagR5erLiyWtzCILI04tKSBup5ZqEu6HKyYTTNdG4j_xWu8xPcqwQ-ecI_3gf2GEFos1x1yJOU4zR8KoXP_rWvSjqzxY");'></div>
-<p class="text-sm font-medium">Homemade Breads</p>
 </div>
-<div class="w-40 flex-shrink-0 space-y-2">
-<div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBbZHrCtcOj4M79bzkftochqnq1jFZUixf0Pf90wvUO2zzgi98RrtMIqIutd_rbbIFXvknvjnv9wOBbM7l0ZiS5ORVLgbzbxqHAuaNueQ5SFjL0Qlcgci8acjLda1RwvzvH0QD62HFs_onfKuaDI0p3rYYqKwW9gzC_1_L1bkfPiwnSoDLHLwbyTr-nJK4XxcCwJPp3Qb0u6c0P_mOdpT1C2ZK_vc6Rr6bV4G7sRohGbx7kQdyd3u5yLM492P_T5E4fv8koixIe1j0");'></div>
-<p class="text-sm font-medium">Cookie Creations</p>
+</nav>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+<h2 class="text-2xl font-bold text-gray-900 dark:text-white">Discover Recipes</h2>
+<div class="flex space-x-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+<button class="px-6 py-2 bg-primary text-white rounded-full font-medium shadow-md shadow-orange-500/20 transition-all whitespace-nowrap">
+                    Latest
+                </button>
+<button class="px-6 py-2 bg-transparent text-muted-light dark:text-muted-dark hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full font-medium transition-all whitespace-nowrap">
+                    Most Viewed
+                </button>
+<button class="px-6 py-2 bg-transparent text-muted-light dark:text-muted-dark hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full font-medium transition-all whitespace-nowrap">
+                    Most Liked
+                </button>
+<button class="px-6 py-2 bg-transparent text-muted-light dark:text-muted-dark hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full font-medium transition-all whitespace-nowrap">
+                    Easy &amp; Quick
+                </button>
 </div>
-<div class="w-40 flex-shrink-0 space-y-2">
-<div class="aspect-square w-full rounded-xl bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC1V4MglmPKFWtcoMWz61ybjmkk9y1BnCCbFaUxxK3-zc5wsO7H2I_UP2d8yqwMCrMcdAXJshXmpfRdhbK3wEbQMrjNiQlUmKls3vt3p7RP3-_nwEnLqWTGcHxJxoZEFoeilD8ERQpIgMNmgtwMf6D3_eV9N-3ro8li5Nl4H-iElTH5cEiOZFlvuJvwm0fsFzypdD9DxyOBHTJYntN_blERWDd9DTZirRSAEqtLNVvLD1Ld6TQoyyWDu_EGc8qjJcjQLzsGBDY927k");'></div>
-<p class="text-sm font-medium">Morning Muffins</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+<article class="group bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 transform hover:-translate-y-1 overflow-hidden flex flex-col">
+<div class="relative h-64 overflow-hidden">
+<img alt="Spicy Thai Basil Chicken" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCensuNpgpWfXBqgQEfeOjj3mKQJCOflEpQktjc5MOZ17rA1jaWWJwuUZvIoQGgfIsHH-y7SaWj0a5aZOE73AhBm5dTJM-ar4cILk-TEwgDPQwn6KQl4Jl-kT2VA_m7PgxXzNBxbKlVEIqeuXuqBoKnQPWjk2lpNqsrvB1nit4XRmJpG9jZeuSWzOIDZLlnZbbNZxw_2_HjinXIWneq2RrVEVjKh4hR29PoANwkDoz4VUDHnS6TfOMatLeGnAW0QOmOzM5lyTDoxQUk"/>
+<button class="absolute top-4 right-4 p-2 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors shadow-sm">
+<span class="material-symbols-rounded text-white dark:text-white" style="font-variation-settings: 'FILL' 0;">favorite</span>
+</button>
+<div class="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
+<div class="w-6 h-1.5 bg-white rounded-full"></div>
+<div class="w-1.5 h-1.5 bg-white/50 rounded-full"></div>
+<div class="w-1.5 h-1.5 bg-white/50 rounded-full"></div>
 </div>
 </div>
-</section>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">Spicy Thai Basil Chicken</h3>
+</div>
+<p class="text-muted-light dark:text-muted-dark text-sm mb-4 line-clamp-2">
+                        A flavorful dish with a kick, perfect for a quick weeknight dinner. Fresh basil is the key.
+                    </p>
+<div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+<div class="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+<span class="flex items-center gap-1"><span class="material-symbols-rounded text-lg">timer</span> 30 min</span>
+<span class="flex items-center gap-1"><span class="material-symbols-rounded text-lg">group</span> 4 servings</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+<span class="material-symbols-rounded text-lg">share</span> Share
+                        </button>
+</div>
+</div>
+</article>
+<article class="group bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 transform hover:-translate-y-1 overflow-hidden flex flex-col">
+<div class="relative h-64 overflow-hidden">
+<img alt="Classic Tomato Spaghetti" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDE2BTKr8nuwEuyJY7E5f7VIvrwFM3OJ19TlwFpe9PE_g9AizYuuQLIGQQZ79PxxDRamXgsDCpCgDubQN4XnVs58NQ0MMbj7yC2-7ZIsYZUKox8dyT3EA2w_ONCW2zG4Kuo_IePC6QhOn7IjJshOTzVjGVM5EbPMupU7Unksk_68CmIp1Hm98qni3H2FhWIOHJ_WcsNTKqmc2HnSyehfBDxnOpnGJrQHT0Ix2v8MuLrpKl9rYingNPzjlrGqpAPctwqSe7BV_IAmJWs"/>
+<button class="absolute top-4 right-4 p-2 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors shadow-sm">
+<span class="material-symbols-rounded text-white dark:text-white" style="font-variation-settings: 'FILL' 0;">favorite</span>
+</button>
+<button class="absolute top-1/2 left-2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-full text-white">
+<span class="material-symbols-rounded">chevron_left</span>
+</button>
+<button class="absolute top-1/2 right-2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-full text-white">
+<span class="material-symbols-rounded">chevron_right</span>
+</button>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">Classic Tomato Spaghetti</h3>
+</div>
+<p class="text-muted-light dark:text-muted-dark text-sm mb-4 line-clamp-2">
+                        Simple, rustic, and incredibly delicious. Made with vine-ripened tomatoes and fresh herbs.
+                    </p>
+<div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+<div class="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+<span class="flex items-center gap-1"><span class="material-symbols-rounded text-lg">timer</span> 25 min</span>
+<span class="flex items-center gap-1"><span class="material-symbols-rounded text-lg">group</span> 2 servings</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+<span class="material-symbols-rounded text-lg">share</span> Share
+                        </button>
+</div>
+</div>
+</article>
+<article class="group bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 transform hover:-translate-y-1 overflow-hidden flex flex-col">
+<div class="relative h-64 overflow-hidden">
+<img alt="Quinoa Avocado Salad" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjQIQQnnP6jIEnL-0RIuDVhM7gMRnGUvcqgqKyYlwgkt6iJ1BFglKn5sS41DlbUDCHBGJA_wSkSUEeYrmzasgd-YeKe3eVS7TPqDCZKPVgLzNSojGTRhylrk2ExQlYDPlx1naU6mWfE0TPsz_6yuREtVbcij49URqQvONECKYRhGwTjYoKIMgpIUOt3WxvbY6mxOhD9_XTTAVEiNaZzYAwn8FL7rXY23WEEnVWhCR_pT1ObxarCX0_KCkWNITcDiZAmWO28b7LOZ2s"/>
+<button class="absolute top-4 right-4 p-2 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors shadow-sm">
+<span class="material-symbols-rounded text-red-500" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">Quinoa Avocado Salad</h3>
+</div>
+<p class="text-muted-light dark:text-muted-dark text-sm mb-4 line-clamp-2">
+                        A power bowl packed with nutrients, featuring roasted chickpeas, avocado, and lime dressing.
+                    </p>
+<div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+<div class="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+<span class="flex items-center gap-1"><span class="material-symbols-rounded text-lg">timer</span> 15 min</span>
+<span class="flex items-center gap-1"><span class="material-symbols-rounded text-lg">group</span> 1 serving</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+<span class="material-symbols-rounded text-lg">share</span> Share
+                        </button>
+</div>
+</div>
+</article>
+<article class="group bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 transform hover:-translate-y-1 overflow-hidden flex flex-col">
+<div class="relative h-64 overflow-hidden">
+<img alt="Berry Parfait" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCX2zePpdVQG369xlppT4EvwseSTpIR4M16aMiFIr80_cQEPO8JHP7kOoESN1viX10ddVbf-9cj3B2rFtA0rSP0SMlRHK8_y_T8Ul_XuIVxgs4k4yyuRkyXwjQWo_LXxzwf4jz8C3FCEy_p_uZl1ebWIxJr8TfpP3WMscyBaqWgxS796JinQ9NQSQ-ZVH2CB9Exg68uCP_fYnV9Y7Htyvhwx6U_Bz4A0p4rdoR530rBxGk9Dv3cKhX7tvHHRLsPCBvipBxoppreF2tt"/>
+<button class="absolute top-4 right-4 p-2 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors shadow-sm">
+<span class="material-symbols-rounded text-white dark:text-white" style="font-variation-settings: 'FILL' 0;">favorite</span>
+</button>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">Summer Berry Parfait</h3>
+</div>
+<p class="text-muted-light dark:text-muted-dark text-sm mb-4 line-clamp-2">
+                        Light, refreshing, and sweet. Layers of greek yogurt, granola, and fresh seasonal berries.
+                    </p>
+<div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+<div class="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+<span class="flex items-center gap-1"><span class="material-symbols-rounded text-lg">timer</span> 10 min</span>
+<span class="flex items-center gap-1"><span class="material-symbols-rounded text-lg">group</span> 2 servings</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+<span class="material-symbols-rounded text-lg">share</span> Share
+                        </button>
+</div>
+</div>
+</article>
+<article class="group bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 transform hover:-translate-y-1 overflow-hidden flex flex-col">
+<div class="relative h-64 overflow-hidden">
+<img alt="Grilled Ribeye Steak" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACjYrvK7jk6Mojo5E0QhoPMu3tmmZbKn_V_YnZMYCgnIkOkLr62-8hlQiQYWPthh0NEibjiCedJcQOilcZNURvy6UwYpW3_6um6wTk5OUoLCQp-55EGbRQt6MYfPmxwzMc_B24hd2k_NWg6GqBfaRzMRw-gjncU9t8PZJZcM7LEcykDM-vDjTwqbMiYiY2N8iqqe4cRDhC5uGBhj5X_k1xv9vqhuIwP0xo3D_iftB-pzOQBbK1VPwkzLzd_7zpD4XVM3kiTJqxzkCu"/>
+<button class="absolute top-4 right-4 p-2 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors shadow-sm">
+<span class="material-symbols-rounded text-white dark:text-white" style="font-variation-settings: 'FILL' 0;">favorite</span>
+</button>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">Grilled Ribeye Steak</h3>
+</div>
+<p class="text-muted-light dark:text-muted-dark text-sm mb-4 line-clamp-2">
+                        Juicy ribeye steak seasoned with garlic butter and rosemary. Best served medium-rare.
+                    </p>
+<div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+<div class="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+<span class="flex items-center gap-1"><span class="material-symbols-rounded text-lg">timer</span> 20 min</span>
+<span class="flex items-center gap-1"><span class="material-symbols-rounded text-lg">group</span> 2 servings</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+<span class="material-symbols-rounded text-lg">share</span> Share
+                        </button>
+</div>
+</div>
+</article>
+<article class="group bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 transform hover:-translate-y-1 overflow-hidden flex flex-col">
+<div class="relative h-64 overflow-hidden">
+<img alt="Fluffy Pancakes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCu0lldPAvve15SvvHpiNsk6jyRyUsVBc44bd-g590jZBgJM4O-6nGdinZflRRxDENg6nyy2sFHzUdil-zeV0jAvzxVOe_nEw0EE6eROY7CBtebbbHv6Ci1wDIzVGdSvxQwr3PX4lOfOhJxmKn6pMv2rFD3iE2QCHH7cB23TZ-OjAwn4oVhmDln8y9uPr0zRBAkjMI2h4bbo3Vpg9HdHo8IOk7Jxn11ADVZy1EPE089VmuLUC1f5DNeezqORvvnXuu0Yj0guGAyHkBO"/>
+<button class="absolute top-4 right-4 p-2 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors shadow-sm">
+<span class="material-symbols-rounded text-white dark:text-white" style="font-variation-settings: 'FILL' 0;">favorite</span>
+</button>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">Fluffy Blueberry Pancakes</h3>
+</div>
+<p class="text-muted-light dark:text-muted-dark text-sm mb-4 line-clamp-2">
+                        Start your morning right with these airy, golden pancakes topped with maple syrup.
+                    </p>
+<div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+<div class="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+<span class="flex items-center gap-1"><span class="material-symbols-rounded text-lg">timer</span> 25 min</span>
+<span class="flex items-center gap-1"><span class="material-symbols-rounded text-lg">group</span> 3 servings</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+<span class="material-symbols-rounded text-lg">share</span> Share
+                        </button>
+</div>
+</div>
+</article>
+</div>
+<div class="flex justify-center mb-12">
+<button class="px-8 py-3 bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-medium rounded-full shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                Load More Recipes
+            </button>
 </div>
 </main>
+<footer class="bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-800 py-12">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex flex-col md:flex-row justify-between items-center">
+<div class="flex items-center gap-2 mb-4 md:mb-0">
+<span class="material-symbols-rounded text-primary icon-lg">menu_book</span>
+<span class="text-xl font-bold text-gray-900 dark:text-white">CookBook</span>
 </div>
-<footer class="fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
-<nav class="flex justify-around px-2 py-1">
-<a class="flex flex-col items-center justify-center gap-1 p-2 text-primary/70 dark:text-primary/80" href="#">
-<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
-<path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77ZM208,208H160V160a16,16,0,0,0-16-16H112a16,16,0,0,0-16,16v48H48V115.55l.11-.1L128,40l79.9,75.43.11.1Z"></path>
-</svg>
-<span class="text-xs font-medium">Home</span>
-</a>
-<a class="flex flex-col items-center justify-center gap-1 rounded-full bg-primary/20 p-2 text-primary" href="#">
-<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
-<path d="M56,128a16,16,0,1,1-16-16A16,16,0,0,1,56,128ZM40,48A16,16,0,1,0,56,64,16,16,0,0,0,40,48Zm0,128a16,16,0,1,0,16,16A16,16,0,0,0,40,176Zm176-64H88a8,8,0,0,0-8,8v16a8,8,0,0,0,8,8H216a8,8,0,0,0,8-8V120A8,8,0,0,0,216,112Zm0-64H88a8,8,0,0,0-8,8V72a8,8,0,0,0,8,8H216a8,8,0,0,0,8-8V56A8,8,0,0,0,216,48Zm0,128H88a8,8,0,0,0-8,8v16a8,8,0,0,0,8,8H216a8,8,0,0,0,8-8V184A8,8,0,0,0,216,176Z"></path>
-</svg>
-<span class="text-xs font-medium">Categories</span>
-</a>
-<a class="flex flex-col items-center justify-center gap-1 p-2 text-primary/70 dark:text-primary/80" href="#">
-<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
-<path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
-</svg>
-<span class="text-xs font-medium">Add</span>
-</a>
-<a class="flex flex-col items-center justify-center gap-1 p-2 text-primary/70 dark:text-primary/80" href="#">
-<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
-<path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
-</svg>
-<span class="text-xs font-medium">Profile</span>
-</a>
-</nav>
-<div class="h-safe-bottom bg-background-light/80 dark:bg-background-dark/80"></div>
+<div class="flex space-x-6 text-sm text-gray-500 dark:text-gray-400">
+<a class="hover:text-primary transition-colors" href="#">About</a>
+<a class="hover:text-primary transition-colors" href="#">Careers</a>
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+</div>
+<div class="mt-4 md:mt-0 text-sm text-gray-400 dark:text-gray-500">
+                    © 2023 CookBook Inc.
+                </div>
+</div>
+</div>
 </footer>
-</div>
-
+<script>
+        // Check local storage or system preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
 </body></html>

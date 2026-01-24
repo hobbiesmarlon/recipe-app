@@ -38,10 +38,11 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
   const [currentIndex, setCurrentIndex] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false); // To block rapid clicks
+  const [showArrows, setShowArrows] = useState(false);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  const minSwipeDistance = 50;
+  const minSwipeDistance = 35;
 
   // Reset when images change
   useEffect(() => {
@@ -50,10 +51,19 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
     setIsAnimating(false);
   }, [images]);
 
+  const resetHideTimer = () => {
+    setShowArrows(true);
+    if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+    hideTimeoutRef.current = setTimeout(() => {
+      setShowArrows(false);
+    }, 2500); // Hide after 2.5 seconds
+  };
+
   const nextSlide = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (isAnimating) return;
 
+    resetHideTimer();
     setIsTransitioning(true);
     setIsAnimating(true);
     setCurrentIndex((prev) => prev + 1);
@@ -63,6 +73,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
     e?.stopPropagation();
     if (isAnimating) return;
 
+    resetHideTimer();
     setIsTransitioning(true);
     setIsAnimating(true);
     setCurrentIndex((prev) => prev - 1);
@@ -72,28 +83,30 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
     e?.stopPropagation();
     if (isAnimating) return;
 
+    resetHideTimer();
     setIsTransitioning(true);
     setIsAnimating(true);
     setCurrentIndex(index + 1); // Adjust for offset
   };
 
   const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
+    resetHideTimer();
     setTouchStart(e.targetTouches[0].clientX);
   };
 
-  const onTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX);
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStart === null) return;
 
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+    const touchEnd = e.changedTouches[0].clientX;
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
     
+    setTouchStart(null);
+
     if (isLeftSwipe) {
       nextSlide();
-    }
-    if (isRightSwipe) {
+    } else if (isRightSwipe) {
       prevSlide();
     }
   };
@@ -121,10 +134,12 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
 
   return (
     <div 
-      className={`relative w-full overflow-hidden group ${heightClass} ${className}`}
+      className={`relative w-full overflow-hidden group touch-pan-y ${heightClass} ${className}`}
       onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
+      onMouseEnter={resetHideTimer}
+      onMouseMove={resetHideTimer}
+      onMouseLeave={() => setShowArrows(false)}
     >
       {/* Images Track */}
       <div 
@@ -151,17 +166,17 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
       {/* Navigation Arrows */}
       <button 
         onClick={prevSlide}
-        className="absolute top-1/2 left-2 -translate-y-1/2 bg-black/30 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-black/50 z-10"
+        className={`absolute top-1/2 left-2 -translate-y-1/2 bg-black/30 text-white p-1 rounded-full transition-opacity duration-700 disabled:opacity-0 hover:bg-black/50 z-10 ${showArrows ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         aria-label="Previous image"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
       </button>
       <button 
         onClick={nextSlide}
-        className="absolute top-1/2 right-2 -translate-y-1/2 bg-black/30 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-black/50 z-10"
+        className={`absolute top-1/2 right-2 -translate-y-1/2 bg-black/30 text-white p-1 rounded-full transition-opacity duration-700 disabled:opacity-0 hover:bg-black/50 z-10 ${showArrows ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         aria-label="Next image"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
       </button>
 
       {/* Dots Indicator */}
@@ -170,8 +185,8 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
           <button
             key={index}
             onClick={(e) => goToSlide(index, e)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              dotIndex === index ? 'bg-white w-4' : 'bg-white/50 hover:bg-white/80'
+            className={`w-1.5 h-1.5 rounded-full transition-all ${
+              dotIndex === index ? 'bg-white w-3' : 'bg-white/50 hover:bg-white/80'
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
