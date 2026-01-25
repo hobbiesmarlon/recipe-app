@@ -12,6 +12,7 @@ import RecipeBasicInfo from './pages/add-recipe/RecipeBasicInfo';
 import RecipeIngredients from './pages/add-recipe/RecipeIngredients';
 import RecipeInstructions from './pages/add-recipe/RecipeInstructions';
 import RecipeCategories from './pages/add-recipe/RecipeCategories';
+import RecipeChefsNote from './pages/add-recipe/RecipeChefsNote';
 import RecipeDetails from './pages/RecipeDetails';
 import ScrollToTop from './components/ScrollToTop';
 
@@ -36,6 +37,7 @@ function App() {
             <Route path="ingredients" element={<RecipeIngredients />} />
             <Route path="instructions" element={<RecipeInstructions />} />
             <Route path="categories" element={<RecipeCategories />} />
+            <Route path="chefs-note" element={<RecipeChefsNote />} />
           </Route>
         </Route>
       </Routes>

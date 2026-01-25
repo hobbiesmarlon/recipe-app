@@ -32,7 +32,7 @@ class Recipe(Base, TimestampMixin):
             'idx_recipes_name_desc_fts',
             func.to_tsvector(
                 text("'english'"),
-                text("coalesce(name, '') || ' ' || coalesce(description, '')")
+                text("coalesce(name, '') || ' ' || coalesce(description, '') || ' ' || coalesce(chefs_note, '')")
             ),
             postgresql_using='gin'
         ),
@@ -73,6 +73,7 @@ class Recipe(Base, TimestampMixin):
     # EXISTING FIELDS (UNCHANGED)
     name = Column(Text, nullable=False)
     description = Column(Text)
+    chefs_note = Column(Text, nullable=True)
     cook_time_minutes = Column(Integer)
     servings = Column(Integer)
     is_public = Column(Boolean, nullable=False, default=True)

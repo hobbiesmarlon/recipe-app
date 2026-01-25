@@ -79,52 +79,52 @@ const RecipeDetails: React.FC = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark pb-safe">
-      {/* Hero Image Section */}
-      <div className="relative h-72 w-full md:h-96">
-        <ImageCarousel images={recipe.images} alt={recipe.title} className="absolute inset-0" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none"></div>
-        
-        {/* Navigation & Actions */}
-        <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-10">
-          <Link to="/" className="text-white hover:text-primary transition-all active:scale-95">
-            <span className="material-symbols-rounded text-[28px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">arrow_back</span>
-          </Link>
-          <div className="flex items-center gap-4">
-             <button 
-              onClick={handleShare}
-              className="text-white hover:text-primary transition-all active:scale-95"
-            >
-              <span className="material-symbols-rounded text-[28px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">share</span>
-            </button>
-            <button 
-              onClick={() => setIsLiked(!isLiked)}
-              className="transition-transform active:scale-95 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]"
-            >
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                viewBox="0 0 24 24" 
-                fill={isLiked ? 'currentColor' : 'none'} 
-                className={`w-7 h-7 transition-colors ${
-                  isLiked 
-                    ? 'text-primary' 
-                    : 'text-white stroke-white'
-                }`}
-                style={{ strokeWidth: isLiked ? 0 : 1.5 }}
+      <div className="mx-auto w-full max-w-2xl">
+        {/* Hero Image Section */}
+        <div className="relative h-72 w-full md:h-96 md:mt-4 md:rounded-2xl overflow-hidden">
+          <ImageCarousel images={recipe.images} alt={recipe.title} className="absolute inset-0" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none"></div>
+          
+          {/* Navigation & Actions */}
+          <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-10">
+            <Link to="/" className="text-white hover:text-primary transition-all active:scale-95">
+              <span className="material-symbols-rounded text-[28px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">arrow_back</span>
+            </Link>
+            <div className="flex items-center gap-4">
+               <button 
+                onClick={handleShare}
+                className="text-white hover:text-primary transition-all active:scale-95"
               >
-                <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3.25 7.75 3.25c2.105 0 3.875 1.25 4.75 3.22.875-1.97 2.645-3.22 4.75-3.22 3.036 0 5.5 2.072 5.5 5.05 0 3.924-2.438 7.11-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.472 0l-.003-.001z" />
-              </svg>
-            </button>
+                <span className="material-symbols-rounded text-[28px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">share</span>
+              </button>
+              <button 
+                onClick={() => setIsLiked(!isLiked)}
+                className="transition-transform active:scale-95 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24" 
+                  fill={isLiked ? 'currentColor' : 'none'} 
+                  className={`w-7 h-7 transition-colors ${
+                    isLiked 
+                      ? 'text-primary' 
+                      : 'text-white stroke-white'
+                  }`}
+                  style={{ strokeWidth: isLiked ? 0 : 1.5 }}
+                >
+                  <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3.25 7.75 3.25c2.105 0 3.875 1.25 4.75 3.22.875-1.97 2.645-3.22 4.75-3.22 3.036 0 5.5 2.072 5.5 5.05 0 3.924-2.438 7.11-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.472 0l-.003-.001z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Title overlay at bottom of image */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+            <h1 className="text-2xl font-bold drop-shadow-md">{recipe.title}</h1>
           </div>
         </div>
 
-        {/* Title overlay at bottom of image */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-          <h1 className="text-2xl font-bold drop-shadow-md">{recipe.title}</h1>
-        </div>
-      </div>
-
-      <div className="flex-grow -mt-4 rounded-t-3xl bg-background-light dark:bg-background-dark relative z-10 px-4 pt-6">
-        <div className="mx-auto max-w-2xl">
+        <div className="flex-grow bg-background-light dark:bg-background-dark relative z-10 px-4 pt-6">
           {/* Meta Info Line */}
           <div className="flex items-center justify-between mb-6 text-sm text-gray-600 dark:text-gray-300 font-medium">
             <div className="flex items-center gap-1">

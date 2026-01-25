@@ -45,11 +45,12 @@ const RecipeCategories: React.FC = () => {
         </header>
 
         {/* Page Indicators */}
-        <div className="flex w-full flex-row items-center justify-center gap-3 pt-0 pb-4 border-b border-primary/10" role="progressbar" aria-label="Step progress" aria-valuemin={1} aria-valuemax={4} aria-valuenow={4}>
+        <div className="flex w-full flex-row items-center justify-center gap-3 pt-0 pb-4 border-b border-primary/10" role="progressbar" aria-label="Step progress" aria-valuemin={1} aria-valuemax={5} aria-valuenow={4}>
           <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
           <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
           <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
           <div className="h-2 w-2 rounded-full progress-dot progress-dot--active" aria-hidden="true"></div>
+          <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
         </div>
       </div>
 
@@ -169,8 +170,8 @@ const RecipeCategories: React.FC = () => {
 
       <footer className="fixed bottom-0 left-0 right-0 z-10 bg-background-light dark:bg-background-dark p-4 border-none outline-none">
         <div className="mx-auto max-w-2xl">
-          <Link to="/" className="h-12 w-full rounded-full bg-primary text-white font-bold text-base leading-normal flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors outline-none ring-0 focus:ring-0">
-            Publish Recipe <span className="material-symbols-outlined">check</span>
+          <Link to="/add-recipe/chefs-note" className="h-12 w-full rounded-full bg-primary text-white font-bold text-base leading-normal flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors outline-none ring-0 focus:ring-0">
+            Next Step <span className="material-symbols-outlined">arrow_forward</span>
           </Link>
         </div>
       </footer>

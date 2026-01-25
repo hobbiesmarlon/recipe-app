@@ -126,8 +126,9 @@ const RecipeBasicInfo: React.FC = () => {
           </header>
           
           {/* Page Indicators */}
-          <div className="flex w-full flex-row items-center justify-center gap-3 pt-0 pb-4 border-b border-primary/10" role="progressbar" aria-label="Step progress" aria-valuemin={1} aria-valuemax={4} aria-valuenow={1}>
+          <div className="flex w-full flex-row items-center justify-center gap-3 pt-0 pb-4 border-b border-primary/10" role="progressbar" aria-label="Step progress" aria-valuemin={1} aria-valuemax={5} aria-valuenow={1}>
             <div className="h-2 w-2 rounded-full progress-dot progress-dot--active" aria-hidden="true"></div>
+            <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
             <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
             <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
             <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>

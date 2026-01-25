@@ -5,7 +5,7 @@ import { PageContainer } from '../components/PageContainer';
 const Categories: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="py-4 sticky top-0 z-10 bg-background-light dark:bg-background-dark">
+      <header className="py-4 sticky top-0 z-10 bg-background-light dark:bg-background-dark md:hidden">
         <PageContainer>
           <div className="flex items-center justify-between">
             <div className="w-6"></div>
@@ -17,9 +17,9 @@ const Categories: React.FC = () => {
 
       <main className="pb-24">
         <PageContainer className="space-y-8 pt-6">
-          <section>
+          <section className="md:w-fit md:mx-auto">
             <h2 className="text-2xl font-bold">Meals</h2>
-            <div className="mt-3 flex space-x-4 overflow-x-auto pb-4 -mx-4 px-4 sm:-mx-6 sm:px-6 no-scrollbar">
+            <div className="mt-3 flex space-x-4 overflow-x-auto pb-4 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:overflow-visible no-scrollbar">
               <div className="w-40 flex-shrink-0 space-y-2">
                 <div className="aspect-square w-full rounded-xl bg-cover bg-center" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDjoelberBs8Fo3VSD3DmAY49iH4_t2Knn-KuV1lksyOnrRWky0p_-PGB_YyKE4WqghpElvpDa_DXlM51A4yLlBJ8cUZ6AF2oC3FIWsQy6RYNaxDVmc5effPsWSqc6ExEcyy3aKTvoDjjtmbAr2o2HWxBtl1eG5ODqMn24zBUq0zEDe9BvtYbKrHm1BHmhacPIVXWlDm-h6NlB5IlKry6DoHhplqPdMl7hg00qhk7ykVj6Iuh2lYAsiZKRsfX-GmYWzdFKaOBsId-s")' }}></div>
                 <p className="text-sm font-medium">Pasta Perfection</p>
@@ -34,9 +34,9 @@ const Categories: React.FC = () => {
               </div>
             </div>
           </section>
-          <section>
+          <section className="md:w-fit md:mx-auto">
             <h2 className="text-2xl font-bold">Desserts</h2>
-            <div className="mt-3 flex space-x-4 overflow-x-auto pb-4 -mx-4 px-4 sm:-mx-6 sm:px-6 no-scrollbar">
+            <div className="mt-3 flex space-x-4 overflow-x-auto pb-4 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:overflow-visible no-scrollbar">
               <div className="w-40 flex-shrink-0 space-y-2">
                 <div className="aspect-square w-full rounded-xl bg-cover bg-center" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCeNS3P0mRNoo9NUJpQlyi_fdFSh9Hs8ZCJj5L3A95KVT2JkYBNt6If3-i561Oe1LSAmUqD2SMQn10LrfNJ95lT5g5XEtxDoxtlgx673eY7ibE32ZtV_AjMv8YSTe7gTk6JVOen_RgoTStjYgc8YKuX91qQBX0YjuCdPB6s5dqpNnaf2M26qtHUUFh1PfYN9esFTxM7uKnbRe07p_oxisLElrhzqs38iSoPbK9BYxNKtKTS8S52YI3rv8fQJF7whenv3SqeyG2ScJM")' }}></div>
                 <p className="text-sm font-medium">Chocolate Indulgence</p>
@@ -51,9 +51,9 @@ const Categories: React.FC = () => {
               </div>
             </div>
           </section>
-          <section>
+          <section className="md:w-fit md:mx-auto">
             <h2 className="text-2xl font-bold">Baking</h2>
-            <div className="mt-3 flex space-x-4 overflow-x-auto pb-4 -mx-4 px-4 sm:-mx-6 sm:px-6 no-scrollbar">
+            <div className="mt-3 flex space-x-4 overflow-x-auto pb-4 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:overflow-visible no-scrollbar">
               <div className="w-40 flex-shrink-0 space-y-2">
                 <div className="aspect-square w-full rounded-xl bg-cover bg-center" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuB84xw7t8VgGsjH2ZIllKa0TLFvcfg7dcmiuZHJtAaZ76jUEfuqOgDdqC33X_CLtJh8HblfxWjONkshmXP0gf2tww8Oepg-Y22rCxGI9zHgmj7KAS5kCKns5DE7Ai_EEI3Vrs7J0z8ZFLB3E_UlNuBk6PVhYyheywqNEBhzD-eK42st44ooagR5erLiyWtzCILI04tKSBup5ZqEu6HKyYTTNdG4j_xWu8xPcqwQ-ecI_3gf2GEFos1x1yJOU4zR8KoXP_rWvSjqzxY")' }}></div>
                 <p className="text-sm font-medium">Homemade Breads</p>
@@ -71,7 +71,9 @@ const Categories: React.FC = () => {
         </PageContainer>
       </main>
 
-      <BottomNav />
+      <div className="md:hidden">
+        <BottomNav />
+      </div>
     </div>
   );
 };
