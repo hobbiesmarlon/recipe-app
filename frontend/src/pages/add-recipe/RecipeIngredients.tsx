@@ -188,7 +188,7 @@ const RecipeIngredients: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
       <div className="flex-grow">
-        <div className="sticky top-0 z-20 bg-background-light dark:bg-background-dark">
+        <div className="sticky top-0 md:top-14 z-20 bg-background-light dark:bg-background-dark">
           <header className="flex items-center justify-between bg-background-light px-4 py-3 dark:bg-background-dark pb-1">
             <Link to="/add-recipe/basic" className="flex items-center justify-center text-primary" aria-label="Back">
               <span className="material-symbols-outlined text-3xl">arrow_back</span>
@@ -198,7 +198,7 @@ const RecipeIngredients: React.FC = () => {
           </header>
           
           {/* Page Indicators */}
-          <div className="flex w-full flex-row items-center justify-center gap-3 pt-0 pb-4 border-b border-primary/10" role="progressbar" aria-label="Step progress" aria-valuemin={1} aria-valuemax={5} aria-valuenow={2}>
+          <div className="flex w-full flex-row items-center justify-center gap-3 pt-0 pb-4" role="progressbar" aria-label="Step progress" aria-valuemin={1} aria-valuemax={5} aria-valuenow={2}>
             <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
             <div className="h-2 w-2 rounded-full progress-dot progress-dot--active" aria-hidden="true"></div>
             <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
@@ -207,133 +207,142 @@ const RecipeIngredients: React.FC = () => {
           </div>
         </div>
 
-        <main className="p-4 mx-auto max-w-2xl pb-32">
-          <div className="space-y-4">
-            <div>
-              <label className="sr-only" htmlFor="ingredient-name">Ingredient name</label>
-              <input 
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className={`h-14 w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400`}
-                id="ingredient-name" 
-                placeholder="Ingredient name" 
-                type="text" 
+        <main className="p-4 mx-auto max-w-2xl lg:max-w-5xl pb-20 lg:pb-6 lg:pt-0">
+          <div className="lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start lg:min-h-[calc(100vh-300px)]">
+            {/* Left Column: Input Form */}
+            <div className="space-y-4 lg:sticky lg:top-[192px] lg:z-10 lg:mt-[68px]">
+              <div className="space-y-4">
+                  <div>
+                    <label className="sr-only" htmlFor="ingredient-name">Ingredient name</label>
+                    <input 
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className={`h-14 w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400`}
+                      id="ingredient-name" 
+                      placeholder="Ingredient name" 
+                      type="text" 
+                    />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <label className="sr-only" htmlFor="quantity">Quantity</label>
+                      <input 
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value)}
+                        className={`h-14 w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400`}
+                        id="quantity" 
+                        placeholder="Quantity" 
+                        type="number"
+                        min="0"
+                        step="any"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="sr-only" htmlFor="unit">Unit</label>
+                      {measurementType === 'weight' ? (
+                        <CustomSelect 
+                          value={unit}
+                          onChange={setUnit}
+                          placeholder="Select unit"
+                          className=""
+                          options={[
+                            { value: 'g', label: 'grams (g)' },
+                            { value: 'kg', label: 'kilograms (kg)' }
+                          ]}
+                        />
+                      ) : measurementType === 'volume' ? (
+                        <CustomSelect 
+                          value={unit}
+                          onChange={setUnit}
+                          placeholder="Select unit"
+                          className=""
+                          options={[
+                            { value: 'ml', label: 'millilitres (ml)' },
+                            { value: 'L', label: 'litres (L)' }
+                          ]}
+                        />
+                      ) : (
+                        <input 
+                          value={unit}
+                          onChange={(e) => setUnit(e.target.value)}
+                          className={`h-14 w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400`}
+                          id="unit" 
+                          placeholder="e.g. cup, tsp" 
+                          type="text" 
+                        />
+                      )}
+                    </div>
+                  </div>
+                  <fieldset className="rounded-lg bg-stone-200/50 p-1.5 dark:bg-stone-800/50">
+                    <legend className="sr-only">Measurement Type</legend>
+                    <div className="grid grid-cols-3 gap-1">
+                      <div>
+                        <input 
+                          checked={measurementType === 'weight'}
+                          onChange={() => handleMeasurementTypeChange('weight')}
+                          className="peer sr-only" 
+                          id="weight" 
+                          name="measurement-type" 
+                          type="radio" 
+                          value="weight" 
+                        />
+                        <label className="flex cursor-pointer items-center justify-center rounded-md py-2 text-sm font-medium text-stone-600 transition-colors peer-checked:bg-primary peer-checked:text-white dark:text-stone-400" htmlFor="weight">Weight</label>
+                      </div>
+                      <div>
+                        <input 
+                          checked={measurementType === 'volume'}
+                          onChange={() => handleMeasurementTypeChange('volume')}
+                          className="peer sr-only" 
+                          id="volume" 
+                          name="measurement-type" 
+                          type="radio" 
+                          value="volume" 
+                        />
+                        <label className="flex cursor-pointer items-center justify-center rounded-md py-2 text-sm font-medium text-stone-600 transition-colors peer-checked:bg-primary peer-checked:text-white dark:text-stone-400" htmlFor="volume">Volume</label>
+                      </div>
+                      <div>
+                        <input 
+                          checked={measurementType === 'count'}
+                          onChange={() => handleMeasurementTypeChange('count')}
+                          className="peer sr-only" 
+                          id="count" 
+                          name="measurement-type" 
+                          type="radio" 
+                          value="count" 
+                        />
+                        <label className="flex cursor-pointer items-center justify-center rounded-md py-2 text-sm font-medium text-stone-600 transition-colors peer-checked:bg-primary peer-checked:text-white dark:text-stone-400" htmlFor="count">Count</label>
+                      </div>
+                    </div>
+                  </fieldset>
+                  <button 
+                    onClick={handleAdd}
+                    className="flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-primary/20 text-primary transition-colors hover:bg-primary/30 dark:bg-primary/30 dark:hover:bg-primary/40"
+                  >
+                    <span className="material-symbols-outlined">add</span>
+                    <span className="font-bold">Add Ingredient</span>
+                  </button>
+                </div>
+              </div>
+
+            {/* Right Column: Ingredients List */}
+            <div className="mt-8 lg:mt-0 relative">
+              <h2 className="text-lg font-bold text-stone-900 dark:text-stone-200 mb-4 lg:sticky lg:top-[124px] lg:z-10 lg:bg-background-light lg:dark:bg-background-dark lg:py-3">
+                Ingredients List
+              </h2>
+              <SortableList 
+                items={ingredients}
+                onReorder={setIngredients}
+                renderItem={renderIngredient}
+                keyExtractor={(item) => item.id}
               />
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <label className="sr-only" htmlFor="quantity">Quantity</label>
-                <input 
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  className={`h-14 w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400`}
-                  id="quantity" 
-                  placeholder="Quantity" 
-                  type="number"
-                  min="0"
-                  step="any"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="sr-only" htmlFor="unit">Unit</label>
-                {measurementType === 'weight' ? (
-                  <CustomSelect 
-                    value={unit}
-                    onChange={setUnit}
-                    placeholder="Select unit"
-                    className=""
-                    options={[
-                      { value: 'g', label: 'grams (g)' },
-                      { value: 'kg', label: 'kilograms (kg)' }
-                    ]}
-                  />
-                ) : measurementType === 'volume' ? (
-                  <CustomSelect 
-                    value={unit}
-                    onChange={setUnit}
-                    placeholder="Select unit"
-                    className=""
-                    options={[
-                      { value: 'ml', label: 'millilitres (ml)' },
-                      { value: 'L', label: 'litres (L)' }
-                    ]}
-                  />
-                ) : (
-                  <input 
-                    value={unit}
-                    onChange={(e) => setUnit(e.target.value)}
-                    className={`h-14 w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400`}
-                    id="unit" 
-                    placeholder="e.g. cup, tsp" 
-                    type="text" 
-                  />
-                )}
-              </div>
-            </div>
-            <fieldset className="rounded-lg bg-stone-200/50 p-1.5 dark:bg-stone-800/50">
-              <legend className="sr-only">Measurement Type</legend>
-              <div className="grid grid-cols-3 gap-1">
-                <div>
-                  <input 
-                    checked={measurementType === 'weight'}
-                    onChange={() => handleMeasurementTypeChange('weight')}
-                    className="peer sr-only" 
-                    id="weight" 
-                    name="measurement-type" 
-                    type="radio" 
-                    value="weight" 
-                  />
-                  <label className="flex cursor-pointer items-center justify-center rounded-md py-2 text-sm font-medium text-stone-600 transition-colors peer-checked:bg-primary peer-checked:text-white dark:text-stone-400" htmlFor="weight">Weight</label>
-                </div>
-                <div>
-                  <input 
-                    checked={measurementType === 'volume'}
-                    onChange={() => handleMeasurementTypeChange('volume')}
-                    className="peer sr-only" 
-                    id="volume" 
-                    name="measurement-type" 
-                    type="radio" 
-                    value="volume" 
-                  />
-                  <label className="flex cursor-pointer items-center justify-center rounded-md py-2 text-sm font-medium text-stone-600 transition-colors peer-checked:bg-primary peer-checked:text-white dark:text-stone-400" htmlFor="volume">Volume</label>
-                </div>
-                <div>
-                  <input 
-                    checked={measurementType === 'count'}
-                    onChange={() => handleMeasurementTypeChange('count')}
-                    className="peer sr-only" 
-                    id="count" 
-                    name="measurement-type" 
-                    type="radio" 
-                    value="count" 
-                  />
-                  <label className="flex cursor-pointer items-center justify-center rounded-md py-2 text-sm font-medium text-stone-600 transition-colors peer-checked:bg-primary peer-checked:text-white dark:text-stone-400" htmlFor="count">Count</label>
-                </div>
-              </div>
-            </fieldset>
-            <button 
-              onClick={handleAdd}
-              className="flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-primary/20 text-primary transition-colors hover:bg-primary/30 dark:bg-primary/30 dark:hover:bg-primary/40"
-            >
-              <span className="material-symbols-outlined">add</span>
-              <span className="font-bold">Add Ingredient</span>
-            </button>
-          </div>
-          <div className="mt-8">
-            <h2 className="text-lg font-bold text-stone-900 dark:text-stone-200 mb-4">Ingredients List</h2>
-            <SortableList 
-              items={ingredients}
-              onReorder={setIngredients}
-              renderItem={renderIngredient}
-              keyExtractor={(item) => item.id}
-            />
           </div>
         </main>
       </div>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-10 bg-background-light dark:bg-background-dark p-4 border-none outline-none">
-        <div className="mx-auto max-w-2xl">
-          <button onClick={handleNext} className="h-12 w-full rounded-full bg-primary text-white font-bold text-base leading-normal flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors outline-none ring-0 focus:ring-0">
+      <footer className="fixed bottom-0 left-0 right-0 z-10 bg-background-light dark:bg-background-dark p-4 border-none outline-none lg:static lg:bg-transparent lg:mt-auto lg:pb-10">
+        <div className="mx-auto max-w-2xl lg:max-w-5xl">
+          <button onClick={handleNext} className="h-12 w-full rounded-full bg-primary text-white font-bold text-base leading-normal flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors outline-none ring-0 focus:ring-0 lg:max-w-xs lg:ml-auto">
             Next Step
             <span className="material-symbols-outlined text-base">arrow_forward</span>
           </button>
