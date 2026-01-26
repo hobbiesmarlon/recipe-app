@@ -5,7 +5,7 @@ import BottomNav from '../components/BottomNav';
 const SignIn: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
-      <header className="py-4 sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+      <header className="py-4 sticky top-0 md:top-14 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
         <div className="mx-auto max-w-2xl px-4 flex items-center justify-between">
           <Link to="/" className="p-2">
             <span className="material-symbols-outlined text-primary">close</span>

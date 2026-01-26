@@ -5,7 +5,7 @@ import { PageContainer } from '../components/PageContainer';
 const Categories: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="py-4 sticky top-0 z-10 bg-background-light dark:bg-background-dark md:hidden">
+      <header className="py-4 sticky top-0 md:top-14 z-10 bg-background-light dark:bg-background-dark">
         <PageContainer>
           <div className="flex items-center justify-between">
             <div className="w-6"></div>

@@ -42,7 +42,8 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [touchStart, setTouchStart] = useState<number | null>(null);
-  const minSwipeDistance = 35;
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 20;
 
   // Reset when images change
   useEffect(() => {
@@ -92,23 +93,28 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
   const onTouchStart = (e: React.TouchEvent) => {
     resetHideTimer();
     setTouchStart(e.targetTouches[0].clientX);
+    setTouchEnd(null);
   };
 
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (touchStart === null) return;
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
 
-    const touchEnd = e.changedTouches[0].clientX;
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
     
-    setTouchStart(null);
-
     if (isLeftSwipe) {
       nextSlide();
     } else if (isRightSwipe) {
       prevSlide();
     }
+
+    setTouchStart(null);
+    setTouchEnd(null);
   };
 
   const handleTransitionEnd = () => {
@@ -136,6 +142,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
     <div 
       className={`relative w-full overflow-hidden group touch-pan-y ${heightClass} ${className}`}
       onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
       onMouseEnter={resetHideTimer}
       onMouseMove={resetHideTimer}

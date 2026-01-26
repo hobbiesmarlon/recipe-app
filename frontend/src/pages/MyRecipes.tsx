@@ -32,9 +32,9 @@ const MyRecipes: React.FC = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
-      <header className="py-4 sticky top-0 z-10 bg-background-light dark:bg-background-dark border-b border-border-light dark:border-border-dark">
+      <header className="py-4 sticky top-0 md:top-14 z-10 bg-background-light dark:bg-background-dark">
         <div className="mx-auto max-w-2xl px-4 flex items-center justify-between relative">
-          <Link to="/profile" className="flex items-center gap-3 text-primary z-20">
+          <Link to="/profile" className="flex items-center gap-3 text-primary z-20 lg:hidden">
             <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg>
           </Link>
           <span className="font-bold text-black dark:text-white absolute left-0 right-0 text-center pointer-events-none">My Recipes</span>
@@ -69,7 +69,9 @@ const MyRecipes: React.FC = () => {
         </section>
       </main>
 
-      <BottomNav />
+      <div className="md:hidden">
+        <BottomNav />
+      </div>
     </div>
   );
 };

@@ -1,22 +1,25 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import { AddRecipeNavigation } from '../../components/forms/AddRecipeNavigation';
 
 const RecipeChefsNote: React.FC = () => {
+  const navigate = useNavigate();
   const [note, setNote] = useState('');
 
   return (
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
-      <div className="sticky top-0 z-20 bg-background-light dark:bg-background-dark">
+      <div className="sticky top-0 md:top-14 z-20 bg-background-light dark:bg-background-dark">
         <header className="flex items-center justify-between bg-background-light px-4 py-3 dark:bg-background-dark pb-1">
-          <Link to="/add-recipe/categories" className="flex items-center justify-center text-primary" aria-label="Back">
+          <Link to="/add-recipe/categories" className="flex items-center justify-center text-primary lg:hidden" aria-label="Back">
             <span className="material-symbols-outlined text-3xl">arrow_back</span>
           </Link>
+          <div className="hidden lg:block w-8"></div>
           <h2 className="text-lg font-bold text-background-dark dark:text-background-light flex-1 text-center">Add Chef's Note</h2>
           <div className="w-8"></div>
         </header>
 
         {/* Page Indicators */}
-        <div className="flex w-full flex-row items-center justify-center gap-3 pt-0 pb-4 border-b border-primary/10" role="progressbar" aria-label="Step progress" aria-valuemin={1} aria-valuemax={5} aria-valuenow={5}>
+        <div className="flex w-full flex-row items-center justify-center gap-3 pt-0 pb-4" role="progressbar" aria-label="Step progress" aria-valuemin={1} aria-valuemax={5} aria-valuenow={5}>
           <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
           <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
           <div className="h-2 w-2 rounded-full progress-dot" aria-hidden="true"></div>
@@ -42,13 +45,20 @@ const RecipeChefsNote: React.FC = () => {
         </div>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-10 bg-background-light dark:bg-background-dark p-4 border-none outline-none">
+      <footer className="fixed bottom-0 left-0 right-0 z-10 bg-background-light dark:bg-background-dark p-4 border-none outline-none lg:hidden">
         <div className="mx-auto max-w-2xl">
           <Link to="/" className="h-12 w-full rounded-full bg-primary text-white font-bold text-base leading-normal flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors outline-none ring-0 focus:ring-0">
             Publish Recipe <span className="material-symbols-outlined">check</span>
           </Link>
         </div>
       </footer>
+
+      <AddRecipeNavigation 
+        onNext={() => navigate('/')}
+        backPath="/add-recipe/categories"
+        nextLabel="Publish Recipe"
+        isLastStep={true}
+      />
     </div>
   );
 };

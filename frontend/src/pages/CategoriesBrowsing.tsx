@@ -38,7 +38,7 @@ const CategoriesBrowsing: React.FC = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-10 flex items-center bg-background-light dark:bg-background-dark p-4">
+      <header className="sticky top-0 md:top-14 z-10 flex items-center bg-background-light dark:bg-background-dark p-4">
         <Link to="/" className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5">
           <span className="material-symbols-outlined text-primary">close</span>
         </Link>
@@ -192,7 +192,9 @@ const CategoriesBrowsing: React.FC = () => {
         </div>
       </main>
 
-      <BottomNav />
+      <div className="md:hidden">
+        <BottomNav />
+      </div>
     </div>
   );
 };

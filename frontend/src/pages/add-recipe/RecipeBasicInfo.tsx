@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Toast } from '../../components/ui/Toast';
 import { SortableList } from '../../components/ui/SortableList';
+import { AddRecipeNavigation } from '../../components/forms/AddRecipeNavigation';
 
 type FileWithId = {
   id: string;
@@ -116,11 +117,12 @@ const RecipeBasicInfo: React.FC = () => {
       <div className="flex-grow">
         <div className="sticky top-0 md:top-14 z-20 bg-background-light dark:bg-background-dark">
           <header className="flex items-center justify-between bg-background-light px-4 py-3 dark:bg-background-dark pb-1">
-            <Link to="/" className="flex items-center justify-center text-primary" aria-label="Close">
+            <Link to="/" className="flex items-center justify-center text-primary lg:hidden" aria-label="Close">
               <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
               </svg>
             </Link>
+            <div className="hidden lg:block w-8"></div>
             <h1 className="text-lg font-bold text-background-dark dark:text-background-light">Add Basic Information</h1>
             <div className="w-8"></div>
           </header>
@@ -247,17 +249,23 @@ const RecipeBasicInfo: React.FC = () => {
         </main>
       </div>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-10 bg-background-light dark:bg-background-dark p-4 border-none outline-none lg:static lg:bg-transparent lg:mt-auto lg:pb-10">
-        <div className="mx-auto max-w-2xl lg:max-w-5xl">
+      <footer className="fixed bottom-0 left-0 right-0 z-10 bg-background-light dark:bg-background-dark p-4 border-none outline-none lg:hidden">
+        <div className="mx-auto max-w-2xl">
           <button 
             onClick={handleNext}
-            className="h-12 w-full rounded-full bg-primary text-white font-bold text-base leading-normal flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors outline-none ring-0 focus:ring-0 lg:max-w-xs lg:ml-auto"
+            className="h-12 w-full rounded-full bg-primary text-white font-bold text-base leading-normal flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors outline-none ring-0 focus:ring-0"
           >
             Next Step
             <span className="material-symbols-outlined text-base">arrow_forward</span>
           </button>
         </div>
       </footer>
+
+      <AddRecipeNavigation 
+        onNext={handleNext}
+        backPath="/"
+      />
+
       <Toast 
         message={toastMessage} 
         isVisible={showToast} 

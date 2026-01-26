@@ -72,7 +72,7 @@ const DiscoveryFeed: React.FC = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="pt-2 pb-4 sticky top-0 md:static z-[100] md:z-auto bg-background-light dark:bg-background-dark md:bg-transparent">
+      <header className="pt-2 pb-4 sticky top-0 md:top-14 z-[100] bg-background-light dark:bg-background-dark">
         <PageContainer>
           <div className="flex items-center justify-between md:hidden">
             <div className="w-6"></div>

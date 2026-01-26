@@ -21,9 +21,9 @@ const EditProfile: React.FC = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
-      <header className="py-4 sticky top-0 z-10 bg-background-light dark:bg-background-dark border-b border-border-light dark:border-border-dark">
+      <header className="py-4 sticky top-0 md:top-14 z-10 bg-background-light dark:bg-background-dark">
         <div className="mx-auto max-w-2xl px-4 flex items-center justify-between relative">
-          <Link to="/profile" className="flex items-center gap-3 text-primary z-20">
+          <Link to="/profile" className="flex items-center gap-3 text-primary z-20 md:-ml-8 lg:hidden">
             <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg>
           </Link>
           <span className="font-bold text-black dark:text-white absolute left-0 right-0 text-center pointer-events-none">Edit Profile</span>
@@ -44,8 +44,10 @@ const EditProfile: React.FC = () => {
               <div id="photoPreview" className="h-32 w-32 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800">
                 <img id="photoImg" src={photo} alt="Profile photo" className="h-full w-full object-cover" />
               </div>
-              <label htmlFor="photoInput" className="absolute -bottom-1 -right-1 inline-flex items-center gap-2 rounded-full bg-white/90 dark:bg-background-dark/80 p-1 shadow cursor-pointer">
-                <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a5 5 0 00-5 5v1H5a3 3 0 00-3 3v6a3 3 0 003 3h14a3 3 0 003-3v-6a3 3 0 00-3-3h-2V7a5 5 0 00-5-5z"/></svg>
+              <label htmlFor="photoInput" className="absolute -bottom-1 -right-1 inline-flex items-center gap-2 rounded-full bg-white/90 dark:bg-background-dark/80 p-2 shadow cursor-pointer border border-primary/10">
+                <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM192,104,152,64l24-24,40,40Z"></path>
+                </svg>
                 <input id="photoInput" type="file" accept="image/*" className="sr-only" onChange={handlePhotoChange} />
               </label>
             </div>
