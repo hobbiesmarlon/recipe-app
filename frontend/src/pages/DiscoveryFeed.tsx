@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import BottomNav from '../components/BottomNav';
 import { PageContainer } from '../components/PageContainer';
 import { ImageCarousel } from '../components/ui/ImageCarousel';
 import { RecipeCard } from '../components/ui/RecipeCard';
+import client from '../api/client';
+
+interface RecipeMedia {
+  url: string;
+  type: 'image' | 'video';
+}
 
 interface Recipe {
   id: string;
@@ -11,49 +17,14 @@ interface Recipe {
   description: string;
   meta: string;
   image: string;
-  images: string[];
+  images: RecipeMedia[];
 }
-
-const recipesData: Recipe[] = [
-  {
-    id: '1',
-    title: 'Spicy Thai Basil Chicken',
-    description: 'A flavorful dish with a kick, perfect for a quick weeknight dinner.',
-    meta: '30 min · 4 servings',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBUf9SIcOlc-L412hId07kkGkX67aekRdlwQkyyJqDBITii3OWnwf-Mvyk_nlHfW2lxWU_YXPwSQida_6ZrXZ73-wDJp-tXFWKibqWUgiMhHxiBvg0gjevlbuBhftRr0vPd-HtPzhbzFwGpHPZvuMkO0xqr6MrcF2eXBTCZIVsBkE_yTXExNMVE0NfSOUh6DEr9lelhRKQwea89u6WG2D042pM6PYbKACprhmbphSZkPmP4v6Cxh_cX2UZsULeIROoMEQBj9yyi7SqH',
-    images: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBUf9SIcOlc-L412hId07kkGkX67aekRdlwQkyyJqDBITii3OWnwf-Mvyk_nlHfW2lxWU_YXPwSQida_6ZrXZ73-wDJp-tXFWKibqWUgiMhHxiBvg0gjevlbuBhftRr0vPd-HtPzhbzFwGpHPZvuMkO0xqr6MrcF2eXBTCZIVsBkE_yTXExNMVE0NfSOUh6DEr9lelhRKQwea89u6WG2D042pM6PYbKACprhmbphSZkPmP4v6Cxh_cX2UZsULeIROoMEQBj9yyi7SqH',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBJMNTg46lYe9RwxB6FjvAgzEa4LBvEOfIx-MvnGvPVytlIgFqyzEGECyho2VOUX_r7m9Bohmj6hE9_LhFdzxOMQ-4ENj9S3szemLxbDKY0h3Y0TR4hcinvXpwEt74MWslA3fXkWwm0o773DrORrwZMuJK4qhZH3HfqzNU0sDBHdg50jc98uiSjLTyE7L2BDJiXNIqekSr3yBXyxVcFmmi1GiGgjYx2fg0EqFbwBcDas8oVxfZsQGGZajweSXH4D0_XrBvDhDi1UsVf',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBtzKBDMQCKlDlTf5ZpsPzqM8KSuFBFHjh-TeYIALeQHWDN4csF3ehPAOCR-1BN4dQcLUFUauEvXx8lmJxtuO87V9mLKJbP6nU6lrlgjBO9Z-dZWtVa_Cz579T5oa82WgPJ2acNYoA8p774IveZPU8ddnSnDgcFYZRQ-s3vN1KlywzW4LnsEbqx0AQlLEPu6XDFHHSWa40ismz5amv9GEStGD7ZLuSUogqYuKy7tMQHfiLvct58drCg7ZFBMEfVitWXdp3OOo3453NE'
-    ]
-  },
-  {
-    id: '2',
-    title: 'Creamy Tomato Pasta',
-    description: 'A comforting and rich pasta dish with a hint of sweetness.',
-    meta: '45 min · 6 servings',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBJMNTg46lYe9RwxB6FjvAgzEa4LBvEOfIx-MvnGvPVytlIgFqyzEGECyho2VOUX_r7m9Bohmj6hE9_LhFdzxOMQ-4ENj9S3szemLxbDKY0h3Y0TR4hcinvXpwEt74MWslA3fXkWwm0o773DrORrwZMuJK4qhZH3HfqzNU0sDBHdg50jc98uiSjLTyE7L2BDJiXNIqekSr3yBXyxVcFmmi1GiGgjYx2fg0EqFbwBcDas8oVxfZsQGGZajweSXH4D0_XrBvDhDi1UsVf',
-    images: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBJMNTg46lYe9RwxB6FjvAgzEa4LBvEOfIx-MvnGvPVytlIgFqyzEGECyho2VOUX_r7m9Bohmj6hE9_LhFdzxOMQ-4ENj9S3szemLxbDKY0h3Y0TR4hcinvXpwEt74MWslA3fXkWwm0o773DrORrwZMuJK4qhZH3HfqzNU0sDBHdg50jc98uiSjLTyE7L2BDJiXNIqekSr3yBXyxVcFmmi1GiGgjYx2fg0EqFbwBcDas8oVxfZsQGGZajweSXH4D0_XrBvDhDi1UsVf',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBUf9SIcOlc-L412hId07kkGkX67aekRdlwQkyyJqDBITii3OWnwf-Mvyk_nlHfW2lxWU_YXPwSQida_6ZrXZ73-wDJp-tXFWKibqWUgiMhHxiBvg0gjevlbuBhftRr0vPd-HtPzhbzFwGpHPZvuMkO0xqr6MrcF2eXBTCZIVsBkE_yTXExNMVE0NfSOUh6DEr9lelhRKQwea89u6WG2D042pM6PYbKACprhmbphSZkPmP4v6Cxh_cX2UZsULeIROoMEQBj9yyi7SqH'
-    ]
-  },
-  {
-    id: '3',
-    title: 'Avocado Toast with Poached Egg',
-    description: 'A simple yet elegant breakfast or brunch option.',
-    meta: '20 min · 2 servings',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBtzKBDMQCKlDlTf5ZpsPzqM8KSuFBFHjh-TeYIALeQHWDN4csF3ehPAOCR-1BN4dQcLUFUauEvXx8lmJxtuO87V9mLKJbP6nU6lrlgjBO9Z-dZWtVa_Cz579T5oa82WgPJ2acNYoA8p774IveZPU8ddnSnDgcFYZRQ-s3vN1KlywzW4LnsEbqx0AQlLEPu6XDFHHSWa40ismz5amv9GEStGD7ZLuSUogqYuKy7tMQHfiLvct58drCg7ZFBMEfVitWXdp3OOo3453NE',
-    images: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBtzKBDMQCKlDlTf5ZpsPzqM8KSuFBFHjh-TeYIALeQHWDN4csF3ehPAOCR-1BN4dQcLUFUauEvXx8lmJxtuO87V9mLKJbP6nU6lrlgjBO9Z-dZWtVa_Cz579T5oa82WgPJ2acNYoA8p774IveZPU8ddnSnDgcFYZRQ-s3vN1KlywzW4LnsEbqx0AQlLEPu6XDFHHSWa40ismz5amv9GEStGD7ZLuSUogqYuKy7tMQHfiLvct58drCg7ZFBMEfVitWXdp3OOo3453NE',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBJMNTg46lYe9RwxB6FjvAgzEa4LBvEOfIx-MvnGvPVytlIgFqyzEGECyho2VOUX_r7m9Bohmj6hE9_LhFdzxOMQ-4ENj9S3szemLxbDKY0h3Y0TR4hcinvXpwEt74MWslA3fXkWwm0o773DrORrwZMuJK4qhZH3HfqzNU0sDBHdg50jc98uiSjLTyE7L2BDJiXNIqekSr3yBXyxVcFmmi1GiGgjYx2fg0EqFbwBcDas8oVxfZsQGGZajweSXH4D0_XrBvDhDi1UsVf'
-    ]
-  }
-];
 
 const DiscoveryFeed: React.FC = () => {
   const [activeTab, setActiveTab] = useState('Latest');
   const [likedRecipes, setLikedRecipes] = useState<Set<string>>(new Set());
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const toggleLike = (e: React.MouseEvent, id: string) => {
@@ -67,6 +38,50 @@ const DiscoveryFeed: React.FC = () => {
     }
     setLikedRecipes(newLiked);
   };
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        setLoading(true);
+        console.log('Fetching recipes from:', client.defaults.baseURL + '/recipes');
+        const response = await client.get('/recipes');
+        console.log('Raw Backend Response:', response.data);
+        
+        if (response.data && Array.isArray(response.data.recipes)) {
+          console.log(`Found ${response.data.recipes.length} recipes`);
+          const mappedRecipes: Recipe[] = response.data.recipes.map((r: any) => {
+            // Filter out media without a URL and extract unique media items
+            const mediaItems: RecipeMedia[] = r.media
+              ? r.media
+                  .filter((m: any) => !!m.url)
+                  .map((m: any) => ({ url: m.url, type: m.type as 'image' | 'video' }))
+              : [];
+            
+            // Remove duplicates based on URL
+            const uniqueMedia = mediaItems.filter((v, i, a) => a.findIndex(t => t.url === v.url) === i);
+            
+            const placeholderUrl = 'https://via.placeholder.com/800x600?text=No+Image';
+
+            return {
+              id: r.id.toString(),
+              title: r.name,
+              description: r.description || '',
+              meta: `${r.cook_time_minutes || 0} min · ${r.servings || 0} servings`,
+              image: uniqueMedia.length > 0 ? uniqueMedia[0].url : placeholderUrl,
+              images: uniqueMedia.length > 0 ? uniqueMedia : [{ url: placeholderUrl, type: 'image' }]
+            };
+          });
+          setRecipes(mappedRecipes);
+        }
+      } catch (error) {
+        console.error('Backend connection failed:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipes();
+  }, []);
 
   const tabs = ['Latest', 'Most Viewed', 'Most Liked'];
 
@@ -100,17 +115,29 @@ const DiscoveryFeed: React.FC = () => {
 
       <main className="pb-24 md:pb-10">
         <PageContainer className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {recipesData.map((recipe) => (
-              <RecipeCard 
-                key={recipe.id}
-                recipe={recipe}
-                isLiked={likedRecipes.has(recipe.id)}
-                onToggleLike={toggleLike}
-                onClick={() => navigate(`/recipe/${recipe.id}`)}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+            </div>
+          ) : recipes.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {recipes.map((recipe) => (
+                <RecipeCard 
+                  key={recipe.id}
+                  recipe={recipe}
+                  isLiked={likedRecipes.has(recipe.id)}
+                  onToggleLike={toggleLike}
+                  onClick={() => navigate(`/recipe/${recipe.id}`)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <span className="material-symbols-rounded text-6xl text-gray-300 mb-4">restaurant_menu</span>
+              <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">No recipes found</h3>
+              <p className="text-gray-500 max-w-xs">We couldn't find any recipes in the database yet. Why not add one?</p>
+            </div>
+          )}
         </PageContainer>
       </main>
 

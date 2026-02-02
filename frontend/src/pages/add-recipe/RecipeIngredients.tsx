@@ -3,14 +3,7 @@ import { Link, useNavigate } from 'react-router';
 import { SortableList } from '../../components/ui/SortableList';
 import { Toast } from '../../components/ui/Toast';
 import { AddRecipeNavigation } from '../../components/forms/AddRecipeNavigation';
-
-interface Ingredient {
-  id: string;
-  name: string;
-  quantity: string;
-  unit: string;
-  measurementType: string;
-}
+import { useAddRecipeStore, Ingredient } from '../../store/useAddRecipeStore';
 
 interface Option {
   value: string;
@@ -72,10 +65,7 @@ const CustomSelect: React.FC<{
 
 const RecipeIngredients: React.FC = () => {
   const navigate = useNavigate();
-  const [ingredients, setIngredients] = useState<Ingredient[]>([
-    { id: '1', name: 'All-Purpose Flour', quantity: '250', unit: 'g', measurementType: 'weight' },
-    { id: '2', name: 'Large Eggs', quantity: '2', unit: '', measurementType: 'count' },
-  ]);
+  const { ingredients, setIngredients } = useAddRecipeStore();
 
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState('');
@@ -187,9 +177,9 @@ const RecipeIngredients: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
-      <div className="flex-grow">
-        <div className="sticky top-0 md:top-14 z-20 bg-background-light dark:bg-background-dark">
+    <div className="flex min-h-screen lg:h-[calc(100vh-56px)] lg:min-h-0 flex-col bg-background-light dark:bg-background-dark">
+      <div className="flex-grow flex flex-col lg:overflow-hidden">
+        <div className="sticky top-0 md:top-14 lg:static z-20 bg-background-light dark:bg-background-dark shrink-0">
           <header className="flex items-center justify-between bg-background-light px-4 py-3 dark:bg-background-dark pb-1">
             <Link to="/add-recipe/basic" className="flex items-center justify-center text-primary lg:hidden" aria-label="Back">
               <span className="material-symbols-outlined text-3xl">arrow_back</span>
@@ -209,10 +199,10 @@ const RecipeIngredients: React.FC = () => {
           </div>
         </div>
 
-        <main className="p-4 mx-auto max-w-2xl lg:max-w-5xl pb-20 lg:pb-6 lg:pt-0">
-          <div className="lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start lg:min-h-[calc(100vh-300px)]">
+        <main className="p-4 mx-auto max-w-2xl lg:max-w-5xl pb-20 lg:pb-0 lg:pt-0 flex-1 lg:overflow-hidden w-full">
+          <div className="lg:grid lg:grid-cols-2 lg:gap-12 lg:h-full">
             {/* Left Column: Input Form */}
-            <div className="space-y-4 lg:sticky lg:top-[192px] lg:z-10 lg:mt-[68px]">
+            <div className="space-y-4 lg:h-full lg:overflow-y-auto no-scrollbar lg:pr-2 lg:pb-24">
               <div className="space-y-4">
                   <div>
                     <label className="sr-only" htmlFor="ingredient-name">Ingredient name</label>
@@ -327,8 +317,8 @@ const RecipeIngredients: React.FC = () => {
               </div>
 
             {/* Right Column: Ingredients List */}
-            <div className="mt-8 lg:mt-0 relative">
-              <h2 className="text-lg font-bold text-stone-900 dark:text-stone-200 mb-4 lg:sticky lg:top-[124px] lg:z-10 lg:bg-background-light lg:dark:bg-background-dark lg:py-3">
+            <div className="mt-8 lg:mt-0 lg:h-full lg:overflow-y-auto no-scrollbar lg:pl-2 lg:pb-24">
+              <h2 className="text-lg font-bold text-stone-900 dark:text-stone-200 mb-4">
                 Ingredients List
               </h2>
               <SortableList 

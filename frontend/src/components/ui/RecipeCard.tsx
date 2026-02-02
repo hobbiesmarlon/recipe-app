@@ -7,7 +7,7 @@ export interface Recipe {
   description: string;
   meta: string;
   image: string;
-  images: string[];
+  images: { url: string; type: 'image' | 'video' }[];
 }
 
 interface RecipeCardProps {

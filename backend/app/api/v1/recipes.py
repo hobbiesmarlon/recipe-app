@@ -9,6 +9,7 @@ from app.models.recipe_ingredient import RecipeIngredient
 from app.models.recipe_step import RecipeStep
 from app.models.category import Category
 from app.schemas.recipe import RecipeCreate, RecipeRead, RecipeUpdate
+from app.schemas.ingredient import IngredientRead
 from app.api.deps import get_current_user, get_optional_current_user
 from app.models.user import User
 from app.core.config import settings
@@ -82,21 +83,27 @@ async def list_recipes(
     category_ids: Optional[List[int]] = Query(None),
     max_cook_time: Optional[int] = Query(None, alias="maxTime"),
     search: Optional[str] = Query(None),
+    author_id: Optional[int] = Query(None),
 ):
     stmt = select(Recipe).options(
-        joinedload(Recipe.ingredients),
-        joinedload(Recipe.steps),
-        joinedload(Recipe.categories),
-        joinedload(Recipe.media),
+        selectinload(Recipe.ingredients).joinedload(RecipeIngredient.unit),
+        selectinload(Recipe.steps),
+        selectinload(Recipe.categories),
+        selectinload(Recipe.media),
+        joinedload(Recipe.author),
     )
 
     # Only public recipes or user's own recipes
-    if user:
-        stmt = stmt.where(
-            (Recipe.is_public) | (Recipe.user_id == user.id)
-        )
-    else:
-        stmt = stmt.where(Recipe.is_public)
+    # if user:
+    #     stmt = stmt.where(
+    #         (Recipe.is_public) | (Recipe.user_id == user.id)
+    #     )
+    # else:
+    #     stmt = stmt.where(Recipe.is_public)
+
+    # Filter by author
+    if author_id:
+        stmt = stmt.where(Recipe.user_id == author_id)
 
     # Filter by categories
     if category_ids:
@@ -142,10 +149,24 @@ async def list_recipes(
                 id=r.id,
                 name=r.name,
                 description=r.description,
+                chefs_note=r.chefs_note,
                 cook_time_minutes=r.cook_time_minutes,
                 servings=r.servings,
                 is_public=r.is_public,
-                ingredients=r.ingredients,
+                author_name=r.author.display_name if r.author else "Anonymous",
+                ingredients=[
+                    IngredientRead(
+                        id=ing.id,
+                        ingredient_id=ing.ingredient_id,
+                        name_text=ing.name_text,
+                        quantity=float(ing.quantity) if ing.quantity else None,
+                        quantity_text=ing.quantity_text,
+                        unit_id=ing.unit_id,
+                        unit_name=ing.unit.name if ing.unit else None,
+                        preparation_notes=ing.preparation_notes,
+                        display_order=ing.display_order
+                    ) for ing in r.ingredients
+                ],
                 steps=r.steps,
                 categories=[c.name for c in r.categories],
                 media=r.media,
@@ -160,10 +181,11 @@ async def get_recipe(recipe_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(Recipe)
         .options(
-            selectinload(Recipe.ingredients),
+            selectinload(Recipe.ingredients).joinedload(RecipeIngredient.unit),
             selectinload(Recipe.steps),
             selectinload(Recipe.categories),
             selectinload(Recipe.media),
+            joinedload(Recipe.author),
         )
         .where(Recipe.id == recipe_id)
     )
@@ -171,17 +193,31 @@ async def get_recipe(recipe_id: int, db: AsyncSession = Depends(get_db)):
     if not recipe:
         raise HTTPException(404, "Recipe not found")
 
-    # Sort media: primary first, then display_order
+    # Sort media
     recipe.media.sort(key=lambda m: (not m.is_primary, m.display_order))
 
     return RecipeRead(
         id=recipe.id,
         name=recipe.name,
         description=recipe.description,
+        chefs_note=recipe.chefs_note,
         cook_time_minutes=recipe.cook_time_minutes,
         servings=recipe.servings,
         is_public=recipe.is_public,
-        ingredients=recipe.ingredients,
+        author_name=recipe.author.display_name if recipe.author else "Anonymous",
+        ingredients=[
+            IngredientRead(
+                id=ing.id,
+                ingredient_id=ing.ingredient_id,
+                name_text=ing.name_text,
+                quantity=float(ing.quantity) if ing.quantity else None,
+                quantity_text=ing.quantity_text,
+                unit_id=ing.unit_id,
+                unit_name=ing.unit.name if ing.unit else None,
+                preparation_notes=ing.preparation_notes,
+                display_order=ing.display_order
+            ) for ing in recipe.ingredients
+        ],
         steps=recipe.steps,
         categories=[c.name for c in recipe.categories],
         media=recipe.media,

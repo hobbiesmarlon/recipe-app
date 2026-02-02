@@ -149,6 +149,10 @@ async def callback(provider: str, code: str, state: str, db: AsyncSession = Depe
             x_username = user_data.get("username")
             name = user_data.get("name") or x_username or f"user_{provider_user_id}"
             email = f"{provider_user_id}@x.com"
+            profile_pic_url = user_data.get("profile_image_url")
+            # X returns normal size by default, replace '_normal' for higher res if needed
+            if profile_pic_url:
+                profile_pic_url = profile_pic_url.replace("_normal", "")
 
     # ---------------- Step 3: Upsert user ----------------
     result = await db.execute(
@@ -158,21 +162,41 @@ async def callback(provider: str, code: str, state: str, db: AsyncSession = Depe
         )
     )
     oauth_acc = result.scalars().first()
+    
     if oauth_acc:
         user = await db.get(User, oauth_acc.user_id)
+        # Update OAuth info
+        oauth_acc.provider_username = x_username if provider == "x" else None
+        oauth_acc.provider_display_name = name
+        oauth_acc.provider_profile_pic_url = profile_pic_url if provider == "x" else None # Google logic to be added later if needed
+        
+        # Update User info if sourced from provider
+        if user.profile_pic_sourced_from_provider and profile_pic_url:
+             user.profile_picture_url = profile_pic_url
+        if user.display_name_sourced_from_provider and name:
+             user.display_name = name
     else:
         if provider == "x":
-            username = f"@{x_username}" if x_username else email.split("@")[0]
+            username = x_username if x_username else email.split("@")[0]
         else:
             username = email.split("@")[0] if email and "@" in email else email
-        user = User(username=username, display_name=name)
+            profile_pic_url = None # Google logic not fully implemented above for pic
+
+        user = User(
+            username=username, 
+            display_name=name,
+            profile_picture_url=profile_pic_url
+        )
         db.add(user)
         await db.flush()
         oauth_acc = OAuthAccount(
             user_id=user.id,
             provider=OAuthProvider(provider),
             provider_user_id=provider_user_id,
-            access_token=access_token
+            access_token=access_token,
+            provider_username=x_username if provider == "x" else None,
+            provider_display_name=name,
+            provider_profile_pic_url=profile_pic_url
         )
         db.add(oauth_acc)
 
@@ -180,8 +204,8 @@ async def callback(provider: str, code: str, state: str, db: AsyncSession = Depe
 
     # ---------------- Step 4: Return JWT ----------------
     token = create_access_token(subject=str(user.id))
-    return JSONResponse({
-        "access_token": token,
-        "token_type": "bearer",
-        "user": {"id": user.id, "username": user.username, "display_name": user.display_name}
-    })
+    
+    frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173")
+    redirect_url = f"{frontend_url}/auth/callback?token={token}"
+    
+    return RedirectResponse(url=redirect_url)

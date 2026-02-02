@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router';
 import { AddRecipeNavigation } from '../../components/forms/AddRecipeNavigation';
+import { useAddRecipeStore } from '../../store/useAddRecipeStore';
 
 const RecipeChefsNote: React.FC = () => {
   const navigate = useNavigate();
-  const [note, setNote] = useState('');
+  const { chefsNote: note, setChefsNote: setNote } = useAddRecipeStore();
 
   return (
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">

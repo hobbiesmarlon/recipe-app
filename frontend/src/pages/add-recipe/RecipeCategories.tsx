@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router';
 import { AddRecipeNavigation } from '../../components/forms/AddRecipeNavigation';
+import { useAddRecipeStore } from '../../store/useAddRecipeStore';
 
 const RecipeCategories: React.FC = () => {
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const { categories, setCategories } = useAddRecipeStore();
 
   const toggle = (category: string, value: string) => {
     const key = `${category}:${value}`;
-    const newSelected = new Set(selected);
-    if (newSelected.has(key)) {
-      newSelected.delete(key);
+    if (categories.includes(key)) {
+      setCategories(categories.filter(c => c !== key));
     } else {
-      newSelected.add(key);
+      setCategories([...categories, key]);
     }
-    setSelected(newSelected);
   };
 
-  const isSelected = (category: string, value: string) => selected.has(`${category}:${value}`);
+  const isSelected = (category: string, value: string) => categories.includes(`${category}:${value}`);
 
   const Chip: React.FC<{ category: string; value: string }> = ({ category, value }) => {
     const selected = isSelected(category, value);

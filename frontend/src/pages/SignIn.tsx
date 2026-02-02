@@ -3,6 +3,11 @@ import { Link } from 'react-router';
 import BottomNav from '../components/BottomNav';
 
 const SignIn: React.FC = () => {
+  const handleLogin = (provider: string) => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    window.location.href = `${apiUrl}/auth/${provider}/login`;
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
       <header className="py-4 sticky top-0 md:top-14 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
@@ -26,20 +31,25 @@ const SignIn: React.FC = () => {
         
         <div className="w-full max-w-sm space-y-4">
           {/* X (Twitter) Button */}
-          <button className="w-full bg-black text-white font-bold py-3 px-5 rounded-lg flex items-center justify-center hover:bg-gray-800 transition-colors">
+          <button 
+            onClick={() => handleLogin('x')}
+            className="w-full bg-black text-white font-bold py-3 px-5 rounded-lg flex items-center justify-center hover:bg-gray-800 transition-colors"
+          >
             <svg className="mr-3 w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
             </svg>
             Continue with X
           </button>
 
-          {/* Facebook Button */}
+          {/* Facebook Button - Disabled/Hidden as backend support is missing */}
+          {/* 
           <button className="w-full bg-[#1877F2] text-white font-bold py-3 px-5 rounded-lg flex items-center justify-center hover:bg-[#166fe5] transition-colors">
             <svg className="mr-3 w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
             </svg>
             Continue with Facebook
           </button>
+           */}
 
           <div className="flex items-center w-full my-4">
             <div className="flex-grow border-t border-black/10 dark:border-white/10"></div>
@@ -48,7 +58,10 @@ const SignIn: React.FC = () => {
           </div>
 
           {/* Google Button */}
-          <button className="w-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold py-3 px-5 rounded-lg flex items-center justify-center border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+          <button 
+            onClick={() => handleLogin('google')}
+            className="w-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold py-3 px-5 rounded-lg flex items-center justify-center border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
             <svg className="mr-3 w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>

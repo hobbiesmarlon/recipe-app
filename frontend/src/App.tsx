@@ -8,6 +8,8 @@ import UserProfile from './pages/UserProfile';
 import EditProfile from './pages/EditProfile';
 import MyRecipes from './pages/MyRecipes';
 import SignIn from './pages/SignIn';
+import AuthCallback from './pages/AuthCallback';
+import PublicProfile from './pages/PublicProfile';
 import RecipeBasicInfo from './pages/add-recipe/RecipeBasicInfo';
 import RecipeIngredients from './pages/add-recipe/RecipeIngredients';
 import RecipeInstructions from './pages/add-recipe/RecipeInstructions';
@@ -27,9 +29,11 @@ function App() {
           <Route path="categories" element={<Categories />} />
           <Route path="browse" element={<CategoriesBrowsing />} />
           <Route path="profile" element={<UserProfile />} />
+          <Route path="u/:username" element={<PublicProfile />} />
           <Route path="edit-profile" element={<EditProfile />} />
           <Route path="my-recipes" element={<MyRecipes />} />
           <Route path="signin" element={<SignIn />} />
+          <Route path="auth/callback" element={<AuthCallback />} />
           
           {/* Add Recipe Flow */}
           <Route path="add-recipe">

@@ -17,5 +17,12 @@ class Unit(Base, TimestampMixin):
     id = Column(BigInteger, primary_key=True)
     name = Column(Text, unique=True, nullable=False)
     symbol = Column(Text)
-    unit_type = Column(Enum(UnitType, native_enum=False), default=UnitType.OTHER)
+    unit_type = Column(
+        Enum(
+            UnitType,
+            native_enum=False,
+            values_callable=lambda x: [e.value for e in x]
+        ),
+        default=UnitType.OTHER
+    )
     conversion_to_base = Column(Float) # double precision

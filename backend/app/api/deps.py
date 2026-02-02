@@ -8,7 +8,7 @@ from app.core.config import settings
 from app.core.db import get_db
 from app.models.user import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
 # --- Cognito Public Key Cache ---
 # In production, we fetch AWS public keys once and cache them.
@@ -53,14 +53,17 @@ async def verify_cognito_token(token: str) -> dict:
 # --- Dependency ---
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
     db: AsyncSession = Depends(get_db),
+    token: Optional[str] = Depends(oauth2_scheme),
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
+    if not token:
+        raise credentials_exception
 
     try:
         if settings.USE_COGNITO:
@@ -97,6 +100,6 @@ async def get_optional_current_user(
     if not token:
         return None
     try:
-        return await get_current_user(token, db)
+        return await get_current_user(db=db, token=token)
     except HTTPException:
         return None

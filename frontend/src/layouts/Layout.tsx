@@ -1,14 +1,20 @@
 import React, { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router';
 import { DesktopNav } from '../components/DesktopNav';
+import { useAuthStore } from '../store/useAuthStore';
 
 const Layout: React.FC = () => {
   const location = useLocation();
   const path = location.pathname;
+  const { fetchUser, user } = useAuthStore();
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
   let themeClass = '';
 
-  if (path.startsWith('/profile') || path.startsWith('/edit-profile') || path.startsWith('/my-recipes')) {
+  if (path.startsWith('/profile') || path.startsWith('/u/') || path.startsWith('/edit-profile') || path.startsWith('/my-recipes')) {
     themeClass = 'theme-profile';
   } else if (path.startsWith('/add-recipe') || path.startsWith('/recipe')) {
     themeClass = 'theme-recipe';

@@ -1,25 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { SortableList } from '../../components/ui/SortableList';
 import { Toast } from '../../components/ui/Toast';
 import { AddRecipeNavigation } from '../../components/forms/AddRecipeNavigation';
-
-interface InstructionStep {
-  id: string;
-  description: string;
-}
+import { useAddRecipeStore, InstructionStep } from '../../store/useAddRecipeStore';
 
 const RecipeInstructions: React.FC = () => {
   const navigate = useNavigate();
-  const [steps, setSteps] = useState<InstructionStep[]>([
-    { id: '1', description: 'Preheat oven to 350°F (175°C).' },
-    { id: '2', description: 'In a large bowl, cream together the butter and sugar until smooth.' },
-    { id: '3', description: 'Beat in the eggs one at a time, then stir in the vanilla.' }
-  ]);
+  const { instructions: steps, setInstructions: setSteps } = useAddRecipeStore();
   const [isAdding, setIsAdding] = useState(false);
   const [newStepDescription, setNewStepDescription] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isAdding || steps.length > 0) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [isAdding, steps.length]);
 
   const handleNext = () => {
     if (steps.length === 0) {
@@ -181,6 +180,7 @@ const RecipeInstructions: React.FC = () => {
               </div>
             )}
           </div>
+          <div ref={bottomRef} className="h-4" />
         </div>
       </main>
 

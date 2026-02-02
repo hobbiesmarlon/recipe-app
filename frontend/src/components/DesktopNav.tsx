@@ -1,8 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router';
 import { PageContainer } from './PageContainer';
+import { useAuthStore } from '../store/useAuthStore';
 
 export const DesktopNav: React.FC = () => {
+  const { user } = useAuthStore();
+
   const getLinkClass = ({ isActive }: { isActive: boolean }) => {
     const baseClass = "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors";
     const activeClass = "text-primary font-bold bg-primary/5";
@@ -53,8 +56,14 @@ export const DesktopNav: React.FC = () => {
           <div className="w-px h-5 bg-border-light dark:bg-border-dark mx-0.5"></div>
 
           <NavLink to="/profile" className="flex-shrink-0">
-             <div className="h-8 w-8 rounded-full overflow-hidden border-2 border-transparent hover:border-primary transition-all shadow-sm">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjF4IBYL2qx1Zz4w-VTiBqLPNeVqbYwLgBfCV_nyEnVAYQ57EGsWmQxIAEFyxmKUgxZDvTyP1w3ynm3A6vF-JGJiRePgFl7mSFANWm_Eu466ilLKDuUihdjuq9pMulKbmP6IsYggE36Y2mYNUdf26X5ZTtjpCwZLLCDef9Do_q3pTY5V3L9u83qxWm05rKI21XfD1Kp0jT0wqiVSAJwvwwO0ITRbFXjFNoTi5bO11kmpK2qpvIWUIYdt00Xba3Wp4ljEYhZmZUxmk" alt="Profile" className="h-full w-full object-cover" />
+             <div className="h-8 w-8 rounded-full overflow-hidden border-2 border-transparent hover:border-primary transition-all shadow-sm flex items-center justify-center bg-gray-100 dark:bg-white/10">
+                {user && user.profile_picture_url ? (
+                  <img src={user.profile_picture_url} alt={user.display_name} className="h-full w-full object-cover" />
+                ) : (
+                  <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                )}
              </div>
           </NavLink>
         </div>

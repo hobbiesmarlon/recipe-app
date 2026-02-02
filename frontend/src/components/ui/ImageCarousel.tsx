@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+interface MediaItem {
+  url: string;
+  type: 'image' | 'video';
+}
+
 interface ImageCarouselProps {
-  images: string[];
+  images: MediaItem[];
   alt: string;
   className?: string;
   heightClass?: string;
@@ -16,16 +21,35 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
   // If no images, render nothing
   if (!images || images.length === 0) return null;
 
-  // If only 1 image, render simple static version
+  const renderMedia = (item: MediaItem, index: number, isPriority: boolean = false) => {
+    if (item.type === 'video') {
+      return (
+        <video
+          src={item.url}
+          className="w-full h-full object-cover"
+          muted
+          loop
+          playsInline
+          autoPlay={isPriority}
+        />
+      );
+    }
+    return (
+      <img 
+        src={item.url} 
+        alt={`${alt} ${index}`} 
+        className="w-full h-full object-cover"
+        loading={isPriority ? "eager" : "lazy"}
+      />
+    );
+  };
+
+  // If only 1 item, render simple static version
   if (images.length === 1) {
     return (
       <div className={`relative w-full overflow-hidden ${heightClass} ${className}`}>
         <div className="w-full h-full relative">
-           <img 
-             src={images[0]} 
-             alt={`${alt} 1`} 
-             className="w-full h-full object-cover"
-           />
+           {renderMedia(images[0], 1, true)}
            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30 pointer-events-none"></div>
         </div>
       </div>
@@ -157,13 +181,9 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
         }}
         onTransitionEnd={handleTransitionEnd}
       >
-        {extendedImages.map((img, index) => (
+        {extendedImages.map((item, index) => (
           <div key={index} className="w-full h-full flex-shrink-0 relative">
-             <img 
-               src={img} 
-               alt={`${alt} ${index}`} // Index is mostly internal here
-               className="w-full h-full object-cover"
-             />
+             {renderMedia(item, index, index === currentIndex)}
              {/* Gradient Overlay */}
              <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30 pointer-events-none"></div>
           </div>

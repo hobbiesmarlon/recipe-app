@@ -12,6 +12,7 @@ class IngredientCreate(BaseModel):
 class IngredientRead(IngredientCreate):
     id: int
     ingredient_id: Optional[int] = None
+    unit_name: Optional[str] = None
 
     class Config:
         from_attributes = True

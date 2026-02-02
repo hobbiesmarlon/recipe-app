@@ -28,9 +28,11 @@ class RecipeRead(BaseModel):
     id: int
     name: str
     description: Optional[str]
+    chefs_note: Optional[str] = None
     cook_time_minutes: Optional[int]
     servings: Optional[int]
     is_public: bool
+    author_name: Optional[str] = None
 
     ingredients: List[IngredientRead]
     steps: List[StepRead]

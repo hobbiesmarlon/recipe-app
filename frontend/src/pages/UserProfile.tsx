@@ -1,17 +1,71 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router';
 import BottomNav from '../components/BottomNav';
 import { PageContainer } from '../components/PageContainer';
+import client from '../api/client';
+
+interface User {
+  id: number;
+  username: string;
+  display_name: string;
+  profile_picture_url?: string;
+  email?: string;
+}
+
+interface RecipeMedia {
+  url: string;
+  type: 'image' | 'video';
+  is_primary: boolean;
+}
+
+interface Recipe {
+  id: number;
+  name: string;
+  media: RecipeMedia[];
+}
 
 const UserProfile: React.FC = () => {
   const [activeTab, setActiveTab] = useState('myrecipes');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   const tabs = ['myrecipes', 'savedrecipes', 'history'];
-  
   const minSwipeDistance = 50;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // Fetch User Profile
+        const userRes = await client.get('/users/me');
+        const userData = userRes.data;
+        setUser(userData);
+
+        // Fetch My Recipes
+        if (userData && userData.id) {
+            const recipesRes = await client.get(`/recipes?author_id=${userData.id}`);
+            setMyRecipes(recipesRes.data.recipes || []);
+        }
+      } catch (error) {
+        console.error("Failed to load profile data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    navigate('/signin');
+  };
 
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);
@@ -36,13 +90,20 @@ const UserProfile: React.FC = () => {
     }
   };
 
+  const getRecipeImage = (recipe: Recipe) => {
+      const primary = recipe.media.find(m => m.is_primary);
+      if (primary) return primary.url;
+      if (recipe.media.length > 0) return recipe.media[0].url;
+      return 'https://via.placeholder.com/300?text=No+Image';
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="py-4 sticky top-0 md:top-14 z-10 bg-background-light dark:bg-background-dark">
+      <header className="py-4 md:py-0 sticky top-0 md:top-14 z-10 bg-background-light dark:bg-background-dark md:bg-transparent">
         <PageContainer>
-          <div className="flex items-center justify-between">
-            <div className="w-10"></div>
-            <h1 className="text-lg font-bold text-background-dark dark:text-background-light">Profile</h1>
+          <div className="flex items-center justify-between md:justify-end md:h-10">
+            <div className="w-10 md:hidden"></div>
+            <h1 className="text-lg font-bold text-background-dark dark:text-background-light md:hidden">Profile</h1>
             
             <div className="relative">
               <button 
@@ -94,6 +155,15 @@ const UserProfile: React.FC = () => {
                         </svg>
                         Share Profile
                       </button>
+                      <button 
+                        onClick={handleSignOut}
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                      >
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                        </svg>
+                        Sign Out
+                      </button>
                     </div>
                   </div>
                 </>
@@ -104,20 +174,34 @@ const UserProfile: React.FC = () => {
       </header>
       
       <main className="pb-24">
-        <PageContainer className="space-y-6 pt-6">
+        <PageContainer className="space-y-6 pt-6 md:pt-4">
           <div className="@container">
             <div className="flex w-full flex-col items-center md:flex-row md:items-end gap-6 md:gap-8">
               <div className="h-32 w-32 md:h-40 md:w-40 shrink-0">
-                <img alt="Sophia Bennett's profile picture" className="h-full w-full rounded-full object-cover shadow-lg border-4 border-white dark:border-stone-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjF4IBYL2qx1Zz4w-VTiBqLPNeVqbYwLgBfCV_nyEnVAYQ57EGsWmQxIAEFyxmKUgxZDvTyP1w3ynm3A6vF-JGJiRePgFl7mSFANWm_Eu466ilLKDuUihdjuq9pMulKbmP6IsYggE36Y2mYNUdf26X5ZTtjpCwZLLCDef9Do_q3pTY5V3L9u83qxWm05rKI21XfD1Kp0jT0wqiVSAJwvwwO0ITRbFXjFNoTi5bO11kmpK2qpvIWUIYdt00Xba3Wp4ljEYhZmZUxmk" />
+                {user ? (
+                   <img 
+                      alt={user.display_name} 
+                      className="h-full w-full rounded-full object-cover shadow-lg border-4 border-white dark:border-stone-800" 
+                      src={user.profile_picture_url || "https://via.placeholder.com/150"} 
+                   />
+                ) : (
+                   <div className="h-full w-full rounded-full bg-gray-200 dark:bg-gray-800 animate-pulse border-4 border-white dark:border-stone-800"></div>
+                )}
               </div>
               <div className="flex flex-col items-center md:items-start mb-2">
-                <p className="text-[22px] md:text-3xl font-bold text-background-dark dark:text-background-light">Sophia Bennett</p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <p className="text-base md:text-lg text-primary">@sophia_b</p>
-                  <svg className="h-3.5 w-3.5 md:h-4 md:w-4 text-background-dark dark:text-background-light" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932 6.064-6.932zm-1.292 19.494h2.039L6.486 3.24H4.298l13.311 17.407z" />
-                  </svg>
-                </div>
+                {user ? (
+                    <>
+                        <p className="text-[22px] md:text-3xl font-bold text-background-dark dark:text-background-light">{user.display_name}</p>
+                        <div className="flex items-center gap-1.5 mt-1">
+                        <p className="text-base md:text-lg text-primary">@{user.username || user.email?.split('@')[0]}</p>
+                        <svg className="h-3.5 w-3.5 md:h-4 md:w-4 text-background-dark dark:text-background-light" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932 6.064-6.932zm-1.292 19.494h2.039L6.486 3.24H4.298l13.311 17.407z" />
+                        </svg>
+                        </div>
+                    </>
+                ) : (
+                    <div className="w-48 h-8 bg-gray-200 dark:bg-gray-800 animate-pulse rounded mt-2"></div>
+                )}
               </div>
             </div>
           </div>
@@ -152,77 +236,57 @@ const UserProfile: React.FC = () => {
             className="min-h-[300px]"
           >
             {activeTab === 'myrecipes' && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fadeIn">
-                <div className="flex flex-col gap-3">
-                  <div className="aspect-square w-full overflow-hidden rounded-lg">
-                    <img alt="Breakfast Ideas" className="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3VAhvxDsk0s_zP5LK4UULTnmbF0PVt6bzCbDlIzDFEDH8NcX48UcH9p3btzkM3rRDFh28RZC2yIg2xacHF1V-5vldpucjt2L4a8inoIg8RRBUd-5852QGPy3EbCzucSmMXIL9MR2Z2GG76Rpi2ep2uL1rrfwjKFr2DGEVoY99uoSL_k6FSGjtQ-7G-MndmwsHtLKblOPCJk1HpSdHyWLAjjPgX1SDWOWY7q3W7UZJPKPR-rUpUhouu_uXpEH5yvr0QvrzGf8HvrI" />
-                  </div>
-                  <p className="font-medium text-background-dark dark:text-background-light">Breakfast Ideas</p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="aspect-square w-full overflow-hidden rounded-lg">
-                    <img alt="Quick Dinners" className="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGuWoHpRwfw07lzD-OOW6f7WcXSj0qn0rVEWOM25qO9x2BLMFSsftZf48-41-_7bfrEwu1NE-W7OHY0brgo30Ynx1UXypwDuxdCryigzmTSn13K7pChFkEbm1SYQPtRYXjxVeUXJInf1sK5KB5vp-sIbb6fX6nykWD5NBwlvjhrqPFDuZqT-War-AZMEfx4R4P7nwLPyfJUP6QOY1l7ofErS5iOj_CEyx83WHtBmgrTsWN3EugaHavO1y3l_-EGwj3i6NJXLvnM_8" />
-                  </div>
-                  <p className="font-medium text-background-dark dark:text-background-light">Quick Dinners</p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="aspect-square w-full overflow-hidden rounded-lg">
-                    <img alt="Dessert Recipes" className="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx3yKlGt_-Bpss7n-SLsrf3tWBugu7TpUyLtV1b_0ed51F3QLAGjekwbn7UPBfKjPDl5lNnQV8-CTBbbMtMs51esPYn_ESsqRLdMHJVX5vV2TqRxyHuGTSjpzUMa91x7S7ys0-5-tp8h8rAMIHB8reHc9jNCqzIUipe0BZ_zZ7Vs20fSVXOy_ePowXFqwXesMXil9KHE-WwXy-xM67N39qRcMxyB1waQOZQfeoRn3dgXupREq1LiipHTnCKNqvtCKCB2K6OIrs9B4" />
-                  </div>
-                  <p className="font-medium text-background-dark dark:text-background-light">Dessert Recipes</p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="aspect-square w-full overflow-hidden rounded-lg">
-                    <img alt="Avocado Toast" className="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjF4IBYL2qx1Zz4w-VTiBqLPNeVqbYwLgBfCV_nyEnVAYQ57EGsWmQxIAEFyxmKUgxZDvTyP1w3ynm3A6vF-JGJiRePgFl7mSFANWm_Eu466ilLKDuUihdjuq9pMulKbmP6IsYggE36Y2mYNUdf26X5ZTtjpCwZLLCDef9Do_q3pTY5V3L9u83qxWm05rKI21XfD1Kp0jT0wqiVSAJwvwwO0ITRbFXjFNoTi5bO11kmpK2qpvIWUIYdt00Xba3Wp4ljEYhZmZUxmk" />
-                  </div>
-                  <p className="font-medium text-background-dark dark:text-background-light">Avocado Toast</p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="aspect-square w-full overflow-hidden rounded-lg">
-                    <img className="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUf9SIcOlc-L412hId07kkGkX67aekRdlwQkyyJqDBITii3OWnwf-Mvyk_nlHfW2lxWU_YXPwSQida_6ZrXZ73-wDJp-tXFWKibqWUgiMhHxiBvg0gjevlbuBhftRr0vPd-HtPzhbzFwGpHPZvuMkO0xqr6MrcF2eXBTCZIVsBkE_yTXExNMVE0NfSOUh6DEr9lelhRKQwea89u6WG2D042pM6PYbKACprhmbphSZkPmP4v6Cxh_cX2UZsULeIROoMEQBj9yyi7SqH" alt="item" />
-                  </div>
-                  <p className="font-medium text-background-dark dark:text-background-light">Spicy Thai Basil Chicken</p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="aspect-square w-full overflow-hidden rounded-lg">
-                    <img className="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJMNTg46lYe9RwxB6FjvAgzEa4LBvEOfIx-MvnGvPVytlIgFqyzEGECyho2VOUX_r7m9Bohmj6hE9_LhFdzxOMQ-4ENj9S3szemLxbDKY0h3Y0TR4hcinvXpwEt74MWslA3fXkWwm0o773DrORrwZMuJK4qhZH3HfqzNU0sDBHdg50jc98uiSjLTyE7L2BDJiXNIqekSr3yBXyxVcFmmi1GiGgjYx2fg0EqFbwBcDas8oVxfZsQGGZajweSXH4D0_XrBvDhDi1UsVf" alt="item" />
-                  </div>
-                  <p className="font-medium text-background-dark dark:text-background-light">Creamy Tomato Pasta</p>
-                </div>
+              <div className="animate-fadeIn">
+                 {loading ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {[1, 2, 3, 4].map(i => (
+                             <div key={i} className="flex flex-col gap-3">
+                                <div className="aspect-square w-full rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+                                <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+                             </div>
+                        ))}
+                    </div>
+                 ) : myRecipes.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {myRecipes.map(recipe => (
+                        <Link to={`/recipe/${recipe.id}`} key={recipe.id} className="flex flex-col gap-3 group">
+                          <div className="aspect-square w-full overflow-hidden rounded-lg">
+                            <img 
+                                alt={recipe.name} 
+                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                                src={getRecipeImage(recipe)} 
+                            />
+                          </div>
+                          <p className="font-medium text-background-dark dark:text-background-light line-clamp-1">{recipe.name}</p>
+                        </Link>
+                      ))}
+                    </div>
+                 ) : (
+                    <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+                        <p>No recipes created yet.</p>
+                        <Link to="/add-recipe" className="text-primary font-bold hover:underline mt-2">Create one now</Link>
+                    </div>
+                 )}
               </div>
             )}
 
             {activeTab === 'savedrecipes' && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fadeIn">
-                <div className="flex flex-col gap-3">
-                  <div className="aspect-square w-full overflow-hidden rounded-lg">
-                    <img alt="Dessert Recipes" className="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx3yKlGt_-Bpss7n-SLsrf3tWBugu7TpUyLtV1b_0ed51F3QLAGjekwbn7UPBfKjPDl5lNnQV8-CTBbbMtMs51esPYn_ESsqRLdMHJVX5vV2TqRxyHuGTSjpzUMa91x7S7ys0-5-tp8h8rAMIHB8reHc9jNCqzIUipe0BZ_zZ7Vs20fSVXOy_ePowXFqwXesMXil9KHE-WwXy-xM67N39qRcMxyB1waQOZQfeoRn3dgXupREq1LiipHTnCKNqvtCKCB2K6OIrs9B4" />
+               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fadeIn">
+                 {/* Empty state for now since backend endpoint is missing */}
+                  <div className="col-span-full flex flex-col items-center justify-center py-10 text-gray-500">
+                      <span className="material-symbols-rounded text-4xl mb-2 opacity-50">bookmark_border</span>
+                      <p>No saved recipes yet.</p>
                   </div>
-                  <p className="font-medium text-background-dark dark:text-background-light">Dessert Recipes</p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="aspect-square w-full overflow-hidden rounded-lg">
-                    <img alt="Avocado Toast" className="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjF4IBYL2qx1Zz4w-VTiBqLPNeVqbYwLgBfCV_nyEnVAYQ57EGsWmQxIAEFyxmKUgxZDvTyP1w3ynm3A6vF-JGJiRePgFl7mSFANWm_Eu466ilLKDuUihdjuq9pMulKbmP6IsYggE36Y2mYNUdf26X5ZTtjpCwZLLCDef9Do_q3pTY5V3L9u83qxWm05rKI21XfD1Kp0jT0wqiVSAJwvwwO0ITRbFXjFNoTi5bO11kmpK2qpvIWUIYdt00Xba3Wp4ljEYhZmZUxmk" />
-                  </div>
-                  <p className="font-medium text-background-dark dark:text-background-light">Avocado Toast</p>
-                </div>
               </div>
             )}
 
             {activeTab === 'history' && (
                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fadeIn">
-                <div className="flex flex-col gap-3">
-                  <div className="aspect-square w-full overflow-hidden rounded-lg">
-                    <img className="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUf9SIcOlc-L412hId07kkGkX67aekRdlwQkyyJqDBITii3OWnwf-Mvyk_nlHfW2lxWU_YXPwSQida_6ZrXZ73-wDJp-tXFWKibqWUgiMhHxiBvg0gjevlbuBhftRr0vPd-HtPzhbzFwGpHPZvuMkO0xqr6MrcF2eXBTCZIVsBkE_yTXExNMVE0NfSOUh6DEr9lelhRKQwea89u6WG2D042pM6PYbKACprhmbphSZkPmP4v6Cxh_cX2UZsULeIROoMEQBj9yyi7SqH" alt="item" />
+                   {/* Empty state for now since backend endpoint is missing */}
+                   <div className="col-span-full flex flex-col items-center justify-center py-10 text-gray-500">
+                      <span className="material-symbols-rounded text-4xl mb-2 opacity-50">history</span>
+                      <p>No viewing history available.</p>
                   </div>
-                  <p className="font-medium text-background-dark dark:text-background-light">Spicy Thai Basil Chicken</p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="aspect-square w-full overflow-hidden rounded-lg">
-                    <img className="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJMNTg46lYe9RwxB6FjvAgzEa4LBvEOfIx-MvnGvPVytlIgFqyzEGECyho2VOUX_r7m9Bohmj6hE9_LhFdzxOMQ-4ENj9S3szemLxbDKY0h3Y0TR4hcinvXpwEt74MWslA3fXkWwm0o773DrORrwZMuJK4qhZH3HfqzNU0sDBHdg50jc98uiSjLTyE7L2BDJiXNIqekSr3yBXyxVcFmmi1GiGgjYx2fg0EqFbwBcDas8oVxfZsQGGZajweSXH4D0_XrBvDhDi1UsVf" alt="item" />
-                  </div>
-                  <p className="font-medium text-background-dark dark:text-background-light">Creamy Tomato Pasta</p>
-                </div>
               </div>
             )}
           </div>

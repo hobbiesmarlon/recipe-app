@@ -1,7 +1,10 @@
 import React from 'react';
 import { NavLink } from 'react-router';
+import { useAuthStore } from '../store/useAuthStore';
 
 const BottomNav: React.FC = () => {
+  const { user } = useAuthStore();
+
   const getLinkClass = ({ isActive }: { isActive: boolean }) => {
     const baseClass = "flex flex-col items-center justify-end flex-1 gap-1 text-xs font-medium";
     const activeClass = "text-primary font-bold";
@@ -56,9 +59,15 @@ const BottomNav: React.FC = () => {
         <NavLink to="/profile" className={getLinkClass}>
           {({ isActive }) => (
             <>
-              <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
-              </svg>
+              {user && user.profile_picture_url ? (
+                  <div className={`h-6 w-6 rounded-full overflow-hidden border ${isActive ? 'border-primary' : 'border-transparent'}`}>
+                    <img src={user.profile_picture_url} alt="Profile" className="h-full w-full object-cover" />
+                  </div>
+              ) : (
+                <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+                </svg>
+              )}
               <p>Profile</p>
             </>
           )}

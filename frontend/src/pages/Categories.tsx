@@ -5,9 +5,9 @@ import { PageContainer } from '../components/PageContainer';
 const Categories: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="py-4 sticky top-0 md:top-14 z-10 bg-background-light dark:bg-background-dark">
+      <header className="py-4 md:py-0 sticky top-0 md:top-14 z-10 bg-background-light dark:bg-background-dark md:bg-transparent">
         <PageContainer>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between md:hidden">
             <div className="w-6"></div>
             <h1 className="text-lg font-bold">Categories</h1>
             <div className="w-10"></div>
@@ -16,7 +16,7 @@ const Categories: React.FC = () => {
       </header>
 
       <main className="pb-24">
-        <PageContainer className="space-y-8 pt-6">
+        <PageContainer className="space-y-8 pt-6 md:pt-4">
           <section className="md:w-fit md:mx-auto">
             <h2 className="text-2xl font-bold">Meals</h2>
             <div className="mt-3 flex space-x-4 overflow-x-auto pb-4 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:overflow-visible no-scrollbar">

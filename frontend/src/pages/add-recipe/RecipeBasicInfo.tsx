@@ -1,38 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Toast } from '../../components/ui/Toast';
 import { SortableList } from '../../components/ui/SortableList';
 import { AddRecipeNavigation } from '../../components/forms/AddRecipeNavigation';
-
-type FileWithId = {
-  id: string;
-  file: File;
-  previewUrl: string;
-};
+import { useAddRecipeStore } from '../../store/useAddRecipeStore';
 
 const RecipeBasicInfo: React.FC = () => {
   const navigate = useNavigate();
-  const [files, setFiles] = useState<FileWithId[]>([]);
-  
-  // Keep track of URLs to cleanup on unmount
-  const fileUrlsRef = useRef<string[]>([]);
+  const { 
+    files, setFiles,
+    name, setName,
+    description, setDescription,
+    prepTime, setPrepTime,
+    servings, setServings
+  } = useAddRecipeStore();
 
-  // Update ref whenever files change so we have the latest list for unmount cleanup
-  useEffect(() => {
-    fileUrlsRef.current = files.map(f => f.previewUrl);
-  }, [files]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      fileUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
-    };
-  }, []);
-
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [prepTime, setPrepTime] = useState('');
-  const [servings, setServings] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('Please fill in all relevant fields');
 
@@ -113,9 +95,9 @@ const RecipeBasicInfo: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
-      <div className="flex-grow">
-        <div className="sticky top-0 md:top-14 z-20 bg-background-light dark:bg-background-dark">
+    <div className="flex min-h-screen lg:h-[calc(100vh-56px)] lg:min-h-0 flex-col bg-background-light dark:bg-background-dark">
+      <div className="flex-grow flex flex-col lg:overflow-hidden">
+        <div className="sticky top-0 md:top-14 lg:static z-20 bg-background-light dark:bg-background-dark shrink-0">
           <header className="flex items-center justify-between bg-background-light px-4 py-3 dark:bg-background-dark pb-1">
             <Link to="/" className="flex items-center justify-center text-primary lg:hidden" aria-label="Close">
               <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
@@ -137,10 +119,10 @@ const RecipeBasicInfo: React.FC = () => {
           </div>
         </div>
 
-        <main className="p-4 space-y-6 mx-auto max-w-2xl lg:max-w-5xl pb-20 lg:pb-6 lg:pt-0">
-          <div className="lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start">
+        <main className="p-4 mx-auto max-w-2xl lg:max-w-5xl pb-20 lg:pb-0 lg:pt-0 flex-1 lg:overflow-hidden w-full">
+          <div className="lg:grid lg:grid-cols-2 lg:gap-12 lg:h-full">
             {/* Left Column: Media */}
-            <div className="space-y-4 lg:sticky lg:top-[124px]">
+            <div className="space-y-4 lg:h-full lg:overflow-y-auto no-scrollbar lg:pr-2 lg:pb-24">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Media</label>
                 <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 p-6 text-center bg-gray-50 dark:bg-gray-800/20">
@@ -179,7 +161,7 @@ const RecipeBasicInfo: React.FC = () => {
             </div>
 
             {/* Right Column: Details */}
-            <div className="space-y-6 mt-6 lg:mt-0">
+            <div className="space-y-6 mt-6 lg:mt-0 lg:h-full lg:overflow-y-auto no-scrollbar lg:pl-2 lg:pb-24">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="recipe-name">Recipe Name</label>
                 <input 
