@@ -7,6 +7,7 @@ from .media import RecipeMediaRead
 class RecipeCreate(BaseModel):
     name: str
     description: Optional[str] = None
+    chefs_note: Optional[str] = None
     cook_time_minutes: Optional[int] = None
     servings: Optional[int] = None
     is_public: bool = True
@@ -17,6 +18,7 @@ class RecipeCreate(BaseModel):
 class RecipeUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+    chefs_note: Optional[str] = None
     cook_time_minutes: Optional[int] = None
     servings: Optional[int] = None
     is_public: Optional[bool] = None
@@ -76,6 +78,7 @@ class RecipeMediaCreate(BaseModel):
 class RecipeCreateWithMedia(BaseModel):
     name: str
     description: Optional[str] = None
+    chefs_note: Optional[str] = None
     cook_time_minutes: Optional[int] = Field(None, ge=0)
     servings: Optional[int] = Field(None, ge=1)
     is_public: bool = True

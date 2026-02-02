@@ -34,11 +34,11 @@ async def create_recipe(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    # Create recipe
     recipe = Recipe(
         user_id=user.id,
         name=data.name,
         description=data.description,
+        chefs_note=data.chefs_note,
         cook_time_minutes=data.cook_time_minutes,
         servings=data.servings,
         is_public=data.is_public,
@@ -345,6 +345,7 @@ async def create_recipe_with_media(
         user_id=user.id,
         name=data.name,
         description=data.description,
+        chefs_note=data.chefs_note,
         cook_time_minutes=data.cook_time_minutes,
         servings=data.servings,
         is_public=data.is_public,
@@ -392,7 +393,11 @@ async def create_recipe_with_media(
         db.add(media)
         await db.flush()
 
-        process_recipe_media_task.delay(media.id)
+        try:
+            process_recipe_media_task.delay(media.id)
+        except Exception as e:
+            # Log error but don't fail the request if background task queue is down
+            print(f"Failed to queue media processing task: {e}")
 
     await db.commit()  # Move outside the context manager
 

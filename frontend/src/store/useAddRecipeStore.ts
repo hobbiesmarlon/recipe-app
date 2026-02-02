@@ -60,15 +60,8 @@ export const useAddRecipeStore = create<AddRecipeState>((set) => ({
   description: '',
   prepTime: '',
   servings: '',
-  ingredients: [
-     { id: '1', name: 'All-Purpose Flour', quantity: '250', unit: 'g', measurementType: 'weight' },
-     { id: '2', name: 'Large Eggs', quantity: '2', unit: '', measurementType: 'count' },
-  ],
-  instructions: [
-    { id: '1', description: 'Preheat oven to 350°F (175°C).' },
-    { id: '2', description: 'In a large bowl, cream together the butter and sugar until smooth.' },
-    { id: '3', description: 'Beat in the eggs one at a time, then stir in the vanilla.' }
-  ],
+  ingredients: [],
+  instructions: [],
   categories: [],
   chefsNote: '',
 
@@ -96,15 +89,8 @@ export const useAddRecipeStore = create<AddRecipeState>((set) => ({
     description: '',
     prepTime: '',
     servings: '',
-    ingredients: [
-        { id: '1', name: 'All-Purpose Flour', quantity: '250', unit: 'g', measurementType: 'weight' },
-        { id: '2', name: 'Large Eggs', quantity: '2', unit: '', measurementType: 'count' },
-    ],
-    instructions: [
-        { id: '1', description: 'Preheat oven to 350°F (175°C).' },
-        { id: '2', description: 'In a large bowl, cream together the butter and sugar until smooth.' },
-        { id: '3', description: 'Beat in the eggs one at a time, then stir in the vanilla.' }
-    ],
+    ingredients: [],
+    instructions: [],
     categories: [],
     chefsNote: '',
   }),

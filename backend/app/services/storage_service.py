@@ -24,7 +24,7 @@ def generate_presigned_post(
     content_type: str,
     max_size_bytes: int,
 ) -> dict:
-    return s3_client.generate_presigned_post(
+    response = s3_client.generate_presigned_post(
         Bucket=settings.MEDIA_BUCKET_NAME,
         Key=key,
         Fields={
@@ -36,3 +36,12 @@ def generate_presigned_post(
         ],
         ExpiresIn=settings.media_presigned_expiry_seconds,
     )
+    
+    # Fix for mobile/external access: replace internal docker hostname with public IP
+    if settings.MEDIA_PUBLIC_BASE_URL and "minio:9000" in response["url"]:
+        # MEDIA_PUBLIC_BASE_URL is likely http://IP:9000/recipe-media
+        # We want http://IP:9000
+        public_base = settings.MEDIA_PUBLIC_BASE_URL.rsplit("/", 1)[0]
+        response["url"] = response["url"].replace("http://minio:9000", public_base)
+        
+    return response
