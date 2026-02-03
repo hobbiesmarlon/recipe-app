@@ -12,11 +12,11 @@ const SignIn: React.FC = () => {
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
       <header className="py-4 sticky top-0 md:top-14 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
         <div className="mx-auto max-w-2xl px-4 flex items-center justify-between">
-          <Link to="/" className="p-2">
+          <Link to="/" className="p-2 md:hidden">
             <span className="material-symbols-outlined text-primary">close</span>
           </Link>
-          <h1 className="text-lg font-bold text-center flex-grow -ml-10 text-black dark:text-white">Sign In</h1>
-          <div className="w-10"></div>
+          <h1 className="text-lg font-bold text-center flex-grow md:ml-0 -ml-10 text-black dark:text-white">Sign In</h1>
+          <div className="w-10 md:hidden"></div>
         </div>
       </header>
 

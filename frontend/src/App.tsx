@@ -17,6 +17,7 @@ import RecipeCategories from './pages/add-recipe/RecipeCategories';
 import RecipeChefsNote from './pages/add-recipe/RecipeChefsNote';
 import RecipeDetails from './pages/RecipeDetails';
 import ScrollToTop from './components/ScrollToTop';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -28,20 +29,24 @@ function App() {
           <Route path="recipe/:id" element={<RecipeDetails />} />
           <Route path="categories" element={<Categories />} />
           <Route path="browse" element={<CategoriesBrowsing />} />
-          <Route path="profile" element={<UserProfile />} />
           <Route path="u/:username" element={<PublicProfile />} />
-          <Route path="edit-profile" element={<EditProfile />} />
-          <Route path="my-recipes" element={<MyRecipes />} />
           <Route path="signin" element={<SignIn />} />
           <Route path="auth/callback" element={<AuthCallback />} />
           
-          {/* Add Recipe Flow */}
-          <Route path="add-recipe">
-            <Route path="basic" element={<RecipeBasicInfo />} />
-            <Route path="ingredients" element={<RecipeIngredients />} />
-            <Route path="instructions" element={<RecipeInstructions />} />
-            <Route path="categories" element={<RecipeCategories />} />
-            <Route path="chefs-note" element={<RecipeChefsNote />} />
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="profile" element={<UserProfile />} />
+            <Route path="edit-profile" element={<EditProfile />} />
+            <Route path="my-recipes" element={<MyRecipes />} />
+            
+            {/* Add Recipe Flow */}
+            <Route path="add-recipe">
+              <Route path="basic" element={<RecipeBasicInfo />} />
+              <Route path="ingredients" element={<RecipeIngredients />} />
+              <Route path="instructions" element={<RecipeInstructions />} />
+              <Route path="categories" element={<RecipeCategories />} />
+              <Route path="chefs-note" element={<RecipeChefsNote />} />
+            </Route>
           </Route>
         </Route>
       </Routes>
