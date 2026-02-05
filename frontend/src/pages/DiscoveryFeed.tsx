@@ -4,7 +4,9 @@ import BottomNav from '../components/BottomNav';
 import { PageContainer } from '../components/PageContainer';
 import { ImageCarousel } from '../components/ui/ImageCarousel';
 import { RecipeCard } from '../components/ui/RecipeCard';
+import { Toast } from '../components/ui/Toast';
 import client from '../api/client';
+import { useAuthStore } from '../store/useAuthStore';
 
 interface RecipeMedia {
   url: string;
@@ -25,18 +27,39 @@ const DiscoveryFeed: React.FC = () => {
   const [likedRecipes, setLikedRecipes] = useState<Set<string>>(new Set());
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAuthToast, setShowAuthToast] = useState(false);
+  const { user } = useAuthStore();
   const navigate = useNavigate();
 
-  const toggleLike = (e: React.MouseEvent, id: string) => {
+  const toggleLike = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     e.preventDefault();
+    
+    if (!user) {
+      setShowAuthToast(true);
+      return;
+    }
+    
+    const isCurrentlyLiked = likedRecipes.has(id);
     const newLiked = new Set(likedRecipes);
-    if (newLiked.has(id)) {
+    
+    if (isCurrentlyLiked) {
       newLiked.delete(id);
     } else {
       newLiked.add(id);
     }
     setLikedRecipes(newLiked);
+
+    try {
+        if (isCurrentlyLiked) {
+            await client.delete(`/recipes/${id}/like`);
+        } else {
+            await client.post(`/recipes/${id}/like`);
+        }
+    } catch (error) {
+        console.error('Failed to toggle like', error);
+        setLikedRecipes(likedRecipes); // Revert on error
+    }
   };
 
   useEffect(() => {
@@ -49,7 +72,14 @@ const DiscoveryFeed: React.FC = () => {
         
         if (response.data && Array.isArray(response.data.recipes)) {
           console.log(`Found ${response.data.recipes.length} recipes`);
+          
+          const likedSet = new Set<string>();
+          
           const mappedRecipes: Recipe[] = response.data.recipes.map((r: any) => {
+            if (r.is_liked) {
+                likedSet.add(r.id.toString());
+            }
+
             // Filter out media without a URL and extract unique media items
             const mediaItems: RecipeMedia[] = r.media
               ? r.media
@@ -72,6 +102,7 @@ const DiscoveryFeed: React.FC = () => {
             };
           });
           setRecipes(mappedRecipes);
+          setLikedRecipes(likedSet);
         }
       } catch (error) {
         console.error('Backend connection failed:', error);
@@ -144,6 +175,16 @@ const DiscoveryFeed: React.FC = () => {
       <div className="md:hidden">
         <BottomNav />
       </div>
+
+      <Toast 
+        isVisible={showAuthToast}
+        message="Sign in to like recipes"
+        onClose={() => setShowAuthToast(false)}
+        action={{
+          label: "Sign In",
+          onClick: () => navigate('/signin')
+        }}
+      />
     </div>
   );
 };

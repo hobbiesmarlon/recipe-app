@@ -40,6 +40,9 @@ class RecipeRead(BaseModel):
     steps: List[StepRead]
     categories: List[str]
     media: List[RecipeMediaRead]
+    is_liked: bool = False
+    is_saved: bool = False
+    likes_count: int = 0
 
     class Config:
         from_attributes = True

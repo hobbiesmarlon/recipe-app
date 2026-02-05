@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useParams, useNavigate } from 'react-router';
 import { ImageCarousel } from '../components/ui/ImageCarousel';
+import { Toast } from '../components/ui/Toast';
 import client from '../api/client';
+import { useAuthStore } from '../store/useAuthStore';
 
 interface RecipeMedia {
   url: string;
@@ -33,16 +35,23 @@ interface FullRecipe {
   steps: Step[];
   media: RecipeMedia[];
   chefs_note?: string;
+  is_liked?: boolean;
+  is_saved?: boolean;
+  likes_count?: number;
 }
 
 const RecipeDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [recipe, setRecipe] = useState<FullRecipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'ingredients' | 'instructions'>('ingredients');
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [showAuthToast, setShowAuthToast] = useState(false);
+  const { user } = useAuthStore();
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const minSwipeDistance = 35;
 
@@ -51,8 +60,14 @@ const RecipeDetails: React.FC = () => {
       if (!id) return;
       try {
         setLoading(true);
+        console.log(`Fetching recipe ${id}...`);
         const response = await client.get(`/recipes/${id}`);
-        setRecipe(response.data);
+        const data = response.data;
+        console.log("Recipe data received:", data);
+        setRecipe(data);
+        setIsLiked(!!data.is_liked);
+        setIsSaved(!!data.is_saved);
+        setLikesCount(data.likes_count || 0);
         setError(null);
       } catch (err) {
         console.error('Error fetching recipe:', err);
@@ -64,6 +79,57 @@ const RecipeDetails: React.FC = () => {
 
     fetchRecipe();
   }, [id]);
+
+  const toggleLike = async () => {
+    if (!recipe) return;
+    
+    if (!user) {
+      setShowAuthToast(true);
+      return;
+    }
+
+    // Optimistic update
+    const previousState = isLiked;
+    const previousCount = likesCount;
+    setIsLiked(!isLiked);
+    setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+
+    try {
+      if (isLiked) {
+        await client.delete(`/recipes/${recipe.id}/like`);
+      } else {
+        await client.post(`/recipes/${recipe.id}/like`);
+      }
+    } catch (error) {
+      console.error('Failed to toggle like', error);
+      // Revert
+      setIsLiked(previousState);
+      setLikesCount(previousCount);
+    }
+  };
+
+  const toggleSave = async () => {
+    if (!recipe) return;
+
+    if (!user) {
+      setShowAuthToast(true);
+      return;
+    }
+
+    const previousState = isSaved;
+    setIsSaved(!isSaved);
+
+    try {
+      if (isSaved) {
+        await client.delete(`/recipes/${recipe.id}/save`);
+      } else {
+        await client.post(`/recipes/${recipe.id}/save`);
+      }
+    } catch (error) {
+      console.error('Failed to toggle save', error);
+      setIsSaved(previousState);
+    }
+  };
 
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
@@ -152,7 +218,7 @@ const RecipeDetails: React.FC = () => {
                 <span className="material-symbols-rounded text-xl">share</span>
               </button>
               <button 
-                onClick={() => setIsLiked(!isLiked)}
+                onClick={toggleLike}
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-md text-white transition-all hover:bg-black/40 active:scale-95"
                 aria-label={isLiked ? "Unlike" : "Like"}
               >
@@ -171,8 +237,14 @@ const RecipeDetails: React.FC = () => {
           </div>
           
           {/* Title overlay at bottom of image */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 pt-20 text-white z-10">
-            <h1 className="text-3xl font-extrabold tracking-tight drop-shadow-lg leading-tight">{recipe.name}</h1>
+          <div className="absolute bottom-0 left-0 right-0 p-6 pt-20 text-white z-10 flex justify-between items-end">
+            <h1 className="text-3xl font-extrabold tracking-tight drop-shadow-lg leading-tight flex-1">{recipe.name}</h1>
+            {likesCount > 0 && (
+                <div className="flex items-center gap-1 text-white/90 drop-shadow-md bg-black/30 px-2 py-1 rounded-full text-xs backdrop-blur-sm">
+                    <span className="material-symbols-rounded text-sm">favorite</span>
+                    {likesCount}
+                </div>
+            )}
           </div>
         </div>
 
@@ -188,7 +260,7 @@ const RecipeDetails: React.FC = () => {
             </div>
             
             <button 
-               onClick={() => setIsSaved(!isSaved)}
+               onClick={toggleSave}
                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${isSaved ? 'bg-primary/10 text-primary' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}
             >
                <span className="material-symbols-outlined text-lg">{isSaved ? 'bookmark_added' : 'bookmark'}</span>
@@ -243,7 +315,7 @@ const RecipeDetails: React.FC = () => {
               </ul>
             ) : (
               <ol className="space-y-6 pb-4">
-                {recipe.steps.sort((a, b) => a.step_number - b.step_number).map((step) => (
+                {[...recipe.steps].sort((a, b) => a.step_number - b.step_number).map((step) => (
                   <li key={step.id} className="flex gap-4">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm">
                       {step.step_number}
@@ -264,6 +336,16 @@ const RecipeDetails: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <Toast 
+        isVisible={showAuthToast}
+        message="Sign in to like/save recipes"
+        onClose={() => setShowAuthToast(false)}
+        action={{
+          label: "Sign In",
+          onClick: () => navigate('/signin')
+        }}
+      />
     </div>
   );
 };

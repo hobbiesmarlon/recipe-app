@@ -1,13 +1,16 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, text
+from sqlalchemy import select, func, text, delete
 from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.exc import IntegrityError
 from app.core.db import get_db
 from app.models.recipe import Recipe
 from app.models.recipe_ingredient import RecipeIngredient
 from app.models.recipe_step import RecipeStep
 from app.models.category import Category
+from app.models.recipe_like import RecipeLike
+from app.models.saved_recipe import UserSavedRecipe
 from app.schemas.recipe import RecipeCreate, RecipeRead, RecipeUpdate
 from app.schemas.ingredient import IngredientRead
 from app.api.deps import get_current_user, get_optional_current_user
@@ -34,6 +37,7 @@ async def create_recipe(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    # Create recipe
     recipe = Recipe(
         user_id=user.id,
         name=data.name,
@@ -72,7 +76,7 @@ async def create_recipe(
 
     await db.commit()
     # Return fully populated recipe
-    return await get_recipe(recipe.id, db)
+    return await get_recipe(recipe.id, db, user=user)
 
 @router.get("", response_model=PaginatedRecipes)
 async def list_recipes(
@@ -92,14 +96,6 @@ async def list_recipes(
         selectinload(Recipe.media),
         joinedload(Recipe.author),
     )
-
-    # Only public recipes or user's own recipes
-    # if user:
-    #     stmt = stmt.where(
-    #         (Recipe.is_public) | (Recipe.user_id == user.id)
-    #     )
-    # else:
-    #     stmt = stmt.where(Recipe.is_public)
 
     # Filter by author
     if author_id:
@@ -140,6 +136,26 @@ async def list_recipes(
     for r in recipes:
         r.media.sort(key=lambda m: (not m.is_primary, m.display_order))
 
+    # Fetch likes/saves status
+    recipe_ids = [r.id for r in recipes]
+    liked_ids = set()
+    saved_ids = set()
+    likes_counts = {}
+
+    if recipe_ids:
+        count_stmt = select(RecipeLike.recipe_id, func.count('*')).where(RecipeLike.recipe_id.in_(recipe_ids)).group_by(RecipeLike.recipe_id)
+        count_result = await db.execute(count_stmt)
+        likes_counts = {r_id: count for r_id, count in count_result.all()}
+
+        if user:
+            like_stmt = select(RecipeLike.recipe_id).where(RecipeLike.user_id == user.id, RecipeLike.recipe_id.in_(recipe_ids))
+            like_result = await db.execute(like_stmt)
+            liked_ids = set(like_result.scalars().all())
+
+            save_stmt = select(UserSavedRecipe.recipe_id).where(UserSavedRecipe.user_id == user.id, UserSavedRecipe.recipe_id.in_(recipe_ids))
+            save_result = await db.execute(save_stmt)
+            saved_ids = set(save_result.scalars().all())
+
     return PaginatedRecipes(
         total=total,
         page=page,
@@ -170,6 +186,9 @@ async def list_recipes(
                 steps=r.steps,
                 categories=[c.name for c in r.categories],
                 media=r.media,
+                is_liked=(r.id in liked_ids),
+                is_saved=(r.id in saved_ids),
+                likes_count=likes_counts.get(r.id, 0),
             )
             for r in recipes
         ]
@@ -177,7 +196,11 @@ async def list_recipes(
 
 
 @router.get("/{recipe_id}", response_model=RecipeRead)
-async def get_recipe(recipe_id: int, db: AsyncSession = Depends(get_db)):
+async def get_recipe(
+    recipe_id: int, 
+    db: AsyncSession = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_current_user)
+):
     result = await db.execute(
         select(Recipe)
         .options(
@@ -195,6 +218,16 @@ async def get_recipe(recipe_id: int, db: AsyncSession = Depends(get_db)):
 
     # Sort media
     recipe.media.sort(key=lambda m: (not m.is_primary, m.display_order))
+
+    # Fetch stats
+    count_stmt = select(func.count('*')).where(RecipeLike.recipe_id == recipe_id)
+    likes_count = (await db.execute(count_stmt)).scalar() or 0
+
+    is_liked = False
+    is_saved = False
+    if user:
+        is_liked = (await db.execute(select(RecipeLike).where(RecipeLike.user_id == user.id, RecipeLike.recipe_id == recipe_id))).scalars().first() is not None
+        is_saved = (await db.execute(select(UserSavedRecipe).where(UserSavedRecipe.user_id == user.id, UserSavedRecipe.recipe_id == recipe_id))).scalars().first() is not None
 
     return RecipeRead(
         id=recipe.id,
@@ -221,6 +254,9 @@ async def get_recipe(recipe_id: int, db: AsyncSession = Depends(get_db)):
         steps=recipe.steps,
         categories=[c.name for c in recipe.categories],
         media=recipe.media,
+        is_liked=is_liked,
+        is_saved=is_saved,
+        likes_count=likes_count,
     )
 
 @router.patch("/{recipe_id}", response_model=RecipeRead)
@@ -291,7 +327,7 @@ async def update_recipe(
         validate_publishable(recipe)
 
     await db.commit()
-    return await get_recipe(recipe.id, db)
+    return await get_recipe(recipe.id, db, user=user)
 
 @router.delete("/{recipe_id}", status_code=204)
 async def delete_recipe(
@@ -322,6 +358,76 @@ async def delete_recipe(
     await db.delete(recipe)
     await db.commit()
 
+# --- INTERACTIONS ---
+
+@router.post("/{recipe_id}/like", status_code=201)
+async def like_recipe(
+    recipe_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    recipe = await db.get(Recipe, recipe_id)
+    if not recipe:
+        raise HTTPException(404, "Recipe not found")
+
+    try:
+        like = RecipeLike(user_id=user.id, recipe_id=recipe_id)
+        db.add(like)
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        # Already liked is fine
+    
+    return {"status": "liked"}
+
+@router.delete("/{recipe_id}/like", status_code=204)
+async def unlike_recipe(
+    recipe_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    await db.execute(
+        delete(RecipeLike).where(
+            RecipeLike.user_id == user.id,
+            RecipeLike.recipe_id == recipe_id
+        )
+    )
+    await db.commit()
+
+@router.post("/{recipe_id}/save", status_code=201)
+async def save_recipe(
+    recipe_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    recipe = await db.get(Recipe, recipe_id)
+    if not recipe:
+        raise HTTPException(404, "Recipe not found")
+
+    try:
+        save = UserSavedRecipe(user_id=user.id, recipe_id=recipe_id)
+        db.add(save)
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        # Already saved is fine
+    
+    return {"status": "saved"}
+
+@router.delete("/{recipe_id}/save", status_code=204)
+async def unsave_recipe(
+    recipe_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    await db.execute(
+        delete(UserSavedRecipe).where(
+            UserSavedRecipe.user_id == user.id,
+            UserSavedRecipe.recipe_id == recipe_id
+        )
+    )
+    await db.commit()
+
 @router.post("/with-media", response_model=dict)
 async def create_recipe_with_media(
     data: RecipeCreateWithMedia,
@@ -345,7 +451,6 @@ async def create_recipe_with_media(
         user_id=user.id,
         name=data.name,
         description=data.description,
-        chefs_note=data.chefs_note,
         cook_time_minutes=data.cook_time_minutes,
         servings=data.servings,
         is_public=data.is_public,
@@ -393,11 +498,7 @@ async def create_recipe_with_media(
         db.add(media)
         await db.flush()
 
-        try:
-            process_recipe_media_task.delay(media.id)
-        except Exception as e:
-            # Log error but don't fail the request if background task queue is down
-            print(f"Failed to queue media processing task: {e}")
+        process_recipe_media_task.delay(media.id)
 
     await db.commit()  # Move outside the context manager
 

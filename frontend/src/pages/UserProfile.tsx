@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router';
 import BottomNav from '../components/BottomNav';
 import { PageContainer } from '../components/PageContainer';
 import client from '../api/client';
+import { useAuthStore } from '../store/useAuthStore';
 
 interface User {
   id: number;
@@ -27,7 +28,7 @@ interface Recipe {
 const UserProfile: React.FC = () => {
   const [activeTab, setActiveTab] = useState('myrecipes');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { user, logout } = useAuthStore();
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -42,14 +43,9 @@ const UserProfile: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch User Profile
-        const userRes = await client.get('/users/me');
-        const userData = userRes.data;
-        setUser(userData);
-
         // Fetch My Recipes
-        if (userData && userData.id) {
-            const recipesRes = await client.get(`/recipes?author_id=${userData.id}`);
+        if (user && user.id) {
+            const recipesRes = await client.get(`/recipes?author_id=${user.id}`);
             setMyRecipes(recipesRes.data.recipes || []);
         }
       } catch (error) {
@@ -60,10 +56,10 @@ const UserProfile: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [user]);
 
   const handleSignOut = () => {
-    localStorage.removeItem('token');
+    logout();
     navigate('/signin');
   };
 

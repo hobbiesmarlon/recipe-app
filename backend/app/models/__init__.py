@@ -10,5 +10,6 @@ from .unit import Unit
 from .ingredient import Ingredient
 from .photo import RecipePhoto
 from .saved_recipe import UserSavedRecipe
+from .recipe_like import RecipeLike
 from .recipe_view import UserRecipeView
 from .recipe_media import RecipeMedia
