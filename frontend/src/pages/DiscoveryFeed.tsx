@@ -25,7 +25,7 @@ interface Recipe {
 const DiscoveryFeed: React.FC = () => {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search');
-  const [activeTab, setActiveTab] = useState('Latest');
+  const [activeTab, setActiveTab] = useState('latest');
   const [likedRecipes, setLikedRecipes] = useState<Set<string>>(new Set());
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,8 +70,11 @@ const DiscoveryFeed: React.FC = () => {
         setLoading(true);
         
         // Pass all search params directly to the API
+        const params = new URLSearchParams(searchParams);
+        params.append('sort_by', activeTab);
+
         const response = await client.get('/recipes', { 
-          params: searchParams 
+          params 
         });
         
         console.log('Raw Backend Response:', response.data);
@@ -118,9 +121,13 @@ const DiscoveryFeed: React.FC = () => {
     };
 
     fetchRecipes();
-  }, [searchParams]);
+  }, [searchParams, activeTab]);
 
-  const tabs = ['Latest', 'Most Viewed', 'Most Liked'];
+  const tabs = [
+    { label: 'Latest', value: 'latest' },
+    { label: 'Most Viewed', value: 'most_viewed' },
+    { label: 'Most Liked', value: 'most_liked' }
+  ];
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -135,15 +142,15 @@ const DiscoveryFeed: React.FC = () => {
           <div className="mt-2 md:mt-0 flex gap-2 px-0 pb-2 overflow-x-auto whitespace-nowrap no-scrollbar scrollbar-hide -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0">
             {tabs.map((tab) => (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
+                key={tab.value}
+                onClick={() => setActiveTab(tab.value)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors flex-shrink-0 ${
-                  activeTab === tab
+                  activeTab === tab.value
                     ? 'bg-primary text-white'
                     : 'bg-primary/20 text-primary dark:bg-primary/30 dark:text-primary hover:bg-primary/30'
                 }`}
               >
-                {tab}
+                {tab.label}
               </button>
             ))}
           </div>

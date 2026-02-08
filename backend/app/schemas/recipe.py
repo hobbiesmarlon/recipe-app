@@ -43,6 +43,7 @@ class RecipeRead(BaseModel):
     is_liked: bool = False
     is_saved: bool = False
     likes_count: int = 0
+    views_count: int = 0
 
     class Config:
         from_attributes = True

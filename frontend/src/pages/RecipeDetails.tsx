@@ -201,13 +201,13 @@ const RecipeDetails: React.FC = () => {
           
           {/* Top Actions Overlay */}
           <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-10">
-            <Link 
-              to="/" 
+            <button 
+              onClick={() => navigate(-1)}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-md text-white transition-all hover:bg-black/40 active:scale-95"
               aria-label="Back"
             >
               <span className="material-symbols-rounded text-2xl">arrow_back</span>
-            </Link>
+            </button>
             
             <div className="flex items-center gap-3">
               <button 

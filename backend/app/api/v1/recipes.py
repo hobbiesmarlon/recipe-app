@@ -1,7 +1,7 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, text, delete
+from sqlalchemy import select, func, text, delete, desc
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.exc import IntegrityError
 from app.core.db import get_db
@@ -13,6 +13,7 @@ from app.models.recipe_like import RecipeLike
 from app.models.saved_recipe import UserSavedRecipe
 from app.models.recipe_category import RecipeCategory
 from app.models.category_group import CategoryGroup
+from app.models.recipe_view import UserRecipeView
 from app.schemas.recipe import RecipeCreate, RecipeRead, RecipeUpdate
 from app.schemas.ingredient import IngredientRead
 from app.api.deps import get_current_user, get_optional_current_user
@@ -90,73 +91,88 @@ async def list_recipes(
     max_cook_time: Optional[int] = Query(None, alias="maxTime"),
     search: Optional[str] = Query(None),
     author_id: Optional[int] = Query(None),
+    sort_by: Optional[str] = Query("latest", enum=["latest", "most_viewed", "most_liked"]),
 ):
+    # Base statement
     stmt = select(Recipe).options(
+        joinedload(Recipe.author),
         selectinload(Recipe.ingredients).joinedload(RecipeIngredient.unit),
         selectinload(Recipe.steps),
         selectinload(Recipe.categories),
         selectinload(Recipe.media),
-        joinedload(Recipe.author),
     )
 
-    # Filter by author
+    # Apply filters
     if author_id:
         stmt = stmt.where(Recipe.user_id == author_id)
-
-    # Filter by categories
     if category_ids:
         stmt = stmt.join(Recipe.categories).where(Category.id.in_(category_ids))
-
-    # Filter by cook time
     if max_cook_time is not None:
         stmt = stmt.where(Recipe.cook_time_minutes <= max_cook_time)
-
-    # Full-text search on name + description
     if search:
         search = search.strip()
         stmt = stmt.where(
             text(
                 "to_tsvector('english', coalesce(recipes.name, '') || ' ' || "
                 "coalesce(recipes.description, '')) @@ plainto_tsquery(:q)" 
-                 )
+            )
         ).params(q=search)
 
-    # Total count for pagination
-    # pylint: disable=not-callable
-    total_stmt = select(func.count('*')).select_from(stmt.subquery())
-    total_result = await db.execute(total_stmt)
+    # Sorting with Subqueries to avoid GROUP BY issues with eager loading
+    if sort_by == "most_liked":
+        likes_subq = select(
+            RecipeLike.recipe_id, 
+            func.count(RecipeLike.user_id).label("l_count")
+        ).group_by(RecipeLike.recipe_id).subquery()
+        
+        stmt = stmt.outerjoin(likes_subq, Recipe.id == likes_subq.c.recipe_id)\
+                   .order_by(desc(func.coalesce(likes_subq.c.l_count, 0)), desc(Recipe.created_at))
+                   
+    elif sort_by == "most_viewed":
+        views_subq = select(
+            UserRecipeView.recipe_id, 
+            func.count(UserRecipeView.id).label("v_count")
+        ).group_by(UserRecipeView.recipe_id).subquery()
+        
+        stmt = stmt.outerjoin(views_subq, Recipe.id == views_subq.c.recipe_id)\
+                   .order_by(desc(func.coalesce(views_subq.c.v_count, 0)), desc(Recipe.created_at))
+    else:
+        stmt = stmt.order_by(desc(Recipe.created_at))
+
+    # Total count
+    # Use subquery approach for total count to be safe with joins
+    total_result = await db.execute(select(func.count()).select_from(stmt.subquery()))
     total = total_result.scalar() or 0
 
-    # Pagination
-    stmt = stmt.order_by(Recipe.created_at.desc())
+    # Execute main query
     stmt = stmt.offset((page - 1) * per_page).limit(per_page)
-
     result = await db.execute(stmt)
     recipes = result.scalars().unique().all()
 
-    # Sort media for each recipe
+    # Post-process results
     for r in recipes:
         r.media.sort(key=lambda m: (not m.is_primary, m.display_order))
 
-    # Fetch likes/saves status
+    # Interaction stats for return
     recipe_ids = [r.id for r in recipes]
     liked_ids = set()
     saved_ids = set()
     likes_counts = {}
+    views_counts = {}
 
     if recipe_ids:
-        count_stmt = select(RecipeLike.recipe_id, func.count('*')).where(RecipeLike.recipe_id.in_(recipe_ids)).group_by(RecipeLike.recipe_id)
-        count_result = await db.execute(count_stmt)
-        likes_counts = {r_id: count for r_id, count in count_result.all()}
+        l_res = await db.execute(select(RecipeLike.recipe_id, func.count('*')).where(RecipeLike.recipe_id.in_(recipe_ids)).group_by(RecipeLike.recipe_id))
+        likes_counts = {row[0]: row[1] for row in l_res.all()}
+
+        v_res = await db.execute(select(UserRecipeView.recipe_id, func.count('*')).where(UserRecipeView.recipe_id.in_(recipe_ids)).group_by(UserRecipeView.recipe_id))
+        views_counts = {row[0]: row[1] for row in v_res.all()}
 
         if user:
-            like_stmt = select(RecipeLike.recipe_id).where(RecipeLike.user_id == user.id, RecipeLike.recipe_id.in_(recipe_ids))
-            like_result = await db.execute(like_stmt)
-            liked_ids = set(like_result.scalars().all())
+            ul_res = await db.execute(select(RecipeLike.recipe_id).where(RecipeLike.user_id == user.id, RecipeLike.recipe_id.in_(recipe_ids)))
+            liked_ids = set(ul_res.scalars().all())
 
-            save_stmt = select(UserSavedRecipe.recipe_id).where(UserSavedRecipe.user_id == user.id, UserSavedRecipe.recipe_id.in_(recipe_ids))
-            save_result = await db.execute(save_stmt)
-            saved_ids = set(save_result.scalars().all())
+            us_res = await db.execute(select(UserSavedRecipe.recipe_id).where(UserSavedRecipe.user_id == user.id, UserSavedRecipe.recipe_id.in_(recipe_ids)))
+            saved_ids = set(us_res.scalars().all())
 
     return PaginatedRecipes(
         total=total,
@@ -191,6 +207,7 @@ async def list_recipes(
                 is_liked=(r.id in liked_ids),
                 is_saved=(r.id in saved_ids),
                 likes_count=likes_counts.get(r.id, 0),
+                views_count=views_counts.get(r.id, 0),
             )
             for r in recipes
         ]
@@ -218,12 +235,20 @@ async def get_recipe(
     if not recipe:
         raise HTTPException(404, "Recipe not found")
 
+    # Record View
+    view = UserRecipeView(recipe_id=recipe.id, user_id=user.id if user else None)
+    db.add(view)
+    await db.commit()
+
     # Sort media
     recipe.media.sort(key=lambda m: (not m.is_primary, m.display_order))
 
     # Fetch stats
-    count_stmt = select(func.count('*')).where(RecipeLike.recipe_id == recipe_id)
-    likes_count = (await db.execute(count_stmt)).scalar() or 0
+    like_count_stmt = select(func.count('*')).where(RecipeLike.recipe_id == recipe_id)
+    likes_count = (await db.execute(like_count_stmt)).scalar() or 0
+
+    view_count_stmt = select(func.count('*')).where(UserRecipeView.recipe_id == recipe_id)
+    views_count = (await db.execute(view_count_stmt)).scalar() or 0
 
     is_liked = False
     is_saved = False
@@ -259,6 +284,7 @@ async def get_recipe(
         is_liked=is_liked,
         is_saved=is_saved,
         likes_count=likes_count,
+        views_count=views_count,
     )
 
 @router.patch("/{recipe_id}", response_model=RecipeRead)

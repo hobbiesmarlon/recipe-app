@@ -34,7 +34,7 @@ const BUDGET_EASE: CategoryItem[] = [
 
 const DRINKS: CategoryItem[] = [
   { id: 28, name: 'Cocktail' }, { id: 29, name: 'Mocktail' }, { id: 30, name: 'Coffee/Tea' },
-  { id: 31, name: 'Juice' }, { id: 32, name: 'Milkshake' }, { id: 33, name: 'Smoothiee' },
+  { id: 31, name: 'Juice' }, { id: 32, name: 'Milkshake' }, { id: 33, name: 'Smoothie' },
 ];
 
 const CategoriesBrowsing: React.FC = () => {
@@ -104,8 +104,8 @@ const CategoriesBrowsing: React.FC = () => {
       <main className="flex-grow p-4 pb-32 sm:p-6 sm:pb-36">
         <div className="mx-auto max-w-2xl space-y-6">
           {/* Ingredient Card */}
-          <details className="group rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark" open>
-            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none text-background-dark dark:text-background-light">
+          <details className="group rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
+            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-2xl">nutrition</span>
                 <h2 className="text-lg font-bold">Ingredients</h2>
@@ -119,7 +119,7 @@ const CategoriesBrowsing: React.FC = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  className="w-full rounded-full border-gray-200 bg-gray-100 dark:bg-white/10 dark:border-border-dark py-2.5 pl-10 pr-4 text-sm focus:border-primary focus:ring-primary dark:placeholder-text-muted-dark dark:text-white" 
+                  className="w-full rounded-full border-gray-200 bg-gray-100 dark:bg-white/10 dark:border-border-dark py-2.5 pl-10 pr-4 text-sm focus:border-primary focus:ring-primary dark:placeholder-text-muted-dark" 
                   placeholder="Search ingredients..." 
                   type="text" 
                 />
@@ -129,7 +129,7 @@ const CategoriesBrowsing: React.FC = () => {
 
           {/* Meal Type Card */}
           <details className="group rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
-            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none text-background-dark dark:text-background-light">
+            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-2xl">restaurant_menu</span>
                 <h2 className="text-lg font-bold">Meal Type</h2>
@@ -147,7 +147,7 @@ const CategoriesBrowsing: React.FC = () => {
           
           {/* Cooking Method Card */}
           <details className="group rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
-            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none text-background-dark dark:text-background-light">
+            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-2xl">skillet</span>
                 <h2 className="text-lg font-bold">Cooking Method</h2>
@@ -165,7 +165,7 @@ const CategoriesBrowsing: React.FC = () => {
 
            {/* Dietary Card */}
            <details className="group rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
-            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none text-background-dark dark:text-background-light">
+            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-2xl">eco</span>
                 <h2 className="text-lg font-bold">Dietary</h2>
@@ -183,7 +183,7 @@ const CategoriesBrowsing: React.FC = () => {
 
            {/* Flavour Card */}
            <details className="group rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
-            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none text-background-dark dark:text-background-light">
+            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-2xl">local_dining</span>
                 <h2 className="text-lg font-bold">Flavour</h2>
@@ -201,7 +201,7 @@ const CategoriesBrowsing: React.FC = () => {
           
            {/* Budget and Ease Card */}
            <details className="group rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
-            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none text-background-dark dark:text-background-light">
+            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-2xl">savings</span>
                 <h2 className="text-lg font-bold">Budget and Ease</h2>
@@ -219,7 +219,7 @@ const CategoriesBrowsing: React.FC = () => {
           
           {/* Drinks */}
           <details className="group rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-0 shadow-subtle dark:shadow-subtle-dark">
-            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none text-background-dark dark:text-background-light">
+            <summary className="flex cursor-pointer items-center justify-between gap-4 p-4 list-none">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-2xl">local_cafe</span>
                 <h2 className="text-lg font-bold">Drinks</h2>
