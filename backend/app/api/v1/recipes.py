@@ -11,6 +11,8 @@ from app.models.recipe_step import RecipeStep
 from app.models.category import Category
 from app.models.recipe_like import RecipeLike
 from app.models.saved_recipe import UserSavedRecipe
+from app.models.recipe_category import RecipeCategory
+from app.models.category_group import CategoryGroup
 from app.schemas.recipe import RecipeCreate, RecipeRead, RecipeUpdate
 from app.schemas.ingredient import IngredientRead
 from app.api.deps import get_current_user, get_optional_current_user
@@ -451,12 +453,21 @@ async def create_recipe_with_media(
         user_id=user.id,
         name=data.name,
         description=data.description,
+        chefs_note=data.chefs_note,
         cook_time_minutes=data.cook_time_minutes,
         servings=data.servings,
         is_public=data.is_public,
     )
     db.add(recipe)
     await db.flush()
+
+    # --- CATEGORY RESOLUTION ---
+    if data.category_ids:
+        # Use simple ID resolution without creating new categories
+        for cat_id in data.category_ids:
+            # We don't verify if ID exists here for speed, assuming FK constraint handles validity
+            # But we must insert into association table manually to avoid lazy load issues
+            db.add(RecipeCategory(recipe_id=recipe.id, category_id=cat_id))
 
     # Ingredients
     for ing in data.ingredients:

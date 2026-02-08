@@ -34,7 +34,7 @@ interface AddRecipeState {
   instructions: InstructionStep[];
 
   // Categories
-  categories: string[];
+  categories: number[];
 
   // Chef's Note
   chefsNote: string;
@@ -47,7 +47,7 @@ interface AddRecipeState {
   setServings: (servings: string) => void;
   setIngredients: (ingredients: Ingredient[] | ((prev: Ingredient[]) => Ingredient[])) => void;
   setInstructions: (instructions: InstructionStep[] | ((prev: InstructionStep[]) => InstructionStep[])) => void;
-  setCategories: (categories: string[] | ((prev: string[]) => string[])) => void;
+  setCategories: (categories: number[] | ((prev: number[]) => number[])) => void;
   setChefsNote: (note: string) => void;
   
   // Reset

@@ -96,7 +96,7 @@ const RecipeChefsNote: React.FC = () => {
             cook_time_minutes: parseInt(store.prepTime) || 0,
             servings: parseInt(store.servings) || 1,
             is_public: true,
-            categories: [], 
+            categories: store.categories, 
             ingredients: store.ingredients.map((ing, index) => ({
                 name_text: ing.name,
                 quantity: parseFloat(ing.quantity) || 0,
