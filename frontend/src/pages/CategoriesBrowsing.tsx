@@ -90,9 +90,7 @@ const CategoriesBrowsing: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 md:top-14 z-10 flex items-center bg-background-light dark:bg-background-dark p-4">
-        <Link to="/" className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5">
-          <span className="material-symbols-outlined text-primary">close</span>
-        </Link>
+        <div className="w-10"></div>
         <h1 className="flex-1 text-center text-lg font-bold tracking-tight">Filter Recipes</h1>
         <button 
           onClick={handleSearch}

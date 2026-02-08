@@ -172,7 +172,7 @@ const DiscoveryFeed: React.FC = () => {
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <span className="material-symbols-rounded text-6xl text-gray-300 mb-4">restaurant_menu</span>
               <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">No recipes found</h3>
-              <p className="text-gray-500 max-w-xs">We couldn't find any recipes in the database yet. Why not add one?</p>
+              <p className="text-gray-500 max-w-xs">We couldn't find any recipes matching this search. Why not add one?</p>
             </div>
           )}
         </PageContainer>
