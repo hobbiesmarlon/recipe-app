@@ -1,10 +1,23 @@
-import React from 'react';
-import { NavLink } from 'react-router';
+import React, { useState } from 'react';
+import { NavLink, useNavigate } from 'react-router';
 import { PageContainer } from './PageContainer';
 import { useAuthStore } from '../store/useAuthStore';
 
 export const DesktopNav: React.FC = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const query = searchQuery.trim();
+      if (query) {
+        navigate(`/?search=${encodeURIComponent(query)}`);
+      } else {
+        navigate('/');
+      }
+    }
+  };
 
   const getLinkClass = ({ isActive }: { isActive: boolean }) => {
     const baseClass = "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors";
@@ -27,17 +40,27 @@ export const DesktopNav: React.FC = () => {
           </NavLink>
 
           {/* Search Bar - Lengthened */}
-          <div className="flex-1 max-w-xl relative">
+          <div className="flex-1 max-w-xl relative group">
              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="w-4 h-4 text-text-muted-light dark:text-text-muted-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-4 h-4 text-text-muted-light dark:text-text-muted-dark group-focus-within:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
              </div>
              <input 
                type="text" 
-               className="block w-full pl-9 pr-4 py-1.5 rounded-full border-none bg-gray-100 dark:bg-white/5 text-xs text-text-light dark:text-text-dark placeholder-text-muted-light dark:placeholder-text-muted-dark focus:ring-1 focus:ring-primary focus:bg-white dark:focus:bg-white/10 transition-all shadow-inner"
+               value={searchQuery}
+               onChange={(e) => setSearchQuery(e.target.value)}
+               onKeyDown={handleSearch}
+               className="block w-full pl-9 pr-10 py-1.5 rounded-full border-none bg-gray-100 dark:bg-white/5 text-xs text-text-light dark:text-text-dark placeholder-text-muted-light dark:placeholder-text-muted-dark focus:ring-1 focus:ring-primary focus:bg-white dark:focus:bg-white/10 transition-all shadow-inner"
                placeholder="Search recipes, ingredients..."
              />
+             <button 
+               onClick={() => navigate('/browse')}
+               className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-muted-light dark:text-text-muted-dark hover:text-primary transition-colors"
+               title="Filters"
+             >
+                <span className="material-symbols-outlined text-lg">tune</span>
+             </button>
           </div>
 
           {/* Navigation Links */}

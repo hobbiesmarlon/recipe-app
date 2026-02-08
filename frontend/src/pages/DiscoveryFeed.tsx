@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import BottomNav from '../components/BottomNav';
 import { PageContainer } from '../components/PageContainer';
 import { ImageCarousel } from '../components/ui/ImageCarousel';
@@ -23,6 +23,8 @@ interface Recipe {
 }
 
 const DiscoveryFeed: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('search');
   const [activeTab, setActiveTab] = useState('Latest');
   const [likedRecipes, setLikedRecipes] = useState<Set<string>>(new Set());
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -66,8 +68,12 @@ const DiscoveryFeed: React.FC = () => {
     const fetchRecipes = async () => {
       try {
         setLoading(true);
-        console.log('Fetching recipes from:', client.defaults.baseURL + '/recipes');
-        const response = await client.get('/recipes');
+        
+        // Pass all search params directly to the API
+        const response = await client.get('/recipes', { 
+          params: searchParams 
+        });
+        
         console.log('Raw Backend Response:', response.data);
         
         if (response.data && Array.isArray(response.data.recipes)) {
@@ -112,7 +118,7 @@ const DiscoveryFeed: React.FC = () => {
     };
 
     fetchRecipes();
-  }, []);
+  }, [searchParams]);
 
   const tabs = ['Latest', 'Most Viewed', 'Most Liked'];
 
