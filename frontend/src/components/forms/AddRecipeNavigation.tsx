@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
+import { useAddRecipeStore } from '../../store/useAddRecipeStore';
 
 interface AddRecipeNavigationProps {
   onNext: () => void;
@@ -15,6 +16,14 @@ export const AddRecipeNavigation: React.FC<AddRecipeNavigationProps> = ({
   isLastStep = false,
 }) => {
   const navigate = useNavigate();
+  const reset = useAddRecipeStore((state) => state.reset);
+
+  const handleDeleteDraft = () => {
+    if (window.confirm("Are you sure you want to delete this draft? All progress will be lost.")) {
+      reset();
+      navigate('/');
+    }
+  };
 
   return (
     <div className="hidden lg:block fixed bottom-0 left-0 right-0 z-30 bg-background-light dark:bg-background-dark border-t border-border-light dark:border-border-dark py-3">
@@ -33,10 +42,10 @@ export const AddRecipeNavigation: React.FC<AddRecipeNavigationProps> = ({
 
         <div className="flex items-center gap-8">
           <button 
-            className="text-text-muted-light dark:text-text-muted-dark font-semibold hover:text-primary transition-colors"
-            onClick={() => alert('Draft saved (mock)')}
+            className="text-red-500 font-semibold hover:text-red-700 transition-colors"
+            onClick={handleDeleteDraft}
           >
-            Save Draft
+            Delete Draft
           </button>
           
           <button 

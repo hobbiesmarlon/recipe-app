@@ -30,6 +30,8 @@ const UserProfile: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout } = useAuthStore();
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
+  const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
+  const [history, setHistory] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -41,12 +43,18 @@ const UserProfile: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!user) return;
       try {
         setLoading(true);
-        // Fetch My Recipes
-        if (user && user.id) {
-            const recipesRes = await client.get(`/recipes?author_id=${user.id}`);
-            setMyRecipes(recipesRes.data.recipes || []);
+        if (activeTab === 'myrecipes') {
+            const res = await client.get(`/recipes?author_id=${user.id}`);
+            setMyRecipes(res.data.recipes || []);
+        } else if (activeTab === 'savedrecipes') {
+            const res = await client.get('/recipes/saved');
+            setSavedRecipes(res.data.recipes || []);
+        } else if (activeTab === 'history') {
+            const res = await client.get('/recipes/history');
+            setHistory(res.data.recipes || []);
         }
       } catch (error) {
         console.error("Failed to load profile data", error);
@@ -56,7 +64,7 @@ const UserProfile: React.FC = () => {
     };
 
     fetchData();
-  }, [user]);
+  }, [user, activeTab]);
 
   const handleSignOut = () => {
     logout();
@@ -268,21 +276,53 @@ const UserProfile: React.FC = () => {
 
             {activeTab === 'savedrecipes' && (
                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fadeIn">
-                 {/* Empty state for now since backend endpoint is missing */}
+                 {loading ? (
+                    <div className="col-span-full flex justify-center py-10"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div></div>
+                 ) : savedRecipes.length > 0 ? (
+                    savedRecipes.map(recipe => (
+                      <Link to={`/recipe/${recipe.id}`} key={recipe.id} className="flex flex-col gap-3 group">
+                        <div className="aspect-square w-full overflow-hidden rounded-lg">
+                          <img 
+                              alt={recipe.name} 
+                              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                              src={getRecipeImage(recipe)} 
+                          />
+                        </div>
+                        <p className="font-medium text-background-dark dark:text-background-light line-clamp-1">{recipe.name}</p>
+                      </Link>
+                    ))
+                 ) : (
                   <div className="col-span-full flex flex-col items-center justify-center py-10 text-gray-500">
                       <span className="material-symbols-rounded text-4xl mb-2 opacity-50">bookmark_border</span>
                       <p>No saved recipes yet.</p>
                   </div>
+                 )}
               </div>
             )}
 
             {activeTab === 'history' && (
                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fadeIn">
-                   {/* Empty state for now since backend endpoint is missing */}
+                   {loading ? (
+                      <div className="col-span-full flex justify-center py-10"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div></div>
+                   ) : history.length > 0 ? (
+                      history.map(recipe => (
+                        <Link to={`/recipe/${recipe.id}`} key={recipe.id} className="flex flex-col gap-3 group">
+                          <div className="aspect-square w-full overflow-hidden rounded-lg">
+                            <img 
+                                alt={recipe.name} 
+                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                                src={getRecipeImage(recipe)} 
+                            />
+                          </div>
+                          <p className="font-medium text-background-dark dark:text-background-light line-clamp-1">{recipe.name}</p>
+                        </Link>
+                      ))
+                   ) : (
                    <div className="col-span-full flex flex-col items-center justify-center py-10 text-gray-500">
                       <span className="material-symbols-rounded text-4xl mb-2 opacity-50">history</span>
                       <p>No viewing history available.</p>
                   </div>
+                   )}
               </div>
             )}
           </div>

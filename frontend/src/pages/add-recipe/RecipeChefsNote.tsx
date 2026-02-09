@@ -45,7 +45,7 @@ const RecipeChefsNote: React.FC = () => {
         let uploadedMedia: any[] = [];
 
         if (mediaFiles.length > 0) {
-            showFeedback("Uploading files to storage...");
+            showFeedback("Uploading recipe...");
 
             // Get presigned URLs
             const presignedRes = await client.post('/media/presigned-posts', 

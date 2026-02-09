@@ -213,6 +213,110 @@ async def list_recipes(
         ]
     )
 
+@router.get("/saved", response_model=PaginatedRecipes)
+async def list_saved_recipes(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, le=100),
+):
+    stmt = select(Recipe).join(UserSavedRecipe).where(UserSavedRecipe.user_id == user.id).options(
+        joinedload(Recipe.author),
+        selectinload(Recipe.media),
+    ).order_by(UserSavedRecipe.saved_at.desc())
+
+    # Total count
+    subq = stmt.subquery()
+    total_result = await db.execute(select(func.count()).select_from(subq))
+    total = total_result.scalar() or 0
+
+    # Paginate
+    stmt = stmt.offset((page - 1) * per_page).limit(per_page)
+    result = await db.execute(stmt)
+    recipes = result.scalars().unique().all()
+
+    return PaginatedRecipes(
+        total=total,
+        page=page,
+        per_page=per_page,
+        recipes=[
+            RecipeRead(
+                id=r.id,
+                name=r.name,
+                description=r.description,
+                chefs_note=r.chefs_note,
+                cook_time_minutes=r.cook_time_minutes,
+                servings=r.servings,
+                is_public=r.is_public,
+                author_name=r.author.display_name if r.author else "Anonymous",
+                ingredients=[], # Not needed for list
+                steps=[], # Not needed for list
+                categories=[], # Not needed for list
+                media=r.media,
+                is_liked=False, # We'd need extra queries to populate these accurately
+                is_saved=True,
+                likes_count=0,
+                views_count=0,
+            )
+            for r in recipes
+        ]
+    )
+
+@router.get("/history", response_model=PaginatedRecipes)
+async def list_view_history(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, le=100),
+):
+    # Get unique recently viewed recipes
+    # Using a subquery to get the latest view time per recipe
+    latest_views = select(
+        UserRecipeView.recipe_id,
+        func.max(UserRecipeView.viewed_at).label("latest_view")
+    ).where(UserRecipeView.user_id == user.id).group_by(UserRecipeView.recipe_id).subquery()
+
+    stmt = select(Recipe).join(latest_views, Recipe.id == latest_views.c.recipe_id).options(
+        joinedload(Recipe.author),
+        selectinload(Recipe.media),
+    ).order_by(desc(latest_views.c.latest_view))
+
+    # Total count
+    subq = stmt.subquery()
+    total_result = await db.execute(select(func.count()).select_from(subq))
+    total = total_result.scalar() or 0
+
+    # Paginate
+    stmt = stmt.offset((page - 1) * per_page).limit(per_page)
+    result = await db.execute(stmt)
+    recipes = result.scalars().unique().all()
+
+    return PaginatedRecipes(
+        total=total,
+        page=page,
+        per_page=per_page,
+        recipes=[
+            RecipeRead(
+                id=r.id,
+                name=r.name,
+                description=r.description,
+                chefs_note=r.chefs_note,
+                cook_time_minutes=r.cook_time_minutes,
+                servings=r.servings,
+                is_public=r.is_public,
+                author_name=r.author.display_name if r.author else "Anonymous",
+                ingredients=[],
+                steps=[],
+                categories=[],
+                media=r.media,
+                is_liked=False,
+                is_saved=False,
+                likes_count=0,
+                views_count=0,
+            )
+            for r in recipes
+        ]
+    )
 
 @router.get("/{recipe_id}", response_model=RecipeRead)
 async def get_recipe(

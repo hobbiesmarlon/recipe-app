@@ -135,6 +135,11 @@ const RecipeDetails: React.FC = () => {
     setTouchStart(e.targetTouches[0].clientX);
   };
 
+  const onTouchMove = (e: React.TouchEvent) => {
+    // Required for some browsers to track movement and prevent vertical scroll during horizontal swipe
+    // though touch-pan-y CSS property usually handles this.
+  };
+
   const onTouchEnd = (e: React.TouchEvent) => {
     if (touchStart === null) return;
     
@@ -297,6 +302,7 @@ const RecipeDetails: React.FC = () => {
             key={activeTab}
             className="animate-fadeIn min-h-[200px] touch-pan-y"
             onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
           >
             {activeTab === 'ingredients' ? (
