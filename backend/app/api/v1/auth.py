@@ -2,7 +2,7 @@
 import secrets
 import urllib.parse
 import os
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.responses import RedirectResponse, JSONResponse
 from app.core.security import generate_code_verifier, generate_code_challenge, create_access_token
 from app.core.db import get_db
@@ -17,6 +17,20 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 # ---------------- In-memory PKCE store (for dev) ----------------
 pkce_store = {}
 
+def get_redirect_uri(request: Request, provider: str):
+    """
+    Dynamically determine the redirect URI based on the request's host.
+    This allows both localhost and IP-based access to work correctly.
+    """
+    host = request.headers.get("host")
+    scheme = request.url.scheme
+    
+    # X (Twitter) often blocks 'localhost', so we force 127.0.0.1
+    if provider == "x" and "localhost" in host:
+        host = host.replace("localhost", "127.0.0.1")
+        
+    return f"{scheme}://{host}/auth/{provider}/callback"
+
 # ---------------- Providers Config ----------------
 OAUTH_PROVIDERS = {
     "google": {
@@ -26,7 +40,6 @@ OAUTH_PROVIDERS = {
         "token_url": "https://oauth2.googleapis.com/token",
         "user_info_url": "https://openidconnect.googleapis.com/v1/userinfo",
         "scope": "openid email profile",
-        "redirect_uri": os.environ["GOOGLE_REDIRECT_URI"],
     },
     "x": {
         "client_id": os.environ["X_CLIENT_ID"],
@@ -35,13 +48,12 @@ OAUTH_PROVIDERS = {
         "token_url": "https://api.twitter.com/2/oauth2/token",
         "user_info_url": "https://api.twitter.com/2/users/me",
         "scope": "tweet.read users.read offline.access",
-        "redirect_uri": os.environ["X_REDIRECT_URI"],
     }
 }
 
 # ---------------- Step 1: Login URL ----------------
 @router.get("/{provider}/login")
-async def login(provider: str):
+async def login(provider: str, request: Request):
     provider = provider.lower()
     if provider not in OAUTH_PROVIDERS:
         raise HTTPException(status_code=400, detail="Unsupported provider")
@@ -52,10 +64,11 @@ async def login(provider: str):
 
     pkce_store[state] = code_verifier
     conf = OAUTH_PROVIDERS[provider]
+    redirect_uri = get_redirect_uri(request, provider)
 
     params = {
         "client_id": conf["client_id"],
-        "redirect_uri": conf["redirect_uri"],
+        "redirect_uri": redirect_uri,
         "response_type": "code",
         "scope": conf["scope"],
         "state": state,
@@ -74,7 +87,7 @@ async def login(provider: str):
 
 # ---------------- Step 2: Callback ----------------
 @router.get("/{provider}/callback")
-async def callback(provider: str, code: str, state: str, db: AsyncSession = Depends(get_db)):
+async def callback(provider: str, code: str, state: str, request: Request, db: AsyncSession = Depends(get_db)):
     provider = provider.lower()
     if provider not in OAUTH_PROVIDERS:
         raise HTTPException(status_code=400, detail="Unsupported provider")
@@ -84,12 +97,13 @@ async def callback(provider: str, code: str, state: str, db: AsyncSession = Depe
 
     code_verifier = pkce_store.pop(state)
     conf = OAUTH_PROVIDERS[provider]
+    redirect_uri = get_redirect_uri(request, provider)
 
     # ---------------- Exchange code for access token ----------------
     data = {
         "grant_type": "authorization_code",
         "code": code,
-        "redirect_uri": conf["redirect_uri"],
+        "redirect_uri": redirect_uri,
     }
 
     request_body_data = data.copy()
@@ -135,6 +149,7 @@ async def callback(provider: str, code: str, state: str, db: AsyncSession = Depe
             email = user_json["email"]
             name = user_json.get("name") or email.split("@")[0]
             provider_user_id = user_json["sub"]
+            profile_pic_url = user_json.get("picture")
         elif provider == "x":
             user_resp = await client.get(
                 conf["user_info_url"],
@@ -163,29 +178,48 @@ async def callback(provider: str, code: str, state: str, db: AsyncSession = Depe
     )
     oauth_acc = result.scalars().first()
     
+    is_new_user = False
+
     if oauth_acc:
         user = await db.get(User, oauth_acc.user_id)
         # Update OAuth info
         oauth_acc.provider_username = x_username if provider == "x" else None
         oauth_acc.provider_display_name = name
-        oauth_acc.provider_profile_pic_url = profile_pic_url if provider == "x" else None # Google logic to be added later if needed
+        oauth_acc.provider_profile_pic_url = profile_pic_url
         
+        # Update User sourcing flags based on current provider login
+        if provider == "google":
+             user.username_sourced_from_provider = False
+             user.display_name_sourced_from_provider = False
+             user.profile_pic_sourced_from_provider = False
+        elif provider == "x":
+             user.username_sourced_from_provider = True
+             user.display_name_sourced_from_provider = True
+             user.profile_pic_sourced_from_provider = True
+
         # Update User info if sourced from provider
         if user.profile_pic_sourced_from_provider and profile_pic_url:
              user.profile_picture_url = profile_pic_url
         if user.display_name_sourced_from_provider and name:
              user.display_name = name
     else:
+        is_new_user = True
         if provider == "x":
             username = x_username if x_username else email.split("@")[0]
+            # X users have details sourced from provider by default
+            sourced = True
         else:
             username = email.split("@")[0] if email and "@" in email else email
-            profile_pic_url = None # Google logic not fully implemented above for pic
+            # Google users can choose their own details
+            sourced = False
 
         user = User(
             username=username, 
             display_name=name,
-            profile_picture_url=profile_pic_url
+            profile_picture_url=profile_pic_url,
+            username_sourced_from_provider=sourced,
+            display_name_sourced_from_provider=sourced,
+            profile_pic_sourced_from_provider=sourced
         )
         db.add(user)
         await db.flush()
@@ -206,6 +240,6 @@ async def callback(provider: str, code: str, state: str, db: AsyncSession = Depe
     token = create_access_token(subject=str(user.id))
     
     frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173")
-    redirect_url = f"{frontend_url}/auth/callback?token={token}"
+    redirect_url = f"{frontend_url}/auth/callback?token={token}&provider={provider}&is_new_user={str(is_new_user).lower()}"
     
     return RedirectResponse(url=redirect_url)

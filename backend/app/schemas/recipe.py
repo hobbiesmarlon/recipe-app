@@ -73,11 +73,12 @@ class PaginatedRecipes(BaseModel):
     recipes: List[RecipeRead]
 
 class RecipeMediaCreate(BaseModel):
-    key: str           # the key returned by presigned URL
-    type: str          # "image" or "video"
+    id: Optional[int] = None # For updates
+    key: Optional[str] = None # For new uploads
+    type: Optional[str] = "image"
     is_primary: Optional[bool] = False
     display_order: Optional[int] = 0
-    content_type: Optional[str] = None  # MIME type for validation
+    content_type: Optional[str] = None
 
 class RecipeCreateWithMedia(BaseModel):
     name: str
@@ -87,6 +88,18 @@ class RecipeCreateWithMedia(BaseModel):
     servings: Optional[int] = Field(None, ge=1)
     is_public: bool = True
     category_ids: Optional[List[int]] = Field([], alias="categories")
-    ingredients: List[IngredientCreate]  # keep same as before
-    steps: List[StepCreate]        # keep same as before
+    ingredients: List[IngredientCreate]
+    steps: List[StepCreate]
     media: List[RecipeMediaCreate]
+
+class RecipeUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    chefs_note: Optional[str] = None
+    cook_time_minutes: Optional[int] = None
+    servings: Optional[int] = None
+    is_public: Optional[bool] = None
+    category_ids: Optional[List[int]] = Field(None, alias="categories")
+    ingredients: Optional[List[IngredientCreate]] = None
+    steps: Optional[List[StepCreate]] = None
+    media: Optional[List[RecipeMediaCreate]] = None

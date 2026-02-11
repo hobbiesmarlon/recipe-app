@@ -7,10 +7,18 @@ const AuthCallback: React.FC = () => {
 
   useEffect(() => {
     const token = searchParams.get('token');
+    const provider = searchParams.get('provider');
+    const isNewUser = searchParams.get('is_new_user') === 'true';
+    
     if (token) {
       localStorage.setItem('token', token);
-      // Optional: Fetch user details here if needed, or rely on subsequent API calls
-      navigate('/', { replace: true });
+      
+      if (isNewUser && provider === 'google') {
+        navigate('/edit-profile', { replace: true });
+      } else {
+        // Ideally, redirect to the page they were trying to access
+        navigate('/', { replace: true });
+      }
     } else {
       // Handle error or missing token
       navigate('/signin', { replace: true });

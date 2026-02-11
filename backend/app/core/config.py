@@ -34,9 +34,12 @@ class Settings(BaseSettings):
     MEDIA_CDN_BASE_URL: str
     MEDIA_PUBLIC_BASE_URL: str
     MEDIA_BUCKET_NAME: str
+    PROFILE_PICTURE_BUCKET_NAME: str = "profile-pictures"
 
     CELERY_BROKER_URL: str = "sqs://"
     AWS_SQS_ENDPOINT_URL: str | None = None
+    
+    FRONTEND_URL: str | None = None
 
     # AWS Cognito
     COGNITO_USER_POOL_ID: str | None = None

@@ -120,7 +120,7 @@ const CategoriesBrowsing: React.FC = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   className="w-full rounded-full border-gray-200 bg-gray-100 dark:bg-white/10 dark:border-border-dark py-2.5 pl-10 pr-4 text-sm focus:border-primary focus:ring-primary dark:placeholder-text-muted-dark" 
-                  placeholder="Search ingredients..." 
+                  placeholder="Search recipes, ingredients..." 
                   type="text" 
                 />
               </div>

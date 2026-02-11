@@ -18,6 +18,9 @@ import RecipeChefsNote from './pages/add-recipe/RecipeChefsNote';
 import RecipeDetails from './pages/RecipeDetails';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
+import AddRecipeGuard from './components/AddRecipeGuard';
+
+import EditRecipeLoader from './components/EditRecipeLoader';
 
 function App() {
   return (
@@ -40,12 +43,23 @@ function App() {
             <Route path="my-recipes" element={<MyRecipes />} />
             
             {/* Add Recipe Flow */}
-            <Route path="add-recipe">
+            <Route path="add-recipe" element={<AddRecipeGuard />}>
               <Route path="basic" element={<RecipeBasicInfo />} />
               <Route path="ingredients" element={<RecipeIngredients />} />
               <Route path="instructions" element={<RecipeInstructions />} />
               <Route path="categories" element={<RecipeCategories />} />
               <Route path="chefs-note" element={<RecipeChefsNote />} />
+            </Route>
+
+            {/* Edit Recipe Flow */}
+            <Route path="edit-recipe/:recipeId" element={<EditRecipeLoader />}>
+              <Route element={<AddRecipeGuard />}>
+                <Route path="basic" element={<RecipeBasicInfo />} />
+                <Route path="ingredients" element={<RecipeIngredients />} />
+                <Route path="instructions" element={<RecipeInstructions />} />
+                <Route path="categories" element={<RecipeCategories />} />
+                <Route path="chefs-note" element={<RecipeChefsNote />} />
+              </Route>
             </Route>
           </Route>
         </Route>

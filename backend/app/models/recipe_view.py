@@ -4,8 +4,8 @@ from app.core.db import Base, TimestampMixin
 class UserRecipeView(Base, TimestampMixin):
     __tablename__ = "user_recipe_views"
     id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger, ForeignKey("users.id"))
-    recipe_id = Column(BigInteger, ForeignKey("recipes.id"))
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"))
+    recipe_id = Column(BigInteger, ForeignKey("recipes.id", ondelete="CASCADE"))
     viewed_at = Column(TIMESTAMP(timezone=True), server_default=text("now()"))
 
     __table_args__ = (

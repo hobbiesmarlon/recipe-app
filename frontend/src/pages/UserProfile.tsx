@@ -11,6 +11,7 @@ interface User {
   display_name: string;
   profile_picture_url?: string;
   email?: string;
+  username_sourced_from_provider?: boolean;
 }
 
 interface RecipeMedia {
@@ -29,42 +30,84 @@ const UserProfile: React.FC = () => {
   const [activeTab, setActiveTab] = useState('myrecipes');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout } = useAuthStore();
-  const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
-  const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
-  const [history, setHistory] = useState<Recipe[]>([]);
+  
+  // Data State
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   const navigate = useNavigate();
 
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
-  const tabs = ['myrecipes', 'savedrecipes', 'history'];
+  const tabs = ['myrecipes', 'savedrecipes', 'likedrecipes', 'history'];
   const minSwipeDistance = 50;
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async (pageNum: number, isNewTab: boolean) => {
       if (!user) return;
       try {
-        setLoading(true);
-        if (activeTab === 'myrecipes') {
-            const res = await client.get(`/recipes?author_id=${user.id}`);
-            setMyRecipes(res.data.recipes || []);
-        } else if (activeTab === 'savedrecipes') {
-            const res = await client.get('/recipes/saved');
-            setSavedRecipes(res.data.recipes || []);
-        } else if (activeTab === 'history') {
-            const res = await client.get('/recipes/history');
-            setHistory(res.data.recipes || []);
+        if (isNewTab) {
+            setLoading(true);
+            setRecipes([]);
+        } else {
+            setIsLoadingMore(true);
         }
+
+        let url = '';
+        if (activeTab === 'myrecipes') {
+            url = `/recipes?author_id=${user.id}`;
+        } else if (activeTab === 'savedrecipes') {
+            url = '/recipes/saved';
+        } else if (activeTab === 'likedrecipes') {
+            url = '/recipes/liked';
+        } else if (activeTab === 'history') {
+            url = '/recipes/history';
+        }
+
+        if (url) {
+             // Append pagination params
+             const separator = url.includes('?') ? '&' : '?';
+             url += `${separator}page=${pageNum}`;
+        }
+
+        const res = await client.get(url);
+        const fetchedRecipes = res.data.recipes || [];
+        const total = res.data.total;
+        
+        // Append or replace recipes
+        if (isNewTab) {
+            setRecipes(fetchedRecipes);
+        } else {
+            setRecipes(prev => [...prev, ...fetchedRecipes]);
+        }
+        
+        // Determine if more pages exist
+        const currentCount = isNewTab ? fetchedRecipes.length : recipes.length + fetchedRecipes.length;
+        setHasMore(currentCount < total);
+
       } catch (error) {
         console.error("Failed to load profile data", error);
       } finally {
         setLoading(false);
+        setIsLoadingMore(false);
       }
-    };
+  };
 
-    fetchData();
+  useEffect(() => {
+    setPage(1);
+    fetchData(1, true);
   }, [user, activeTab]);
+
+  const handleLoadMore = () => {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchData(nextPage, false);
+  };
 
   const handleSignOut = () => {
     logout();
@@ -101,9 +144,77 @@ const UserProfile: React.FC = () => {
       return 'https://via.placeholder.com/300?text=No+Image';
   };
 
+  const renderRecipeGrid = () => (
+      <>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fadeIn">
+            {recipes.map(recipe => (
+            <Link to={`/recipe/${recipe.id}`} key={recipe.id} className="flex flex-col gap-3 group">
+                <div className="aspect-square w-full overflow-hidden rounded-lg">
+                <img 
+                    alt={recipe.name} 
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                    src={getRecipeImage(recipe)} 
+                />
+                </div>
+                <p className="font-medium text-background-dark dark:text-background-light line-clamp-1">{recipe.name}</p>
+            </Link>
+            ))}
+        </div>
+        
+        {hasMore && (
+            <div className="flex justify-center pt-8 pb-4">
+                <button 
+                onClick={handleLoadMore}
+                disabled={isLoadingMore}
+                className="px-5 py-2 rounded-full bg-surface-light dark:bg-surface-dark border border-primary text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                {isLoadingMore ? (
+                    <>
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+                        Loading...
+                    </>
+                ) : (
+                    'Load More'
+                )}
+                </button>
+            </div>
+        )}
+      </>
+  );
+
+  const renderEmptyState = () => {
+      let icon = 'restaurant_menu';
+      let message = 'No recipes found.';
+      let subMessage = '';
+      let action = null;
+
+      if (activeTab === 'myrecipes') {
+          message = 'No recipes created yet.';
+          action = <Link to="/add-recipe" className="text-primary font-bold hover:underline mt-2">Create one now</Link>;
+      } else if (activeTab === 'savedrecipes') {
+          icon = 'bookmark_border';
+          message = 'No saved recipes yet.';
+      } else if (activeTab === 'likedrecipes') {
+          icon = 'favorite_border';
+          message = 'No liked recipes yet.';
+      } else if (activeTab === 'history') {
+          icon = 'history';
+          message = 'No viewing history available.';
+      }
+
+      return (
+        <div className="flex flex-col items-center justify-center py-10 text-gray-500 animate-fadeIn">
+            <span className="material-symbols-rounded text-4xl mb-2 opacity-50">{icon}</span>
+            <p>{message}</p>
+            {subMessage && <p className="text-sm mt-1">{subMessage}</p>}
+            {action}
+        </div>
+      );
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="py-4 md:py-0 sticky top-0 md:top-14 z-10 bg-background-light dark:bg-background-dark md:bg-transparent">
+      <header className="py-4 md:py-0 bg-background-light dark:bg-background-dark md:bg-transparent">
         <PageContainer>
           <div className="flex items-center justify-between md:justify-end md:h-10">
             <div className="w-10 md:hidden"></div>
@@ -198,9 +309,11 @@ const UserProfile: React.FC = () => {
                         <p className="text-[22px] md:text-3xl font-bold text-background-dark dark:text-background-light">{user.display_name}</p>
                         <div className="flex items-center gap-1.5 mt-1">
                         <p className="text-base md:text-lg text-primary">@{user.username || user.email?.split('@')[0]}</p>
-                        <svg className="h-3.5 w-3.5 md:h-4 md:w-4 text-background-dark dark:text-background-light" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        {user.username_sourced_from_provider && (
+                          <svg className="h-3.5 w-3.5 md:h-4 md:w-4 text-background-dark dark:text-background-light" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932 6.064-6.932zm-1.292 19.494h2.039L6.486 3.24H4.298l13.311 17.407z" />
-                        </svg>
+                          </svg>
+                        )}
                         </div>
                     </>
                 ) : (
@@ -210,8 +323,8 @@ const UserProfile: React.FC = () => {
             </div>
           </div>
 
-          <div className="border-b border-primary/20 dark:border-primary/30">
-            <nav className="flex justify-center md:justify-start gap-8 px-4" role="tablist" aria-label="Profile tabs">
+          <div className="border-b border-primary/20 dark:border-primary/30 overflow-x-auto">
+            <nav className="flex justify-start md:justify-start gap-8 px-4 min-w-max" role="tablist" aria-label="Profile tabs">
               <button 
                 onClick={() => setActiveTab('myrecipes')}
                 className={`flex flex-col items-center border-b-2 pb-3 pt-4 text-sm font-bold transition-colors ${activeTab === 'myrecipes' ? 'border-primary text-primary' : 'border-transparent text-gray-500 dark:text-gray-400'}`}
@@ -222,7 +335,13 @@ const UserProfile: React.FC = () => {
                 onClick={() => setActiveTab('savedrecipes')}
                 className={`flex flex-col items-center border-b-2 pb-3 pt-4 text-sm font-bold transition-colors ${activeTab === 'savedrecipes' ? 'border-primary text-primary' : 'border-transparent text-gray-500 dark:text-gray-400'}`}
               >
-                Saved Recipes
+                Saved
+              </button>
+               <button 
+                onClick={() => setActiveTab('likedrecipes')}
+                className={`flex flex-col items-center border-b-2 pb-3 pt-4 text-sm font-bold transition-colors ${activeTab === 'likedrecipes' ? 'border-primary text-primary' : 'border-transparent text-gray-500 dark:text-gray-400'}`}
+              >
+                Liked
               </button>
               <button 
                 onClick={() => setActiveTab('history')}
@@ -239,92 +358,20 @@ const UserProfile: React.FC = () => {
             onTouchEnd={onTouchEnd}
             className="min-h-[300px]"
           >
-            {activeTab === 'myrecipes' && (
-              <div className="animate-fadeIn">
-                 {loading ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {[1, 2, 3, 4].map(i => (
-                             <div key={i} className="flex flex-col gap-3">
-                                <div className="aspect-square w-full rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
-                                <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
-                             </div>
-                        ))}
-                    </div>
-                 ) : myRecipes.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {myRecipes.map(recipe => (
-                        <Link to={`/recipe/${recipe.id}`} key={recipe.id} className="flex flex-col gap-3 group">
-                          <div className="aspect-square w-full overflow-hidden rounded-lg">
-                            <img 
-                                alt={recipe.name} 
-                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" 
-                                src={getRecipeImage(recipe)} 
-                            />
-                          </div>
-                          <p className="font-medium text-background-dark dark:text-background-light line-clamp-1">{recipe.name}</p>
-                        </Link>
-                      ))}
-                    </div>
-                 ) : (
-                    <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-                        <p>No recipes created yet.</p>
-                        <Link to="/add-recipe" className="text-primary font-bold hover:underline mt-2">Create one now</Link>
-                    </div>
-                 )}
-              </div>
-            )}
-
-            {activeTab === 'savedrecipes' && (
-               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fadeIn">
-                 {loading ? (
-                    <div className="col-span-full flex justify-center py-10"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div></div>
-                 ) : savedRecipes.length > 0 ? (
-                    savedRecipes.map(recipe => (
-                      <Link to={`/recipe/${recipe.id}`} key={recipe.id} className="flex flex-col gap-3 group">
-                        <div className="aspect-square w-full overflow-hidden rounded-lg">
-                          <img 
-                              alt={recipe.name} 
-                              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" 
-                              src={getRecipeImage(recipe)} 
-                          />
-                        </div>
-                        <p className="font-medium text-background-dark dark:text-background-light line-clamp-1">{recipe.name}</p>
-                      </Link>
-                    ))
-                 ) : (
-                  <div className="col-span-full flex flex-col items-center justify-center py-10 text-gray-500">
-                      <span className="material-symbols-rounded text-4xl mb-2 opacity-50">bookmark_border</span>
-                      <p>No saved recipes yet.</p>
-                  </div>
-                 )}
-              </div>
-            )}
-
-            {activeTab === 'history' && (
-               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fadeIn">
-                   {loading ? (
-                      <div className="col-span-full flex justify-center py-10"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div></div>
-                   ) : history.length > 0 ? (
-                      history.map(recipe => (
-                        <Link to={`/recipe/${recipe.id}`} key={recipe.id} className="flex flex-col gap-3 group">
-                          <div className="aspect-square w-full overflow-hidden rounded-lg">
-                            <img 
-                                alt={recipe.name} 
-                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" 
-                                src={getRecipeImage(recipe)} 
-                            />
-                          </div>
-                          <p className="font-medium text-background-dark dark:text-background-light line-clamp-1">{recipe.name}</p>
-                        </Link>
-                      ))
-                   ) : (
-                   <div className="col-span-full flex flex-col items-center justify-center py-10 text-gray-500">
-                      <span className="material-symbols-rounded text-4xl mb-2 opacity-50">history</span>
-                      <p>No viewing history available.</p>
-                  </div>
-                   )}
-              </div>
-            )}
+             {loading ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fadeIn">
+                    {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="flex flex-col gap-3">
+                            <div className="aspect-square w-full rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+                            <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+                            </div>
+                    ))}
+                </div>
+             ) : recipes.length > 0 ? (
+                 renderRecipeGrid()
+             ) : (
+                 renderEmptyState()
+             )}
           </div>
         </PageContainer>
       </main>

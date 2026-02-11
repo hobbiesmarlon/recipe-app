@@ -30,6 +30,12 @@ const DiscoveryFeed: React.FC = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAuthToast, setShowAuthToast] = useState(false);
+  
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
@@ -64,64 +70,90 @@ const DiscoveryFeed: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchRecipes = async () => {
-      try {
+  const fetchRecipes = async (pageNum: number, isNewSearch: boolean) => {
+    try {
+      if (isNewSearch) {
         setLoading(true);
-        
-        // Pass all search params directly to the API
-        const params = new URLSearchParams(searchParams);
-        params.append('sort_by', activeTab);
-
-        const response = await client.get('/recipes', { 
-          params 
-        });
-        
-        console.log('Raw Backend Response:', response.data);
-        
-        if (response.data && Array.isArray(response.data.recipes)) {
-          console.log(`Found ${response.data.recipes.length} recipes`);
-          
-          const likedSet = new Set<string>();
-          
-          const mappedRecipes: Recipe[] = response.data.recipes.map((r: any) => {
-            if (r.is_liked) {
-                likedSet.add(r.id.toString());
-            }
-
-            // Filter out media without a URL and extract unique media items
-            const mediaItems: RecipeMedia[] = r.media
-              ? r.media
-                  .filter((m: any) => !!m.url)
-                  .map((m: any) => ({ url: m.url, type: m.type as 'image' | 'video' }))
-              : [];
-            
-            // Remove duplicates based on URL
-            const uniqueMedia = mediaItems.filter((v, i, a) => a.findIndex(t => t.url === v.url) === i);
-            
-            const placeholderUrl = 'https://via.placeholder.com/800x600?text=No+Image';
-
-            return {
-              id: r.id.toString(),
-              title: r.name,
-              description: r.description || '',
-              meta: `${r.cook_time_minutes || 0} min · ${r.servings || 0} servings`,
-              image: uniqueMedia.length > 0 ? uniqueMedia[0].url : placeholderUrl,
-              images: uniqueMedia.length > 0 ? uniqueMedia : [{ url: placeholderUrl, type: 'image' }]
-            };
-          });
-          setRecipes(mappedRecipes);
-          setLikedRecipes(likedSet);
-        }
-      } catch (error) {
-        console.error('Backend connection failed:', error);
-      } finally {
-        setLoading(false);
+      } else {
+        setIsLoadingMore(true);
       }
-    };
+      
+      // Pass all search params directly to the API
+      const params = new URLSearchParams(searchParams);
+      params.append('sort_by', activeTab);
+      params.append('page', pageNum.toString());
 
-    fetchRecipes();
+      const response = await client.get('/recipes', { 
+        params 
+      });
+      
+      console.log('Raw Backend Response:', response.data);
+      
+      if (response.data && Array.isArray(response.data.recipes)) {
+        const fetchedRecipes = response.data.recipes;
+        console.log(`Found ${fetchedRecipes.length} recipes`);
+        
+        // Update hasMore based on whether we received fewer items than requested (default 12)
+        // Or strictly if current count < total
+        const total = response.data.total;
+        const currentCount = isNewSearch ? fetchedRecipes.length : recipes.length + fetchedRecipes.length;
+        setHasMore(currentCount < total);
+
+        const likedSet = isNewSearch ? new Set<string>() : new Set(likedRecipes);
+        
+        const mappedRecipes: Recipe[] = fetchedRecipes.map((r: any) => {
+          if (r.is_liked) {
+              likedSet.add(r.id.toString());
+          }
+
+          // Filter out media without a URL and extract unique media items
+          const mediaItems: RecipeMedia[] = r.media
+            ? r.media
+                .filter((m: any) => !!m.url)
+                .map((m: any) => ({ url: m.url, type: m.type as 'image' | 'video' }))
+            : [];
+          
+          // Remove duplicates based on URL
+          const uniqueMedia = mediaItems.filter((v, i, a) => a.findIndex(t => t.url === v.url) === i);
+          
+          const placeholderUrl = 'https://via.placeholder.com/800x600?text=No+Image';
+
+          return {
+            id: r.id.toString(),
+            title: r.name,
+            description: r.description || '',
+            meta: `${r.cook_time_minutes || 0} min · ${r.servings || 0} servings`,
+            image: uniqueMedia.length > 0 ? uniqueMedia[0].url : placeholderUrl,
+            images: uniqueMedia.length > 0 ? uniqueMedia : [{ url: placeholderUrl, type: 'image' }]
+          };
+        });
+
+        if (isNewSearch) {
+          setRecipes(mappedRecipes);
+        } else {
+          setRecipes(prev => [...prev, ...mappedRecipes]);
+        }
+        setLikedRecipes(likedSet);
+      }
+    } catch (error) {
+      console.error('Backend connection failed:', error);
+    } finally {
+      setLoading(false);
+      setIsLoadingMore(false);
+    }
+  };
+
+  // Effect for initial load or search/tab change
+  useEffect(() => {
+    setPage(1);
+    fetchRecipes(1, true);
   }, [searchParams, activeTab]);
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchRecipes(nextPage, false);
+  };
 
   const tabs = [
     { label: 'Latest', value: 'latest' },
@@ -164,17 +196,38 @@ const DiscoveryFeed: React.FC = () => {
               <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
             </div>
           ) : recipes.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {recipes.map((recipe) => (
-                <RecipeCard 
-                  key={recipe.id}
-                  recipe={recipe}
-                  isLiked={likedRecipes.has(recipe.id)}
-                  onToggleLike={toggleLike}
-                  onClick={() => navigate(`/recipe/${recipe.id}`)}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {recipes.map((recipe) => (
+                  <RecipeCard 
+                    key={recipe.id}
+                    recipe={recipe}
+                    isLiked={likedRecipes.has(recipe.id)}
+                    onToggleLike={toggleLike}
+                    onClick={() => navigate(`/recipe/${recipe.id}`)}
+                  />
+                ))}
+              </div>
+              
+              {hasMore && (
+                <div className="flex justify-center pt-6">
+                  <button 
+                    onClick={handleLoadMore}
+                    disabled={isLoadingMore}
+                    className="px-5 py-2 rounded-full bg-surface-light dark:bg-surface-dark border border-primary text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {isLoadingMore ? (
+                       <>
+                         <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+                         Loading...
+                       </>
+                    ) : (
+                       'Load More'
+                    )}
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <span className="material-symbols-rounded text-6xl text-gray-300 mb-4">restaurant_menu</span>

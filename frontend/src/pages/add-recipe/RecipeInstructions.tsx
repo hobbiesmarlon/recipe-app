@@ -73,35 +73,36 @@ const RecipeInstructions: React.FC = () => {
 
     return (
       <div 
-        className="flex items-center justify-between rounded-xl bg-white p-5 shadow-lg dark:bg-black/20 select-none"
+        className="flex items-start gap-3 rounded-xl bg-white p-5 shadow-lg dark:bg-black/20 select-none"
       >
-        <div className="flex items-start gap-3 flex-1">
-          <div 
-            {...dragHandleProps}
-            className="text-background-dark/60 hover:text-primary dark:text-background-light/60 p-1 mt-1 cursor-grab active:cursor-grabbing touch-none"
-          >
-            <span className="material-symbols-outlined text-3xl">drag_indicator</span>
-          </div>
-          <div className="flex-1">
-            <p className="text-lg font-bold text-background-dark dark:text-background-light">Step {index + 1}</p>
-            <p className="text-base text-background-dark/80 dark:text-background-light/80 mt-1">{step.description}</p>
-          </div>
+        <div 
+          {...dragHandleProps}
+          className="text-background-dark/60 hover:text-primary dark:text-background-light/60 p-1 mt-1 cursor-grab active:cursor-grabbing touch-none"
+        >
+          <span className="material-symbols-outlined text-3xl">drag_indicator</span>
         </div>
-        <div className="flex items-center gap-2 ml-4">
-          <button 
-            onClick={(e) => { e.stopPropagation(); handleEditStep(step); }}
-            aria-label="edit" 
-            className="flex h-8 w-8 items-center justify-center rounded-full text-background-dark/60 hover:text-primary dark:text-background-light/60"
-          >
-            <span className="material-symbols-outlined text-base">edit</span>
-          </button>
-          <button 
-            onClick={(e) => { e.stopPropagation(); handleRemoveStep(step.id); }}
-            aria-label="delete" 
-            className="flex h-8 w-8 items-center justify-center rounded-full text-background-dark/60 hover:text-primary dark:text-background-light/60"
-          >
-            <span className="material-symbols-outlined text-base">delete</span>
-          </button>
+        
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <p className="text-lg font-bold text-background-dark dark:text-background-light">Step {index + 1}</p>
+            <div className="flex items-center gap-1">
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleEditStep(step); }}
+                aria-label="edit" 
+                className="flex h-8 w-8 items-center justify-center rounded-full text-background-dark/60 hover:text-primary dark:text-background-light/60"
+              >
+                <span className="material-symbols-outlined text-base">edit</span>
+              </button>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleRemoveStep(step.id); }}
+                aria-label="delete" 
+                className="flex h-8 w-8 items-center justify-center rounded-full text-background-dark/60 hover:text-primary dark:text-background-light/60"
+              >
+                <span className="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+          </div>
+          <p className="text-base text-background-dark/80 dark:text-background-light/80 mt-1 break-words">{step.description}</p>
         </div>
       </div>
     );

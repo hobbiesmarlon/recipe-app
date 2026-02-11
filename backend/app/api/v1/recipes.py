@@ -86,7 +86,7 @@ async def list_recipes(
     db: AsyncSession = Depends(get_db),
     user: Optional[User] = Depends(get_optional_current_user),
     page: int = Query(1, ge=1),
-    per_page: int = Query(20, le=100),
+    per_page: int = Query(12, le=100),
     category_ids: Optional[List[int]] = Query(None),
     max_cook_time: Optional[int] = Query(None, alias="maxTime"),
     search: Optional[str] = Query(None),
@@ -213,12 +213,61 @@ async def list_recipes(
         ]
     )
 
+@router.get("/liked", response_model=PaginatedRecipes)
+async def list_liked_recipes(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+    page: int = Query(1, ge=1),
+    per_page: int = Query(12, le=100),
+):
+    stmt = select(Recipe).join(RecipeLike).where(RecipeLike.user_id == user.id).options(
+        joinedload(Recipe.author),
+        selectinload(Recipe.media),
+    ).order_by(RecipeLike.created_at.desc())
+
+    # Total count
+    subq = stmt.subquery()
+    total_result = await db.execute(select(func.count()).select_from(subq))
+    total = total_result.scalar() or 0
+
+    # Paginate
+    stmt = stmt.offset((page - 1) * per_page).limit(per_page)
+    result = await db.execute(stmt)
+    recipes = result.scalars().unique().all()
+
+    return PaginatedRecipes(
+        total=total,
+        page=page,
+        per_page=per_page,
+        recipes=[
+            RecipeRead(
+                id=r.id,
+                name=r.name,
+                description=r.description,
+                chefs_note=r.chefs_note,
+                cook_time_minutes=r.cook_time_minutes,
+                servings=r.servings,
+                is_public=r.is_public,
+                author_name=r.author.display_name if r.author else "Anonymous",
+                ingredients=[], # Not needed for list
+                steps=[], # Not needed for list
+                categories=[], # Not needed for list
+                media=r.media,
+                is_liked=True,
+                is_saved=False, # We'd need extra queries to populate accurately
+                likes_count=0,
+                views_count=0,
+            )
+            for r in recipes
+        ]
+    )
+
 @router.get("/saved", response_model=PaginatedRecipes)
 async def list_saved_recipes(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
     page: int = Query(1, ge=1),
-    per_page: int = Query(20, le=100),
+    per_page: int = Query(12, le=100),
 ):
     stmt = select(Recipe).join(UserSavedRecipe).where(UserSavedRecipe.user_id == user.id).options(
         joinedload(Recipe.author),
@@ -267,7 +316,7 @@ async def list_view_history(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
     page: int = Query(1, ge=1),
-    per_page: int = Query(20, le=100),
+    per_page: int = Query(12, le=100),
 ):
     # Get unique recently viewed recipes
     # Using a subquery to get the latest view time per recipe
@@ -395,20 +444,34 @@ async def get_recipe(
 async def update_recipe(
     recipe_id: int,
     data: RecipeUpdate,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    recipe = await db.get(Recipe, recipe_id)
+    result = await db.execute(
+        select(Recipe)
+        .options(
+            selectinload(Recipe.media),
+            selectinload(Recipe.ingredients),
+            selectinload(Recipe.steps)
+        )
+        .where(Recipe.id == recipe_id)
+    )
+    recipe = result.scalars().first()
+
     if not recipe:
         raise HTTPException(404, "Recipe not found")
     if recipe.user_id != user.id:
         raise HTTPException(403, "Not authorized")
 
     publish_requested = False
+    
+    # Track media to cleanup
+    media_cleanup_keys = []
 
     # Update basic fields
     for field, value in data.dict(exclude_unset=True).items():
-        if field in {"ingredients", "steps", "category_ids"}:
+        if field in {"ingredients", "steps", "category_ids", "media"}:
             continue
         if field == "is_public" and value is True:
             publish_requested = True
@@ -453,12 +516,72 @@ async def update_recipe(
         )
         recipe.categories = result.scalars().all()
 
+    # Update Media
+    if data.media is not None:
+        # Get existing media
+        existing_media_map = {m.id: m for m in recipe.media}
+        incoming_media_ids = {m.id for m in data.media if m.id is not None}
+        
+        # 1. Identify and remove media
+        for mid, media in existing_media_map.items():
+            if mid not in incoming_media_ids:
+                media_cleanup_keys.extend([
+                    media.key,
+                    media.thumbnail_small_key,
+                    media.thumbnail_medium_key,
+                    media.thumbnail_large_key,
+                ])
+                # Remove from relationship to trigger delete-orphan cascade
+                recipe.media.remove(media)
+        
+        # 2. Update existing or Add new Media
+        for m_data in data.media:
+            if m_data.id and m_data.id in existing_media_map:
+                # Update existing in-memory object
+                media = existing_media_map[m_data.id]
+                media.is_primary = m_data.is_primary
+                media.display_order = m_data.display_order
+            elif m_data.key:
+                # Add new
+                try:
+                    metadata = head_object(m_data.key)
+                except ClientError:
+                    raise HTTPException(400, f"Media file not found in storage: {m_data.key}")
+
+                new_media = RecipeMedia(
+                    recipe_id=recipe.id,
+                    recipe_uuid=recipe.uuid,
+                    key=m_data.key,
+                    object_key=m_data.key,
+                    bucket=settings.MEDIA_BUCKET_NAME,
+                    storage_provider=StorageProvider.MINIO,
+                    media_type=MediaType(m_data.type),
+                    content_type=metadata.get("ContentType", "application/octet-stream"),
+                    size_bytes=metadata.get("ContentLength", 0),
+                    type=m_data.type,
+                    is_primary=m_data.is_primary,
+                    display_order=m_data.display_order,
+                )
+                recipe.media.append(new_media)
+                await db.flush() # Ensure we have IDs
+                process_recipe_media_task.delay(new_media.id)
+        
+        # Ensure changes are flushed before potential validation
+        await db.flush()
+
     # ✅ Enforce publish rules only if publishing
-    if publish_requested:
-        await db.refresh(recipe)
+    # Skip validation ONLY if we added new media (which needs processing).
+    # Existing media updates or deletions should still be validated.
+    has_new_media = data.media is not None and any(m.key for m in data.media)
+    
+    if publish_requested and not has_new_media:
         validate_publishable(recipe)
 
     await db.commit()
+
+    if media_cleanup_keys:
+        background_tasks.add_task(cleanup_media_files, media_cleanup_keys)
+    
     return await get_recipe(recipe.id, db, user=user)
 
 @router.delete("/{recipe_id}", status_code=204)

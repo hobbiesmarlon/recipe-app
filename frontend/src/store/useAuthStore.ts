@@ -7,6 +7,9 @@ interface User {
   display_name: string;
   profile_picture_url?: string;
   email?: string;
+  username_sourced_from_provider: boolean;
+  display_name_sourced_from_provider: boolean;
+  profile_pic_sourced_from_provider: boolean;
 }
 
 interface AuthState {

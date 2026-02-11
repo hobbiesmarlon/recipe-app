@@ -7,6 +7,7 @@ interface AddRecipeNavigationProps {
   backPath?: string;
   nextLabel?: string;
   isLastStep?: boolean;
+  isLoading?: boolean;
 }
 
 export const AddRecipeNavigation: React.FC<AddRecipeNavigationProps> = ({
@@ -14,6 +15,7 @@ export const AddRecipeNavigation: React.FC<AddRecipeNavigationProps> = ({
   backPath,
   nextLabel = 'Next Step',
   isLastStep = false,
+  isLoading = false,
 }) => {
   const navigate = useNavigate();
   const reset = useAddRecipeStore((state) => state.reset);
@@ -50,12 +52,15 @@ export const AddRecipeNavigation: React.FC<AddRecipeNavigationProps> = ({
           
           <button 
             onClick={onNext}
-            className="flex items-center gap-2 bg-primary text-white px-8 py-2 rounded-xl font-bold hover:bg-orange-600 transition-all active:scale-95 shadow-lg shadow-primary/20"
+            disabled={isLoading}
+            className="flex items-center gap-2 bg-primary text-white px-8 py-2 rounded-xl font-bold hover:bg-orange-600 transition-all active:scale-95 shadow-lg shadow-primary/20 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {nextLabel}
-            <span className="material-symbols-outlined">
-              {isLastStep ? 'arrow_forward' : 'arrow_forward'}
-            </span>
+            {!isLoading && (
+              <span className="material-symbols-outlined">
+                {isLastStep ? 'arrow_forward' : 'arrow_forward'}
+              </span>
+            )}
           </button>
         </div>
       </div>

@@ -19,7 +19,20 @@ export interface FileWithId {
   previewUrl: string;
 }
 
+export interface ExistingMedia {
+  id: number;
+  url: string;
+  type: 'image' | 'video';
+  is_primary: boolean;
+  display_order: number;
+}
+
 interface AddRecipeState {
+  // Edit Mode
+  editId: number | null;
+  existingMedia: ExistingMedia[];
+  deletedMediaIds: number[];
+
   // Basic Info
   files: FileWithId[];
   name: string;
@@ -40,6 +53,10 @@ interface AddRecipeState {
   chefsNote: string;
 
   // Actions
+  setEditMode: (id: number, recipe: any) => void; // Using any for recipe to avoid circular deps or dup types
+  setExistingMedia: (media: ExistingMedia[] | ((prev: ExistingMedia[]) => ExistingMedia[])) => void;
+  markMediaDeleted: (id: number) => void;
+
   setFiles: (files: FileWithId[] | ((prev: FileWithId[]) => FileWithId[])) => void;
   setName: (name: string) => void;
   setDescription: (description: string) => void;
@@ -55,6 +72,10 @@ interface AddRecipeState {
 }
 
 export const useAddRecipeStore = create<AddRecipeState>((set) => ({
+  editId: null,
+  existingMedia: [],
+  deletedMediaIds: [],
+  
   files: [],
   name: '',
   description: '',
@@ -64,6 +85,60 @@ export const useAddRecipeStore = create<AddRecipeState>((set) => ({
   instructions: [],
   categories: [],
   chefsNote: '',
+
+  setEditMode: (id, recipe) => set({
+    editId: id,
+    name: recipe.name,
+    description: recipe.description || '',
+    prepTime: recipe.cook_time_minutes?.toString() || '',
+    servings: recipe.servings?.toString() || '',
+    chefsNote: recipe.chefs_note || '',
+    existingMedia: recipe.media?.map((m: any) => ({
+      id: m.id,
+      url: m.url,
+      type: m.type,
+      is_primary: m.is_primary,
+      display_order: m.display_order
+    })) || [],
+    files: [], // Clear new files
+    deletedMediaIds: [],
+    // Map ingredients
+    ingredients: recipe.ingredients?.map((ing: any) => {
+        const unit = ing.quantity_text || '';
+        const lowerUnit = unit.toLowerCase().trim();
+        
+        let type = 'count';
+        if (['g', 'kg', 'grams', 'kilograms', 'oz', 'lb'].includes(lowerUnit)) {
+            type = 'weight';
+        } else if (['ml', 'l', 'millilitres', 'litres', 'liter', 'liters'].includes(lowerUnit)) {
+            type = 'volume';
+        }
+        
+        return {
+            id: Math.random().toString(36).substr(2, 9),
+            name: ing.name_text,
+            quantity: ing.quantity?.toString() || '',
+            unit: unit, 
+            measurementType: type
+        };
+    }) || [],
+    // Map instructions
+    instructions: recipe.steps?.map((step: any) => ({
+        id: Math.random().toString(36).substr(2, 9),
+        description: step.instruction
+    })) || [],
+    // Map categories
+    categories: [] 
+  }),
+
+  setExistingMedia: (media) => set((state) => ({
+    existingMedia: typeof media === 'function' ? media(state.existingMedia) : media
+  })),
+
+  markMediaDeleted: (id) => set((state) => ({
+    deletedMediaIds: [...state.deletedMediaIds, id],
+    existingMedia: state.existingMedia.filter(m => m.id !== id)
+  })),
 
   setFiles: (files) => set((state) => ({ 
     files: typeof files === 'function' ? files(state.files) : files 
@@ -84,6 +159,9 @@ export const useAddRecipeStore = create<AddRecipeState>((set) => ({
   setChefsNote: (chefsNote) => set({ chefsNote }),
 
   reset: () => set({
+    editId: null,
+    existingMedia: [],
+    deletedMediaIds: [],
     files: [],
     name: '',
     description: '',
