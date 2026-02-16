@@ -20,7 +20,7 @@ const SignIn: React.FC = () => {
           >
             <span className="material-symbols-outlined">close</span>
           </button>
-          <h1 className="text-lg font-bold text-center flex-grow md:ml-0 -ml-10 text-black dark:text-white">Sign In</h1>
+          <h1 className="text-lg font-bold text-center flex-grow md:ml-0 -ml-10 text-black dark:text-white md:hidden">Sign In</h1>
           <div className="w-10 md:hidden"></div>
         </div>
       </header>

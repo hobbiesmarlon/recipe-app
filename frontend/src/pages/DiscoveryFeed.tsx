@@ -23,9 +23,9 @@ interface Recipe {
 }
 
 const DiscoveryFeed: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get('search');
-  const [activeTab, setActiveTab] = useState('latest');
+  const activeTab = searchParams.get('sort') || 'latest';
   const [likedRecipes, setLikedRecipes] = useState<Set<string>>(new Set());
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +38,16 @@ const DiscoveryFeed: React.FC = () => {
 
   const { user } = useAuthStore();
   const navigate = useNavigate();
+
+  const handleTabChange = (tabValue: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (tabValue === 'latest') {
+      newParams.delete('sort');
+    } else {
+      newParams.set('sort', tabValue);
+    }
+    setSearchParams(newParams);
+  };
 
   const toggleLike = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -80,8 +90,8 @@ const DiscoveryFeed: React.FC = () => {
       
       // Pass all search params directly to the API
       const params = new URLSearchParams(searchParams);
-      params.append('sort_by', activeTab);
-      params.append('page', pageNum.toString());
+      params.set('sort_by', activeTab);
+      params.set('page', pageNum.toString());
 
       const response = await client.get('/recipes', { 
         params 
@@ -175,7 +185,7 @@ const DiscoveryFeed: React.FC = () => {
             {tabs.map((tab) => (
               <button
                 key={tab.value}
-                onClick={() => setActiveTab(tab.value)}
+                onClick={() => handleTabChange(tab.value)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors flex-shrink-0 ${
                   activeTab === tab.value
                     ? 'bg-primary text-white'

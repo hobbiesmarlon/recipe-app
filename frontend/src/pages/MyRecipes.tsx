@@ -103,14 +103,14 @@ const MyRecipes: React.FC = () => {
           <Link to="/profile" className="flex items-center gap-3 text-primary z-20 lg:hidden">
             <span className="material-symbols-outlined text-2xl">arrow_back</span>
           </Link>
-          <span className="font-bold text-black dark:text-white absolute left-0 right-0 text-center pointer-events-none">My Recipes</span>
+          <span className="font-bold text-black dark:text-white absolute left-0 right-0 text-center pointer-events-none md:hidden">My Recipes</span>
           <div className="w-6"></div>
         </div>
       </header>
 
       <main className="px-4 space-y-6 mx-auto max-w-2xl pb-32">
         <section className="pt-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between md:hidden">
             <h2 className="text-lg font-bold text-background-dark dark:text-background-light">
               {recipes.length > 0 ? `${recipes.length} Recipes` : 'Your recipes'}
             </h2>

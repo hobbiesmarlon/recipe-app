@@ -17,7 +17,13 @@ const EditProfile: React.FC = () => {
     if (user) {
       setPhoto(user.profile_picture_url || 'https://via.placeholder.com/150');
       setDisplayName(user.display_name);
-      setUsername(user.username);
+      
+      // If it's a temp username (new Google user), show blank
+      if (user.username && user.username.startsWith('temp_user_')) {
+          setUsername('');
+      } else {
+          setUsername(user.username);
+      }
     }
   }, [user]);
 
@@ -38,6 +44,11 @@ const EditProfile: React.FC = () => {
   };
 
   const handleSave = async () => {
+    if (!displayName.trim() || !username.trim()) {
+        alert("Please fill in both Display Name and Username.");
+        return;
+    }
+
     setIsLoading(true);
     try {
       let finalProfilePicUrl = user?.profile_picture_url;
@@ -91,7 +102,7 @@ const EditProfile: React.FC = () => {
           <Link to="/profile" className="flex items-center gap-3 text-primary z-20 md:-ml-8 lg:hidden">
             <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg>
           </Link>
-          <span className="font-bold text-black dark:text-white absolute left-0 right-0 text-center pointer-events-none">Edit Profile</span>
+          <span className="font-bold text-black dark:text-white absolute left-0 right-0 text-center pointer-events-none md:hidden">Edit Profile</span>
           <div className="w-6"></div>
         </div>
       </header>
