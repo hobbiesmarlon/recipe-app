@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, Text, Boolean, Index
+from sqlalchemy import Column, BigInteger, Text, Boolean
 from sqlalchemy.orm import relationship
 from app.core.db import Base, TimestampMixin
 
@@ -6,7 +6,7 @@ class User(Base, TimestampMixin):
     __tablename__ = "users"
 
     id = Column(BigInteger, primary_key=True)
-    username = Column(Text, unique=True, nullable=False)
+    username = Column(Text, nullable=False)
     display_name = Column(Text, nullable=False)
     profile_picture_url = Column(Text, nullable=True)
 

@@ -28,3 +28,8 @@ def process_recipe_media_task(self, media_id: int):
         loop.run_until_complete(run_task())
     finally:
         loop.close()
+
+@celery_app.task
+def cleanup_media_files_task(keys: list[str]):
+    from app.services.media_cleanup import cleanup_media_files
+    cleanup_media_files(keys)

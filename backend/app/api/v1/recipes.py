@@ -28,7 +28,7 @@ from app.models.recipe_media import RecipeMedia, StorageProvider, MediaType
 from app.services.recipe_validation import validate_publishable, validate_media_upload
 from app.services.media_processing import process_recipe_media
 from app.services.media_cleanup import cleanup_media_files
-from app.tasks.media import process_recipe_media_task
+from app.tasks.media import process_recipe_media_task, cleanup_media_files_task
 from botocore.exceptions import ClientError
 from app.services.storage_service import head_object
 
@@ -580,7 +580,7 @@ async def update_recipe(
     await db.commit()
 
     if media_cleanup_keys:
-        background_tasks.add_task(cleanup_media_files, media_cleanup_keys)
+        cleanup_media_files_task.delay(media_cleanup_keys)
     
     return await get_recipe(recipe.id, db, user=user)
 
@@ -608,7 +608,7 @@ async def delete_recipe(
         ])
     
     if media_keys:
-        background_tasks.add_task(cleanup_media_files, media_keys)
+        cleanup_media_files_task.delay(media_keys)
 
     await db.delete(recipe)
     await db.commit()

@@ -133,6 +133,7 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
 
         token_json = token_resp.json()
         access_token = token_json.get("access_token")
+        refresh_token = token_json.get("refresh_token")
         if not access_token:
             raise HTTPException(status_code=400, detail="No access token returned")
 
@@ -186,22 +187,21 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
         oauth_acc.provider_username = x_username if provider == "x" else None
         oauth_acc.provider_display_name = name
         oauth_acc.provider_profile_pic_url = profile_pic_url
+        oauth_acc.access_token = access_token # Update token
+        if refresh_token:
+            oauth_acc.refresh_token = refresh_token
         
-        # Update User sourcing flags based on current provider login
-        if provider == "google":
-             user.username_sourced_from_provider = False
-             user.display_name_sourced_from_provider = False
-             user.profile_pic_sourced_from_provider = False
-        elif provider == "x":
-             user.username_sourced_from_provider = True
-             user.display_name_sourced_from_provider = True
-             user.profile_pic_sourced_from_provider = True
-
         # Update User info if sourced from provider
+        if user.username_sourced_from_provider and x_username and user.username != x_username:
+             user.username = x_username
+        
         if user.profile_pic_sourced_from_provider and profile_pic_url:
              user.profile_picture_url = profile_pic_url
         if user.display_name_sourced_from_provider and name:
              user.display_name = name
+        
+        # We don't necessarily want to reset sourcing flags on every login, 
+        # but we do want to ensure details are updated if flags are True.
     else:
         is_new_user = True
         if provider == "x":
@@ -209,7 +209,10 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
             # X users have details sourced from provider by default
             sourced = True
         else:
-            username = email.split("@")[0] if email and "@" in email else email
+            # Google users: Start with blank details as requested
+            # Username must be unique, so we generate a temp one
+            username = f"temp_user_{secrets.token_hex(4)}"
+            name = "" 
             # Google users can choose their own details
             sourced = False
 
@@ -228,6 +231,7 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
             provider=OAuthProvider(provider),
             provider_user_id=provider_user_id,
             access_token=access_token,
+            refresh_token=refresh_token,
             provider_username=x_username if provider == "x" else None,
             provider_display_name=name,
             provider_profile_pic_url=profile_pic_url

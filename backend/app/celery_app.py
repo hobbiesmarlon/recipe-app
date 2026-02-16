@@ -1,4 +1,5 @@
 from celery import Celery
+from celery.schedules import crontab
 from app.core.config import settings
 
 celery_app = Celery(
@@ -7,6 +8,7 @@ celery_app = Celery(
     include=[
         "app.tasks.media",
         "app.tasks.maintenance",
+        "app.tasks.user_sync",
     ]
 )
 
