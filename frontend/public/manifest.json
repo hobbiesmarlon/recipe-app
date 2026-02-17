@@ -1,0 +1,21 @@
+{
+  "short_name": "RecipeApp",
+  "name": "RecipeApp",
+  "icons": [
+    {
+      "src": "/PNG/192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/PNG/512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "theme_color": "#f48525",
+  "description": "Discover and share recipes"
+}
