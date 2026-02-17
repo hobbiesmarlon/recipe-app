@@ -5,6 +5,8 @@ import { PageContainer } from '../components/PageContainer';
 import client from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 
+import { Toast } from '../components/ui/Toast';
+
 interface User {
   id: number;
   username: string;
@@ -30,6 +32,7 @@ const UserProfile: React.FC = () => {
   const [activeTab, setActiveTab] = useState('myrecipes');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout } = useAuthStore();
+  const [shareToast, setShareToast] = useState({ visible: false, message: '' });
   
   // Data State
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -112,6 +115,27 @@ const UserProfile: React.FC = () => {
   const handleSignOut = () => {
     logout();
     navigate('/signin');
+  };
+
+  const handleShareProfile = () => {
+    setIsMenuOpen(false);
+    if (!user) return;
+
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const url = `${apiUrl}/share/user/${user.id}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: `Check out ${user.display_name}'s profile`,
+        url: url,
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        setShareToast({ visible: true, message: 'Profile link copied!' });
+      }).catch(() => {
+        setShareToast({ visible: true, message: 'Failed to copy link' });
+      });
+    }
   };
 
   const onTouchStart = (e: React.TouchEvent) => {
@@ -263,7 +287,7 @@ const UserProfile: React.FC = () => {
                       <button 
                         id="shareProfileBtn"
                         className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-semibold text-text-light dark:text-text-dark hover:bg-primary/10 dark:hover:bg-white/5 transition-colors"
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={handleShareProfile}
                       >
                         <svg className="h-5 w-5 text-primary" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
@@ -379,6 +403,12 @@ const UserProfile: React.FC = () => {
       <div className="md:hidden">
         <BottomNav />
       </div>
+
+      <Toast 
+        isVisible={shareToast.visible}
+        message={shareToast.message}
+        onClose={() => setShareToast({ ...shareToast, visible: false })}
+      />
     </div>
   );
 };

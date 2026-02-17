@@ -51,6 +51,7 @@ const RecipeDetails: React.FC = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [showAuthToast, setShowAuthToast] = useState(false);
+  const [shareToast, setShareToast] = useState({ visible: false, message: '' });
   const { user } = useAuthStore();
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const minSwipeDistance = 35;
@@ -159,14 +160,25 @@ const RecipeDetails: React.FC = () => {
   };
 
   const handleShare = () => {
-    if (recipe && navigator.share) {
-      navigator.share({
-        title: recipe.name,
-        text: `Check out this recipe: ${recipe.name}`,
-        url: window.location.href,
-      }).catch(console.error);
-    } else {
-      alert('Share functionality is not supported on this browser/device.');
+    if (recipe) {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const shareUrl = `${apiUrl}/share/recipe/${recipe.id}`;
+
+      if (navigator.share) {
+        navigator.share({
+          title: recipe.name,
+          text: `Check out this recipe: ${recipe.name}`,
+          url: shareUrl,
+        }).catch((err) => {
+            console.error("Error sharing:", err);
+        });
+      } else {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          setShareToast({ visible: true, message: 'Share link copied to clipboard!' });
+        }).catch(() => {
+          setShareToast({ visible: true, message: 'Failed to copy link' });
+        });
+      }
     }
   };
 
@@ -351,6 +363,12 @@ const RecipeDetails: React.FC = () => {
           label: "Sign In",
           onClick: () => navigate('/signin')
         }}
+      />
+      
+      <Toast 
+        isVisible={shareToast.visible}
+        message={shareToast.message}
+        onClose={() => setShareToast({ ...shareToast, visible: false })}
       />
     </div>
   );

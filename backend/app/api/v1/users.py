@@ -137,17 +137,11 @@ async def get_profile_upload_url(
     
     return PresignedUrlResponse(url=presigned["url"], fields=presigned["fields"], public_url=public_url)
 
-@router.get("/{username}")
-async def get_user_by_username(username: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.username == username))
-    user = result.scalars().first()
+@router.get("/{user_id}", response_model=UserResponse)
+async def get_user_by_id(user_id: int, db: AsyncSession = Depends(get_db)):
+    user = await db.get(User, user_id)
     
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
         
-    return {
-        "id": user.id,
-        "username": user.username,
-        "display_name": user.display_name,
-        "profile_picture_url": user.profile_picture_url
-    }
+    return user

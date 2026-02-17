@@ -24,7 +24,7 @@ interface Recipe {
 }
 
 const PublicProfile: React.FC = () => {
-  const { username } = useParams<{ username: string }>();
+  const { userId } = useParams<{ userId: string }>();
   const [user, setUser] = useState<User | null>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,14 +32,12 @@ const PublicProfile: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!username) return;
+      if (!userId) return;
       try {
         setLoading(true);
         setError(null);
-        // Fetch User Profile by username
-        // Note: You must remove the '@' from the URL if it was included in the link
-        const cleanUsername = username.startsWith('@') ? username.substring(1) : username;
-        const userRes = await client.get(`/users/${cleanUsername}`);
+        
+        const userRes = await client.get(`/users/${userId}`);
         const userData = userRes.data;
         setUser(userData);
 
@@ -57,7 +55,7 @@ const PublicProfile: React.FC = () => {
     };
 
     fetchData();
-  }, [username]);
+  }, [userId]);
 
   const getRecipeImage = (recipe: Recipe) => {
       const primary = recipe.media.find(m => m.is_primary);

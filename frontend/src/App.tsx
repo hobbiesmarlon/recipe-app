@@ -32,7 +32,7 @@ function App() {
           <Route path="recipe/:id" element={<RecipeDetails />} />
           <Route path="categories" element={<Categories />} />
           <Route path="browse" element={<CategoriesBrowsing />} />
-          <Route path="u/:username" element={<PublicProfile />} />
+          <Route path="u/:userId" element={<PublicProfile />} />
           <Route path="signin" element={<SignIn />} />
           <Route path="auth/callback" element={<AuthCallback />} />
           

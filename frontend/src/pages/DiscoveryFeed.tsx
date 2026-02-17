@@ -30,6 +30,7 @@ const DiscoveryFeed: React.FC = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAuthToast, setShowAuthToast] = useState(false);
+  const [shareToast, setShareToast] = useState({ visible: false, message: '' });
   
   // Pagination State
   const [page, setPage] = useState(1);
@@ -107,7 +108,10 @@ const DiscoveryFeed: React.FC = () => {
         // Or strictly if current count < total
         const total = response.data.total;
         const currentCount = isNewSearch ? fetchedRecipes.length : recipes.length + fetchedRecipes.length;
-        setHasMore(currentCount < total);
+        
+        // If we got fewer recipes than the page limit (12), we've reached the end
+        const isEndReached = fetchedRecipes.length < 12 || currentCount >= total;
+        setHasMore(!isEndReached);
 
         const likedSet = isNewSearch ? new Set<string>() : new Set(likedRecipes);
         
@@ -165,6 +169,31 @@ const DiscoveryFeed: React.FC = () => {
     fetchRecipes(nextPage, false);
   };
 
+  const handleShare = (e: React.MouseEvent, recipe: Recipe) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    // Use the backend share endpoint which provides OG tags
+    const shareUrl = `${apiUrl}/share/recipe/${recipe.id}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: recipe.title,
+        text: `Check out this recipe: ${recipe.title}`,
+        url: shareUrl,
+      }).catch((err) => {
+          console.error("Error sharing:", err);
+      });
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        setShareToast({ visible: true, message: 'Share link copied to clipboard!' });
+      }).catch(() => {
+        setShareToast({ visible: true, message: 'Failed to copy link' });
+      });
+    }
+  };
+
   const tabs = [
     { label: 'Latest', value: 'latest' },
     { label: 'Most Viewed', value: 'most_viewed' },
@@ -215,6 +244,7 @@ const DiscoveryFeed: React.FC = () => {
                     isLiked={likedRecipes.has(recipe.id)}
                     onToggleLike={toggleLike}
                     onClick={() => navigate(`/recipe/${recipe.id}`)}
+                    onShare={handleShare}
                   />
                 ))}
               </div>
@@ -260,6 +290,12 @@ const DiscoveryFeed: React.FC = () => {
           label: "Sign In",
           onClick: () => navigate('/signin')
         }}
+      />
+      
+      <Toast 
+        isVisible={shareToast.visible}
+        message={shareToast.message}
+        onClose={() => setShareToast({ ...shareToast, visible: false })}
       />
     </div>
   );
