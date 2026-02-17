@@ -99,7 +99,7 @@ const MyRecipes: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
       <header className="py-4 sticky top-0 md:top-14 z-10 bg-background-light dark:bg-background-dark">
-        <div className="mx-auto max-w-2xl px-4 flex items-center justify-between relative">
+        <div className="mx-auto max-w-2xl lg:max-w-5xl px-4 flex items-center justify-between relative">
           <Link to="/profile" className="flex items-center gap-3 text-primary z-20 lg:hidden">
             <span className="material-symbols-outlined text-2xl">arrow_back</span>
           </Link>
@@ -108,7 +108,7 @@ const MyRecipes: React.FC = () => {
         </div>
       </header>
 
-      <main className="px-4 space-y-6 mx-auto max-w-2xl pb-32">
+      <main className="px-4 space-y-6 mx-auto max-w-2xl lg:max-w-5xl pb-32">
         <section className="pt-6">
           <div className="flex items-center justify-between md:hidden">
             <h2 className="text-lg font-bold text-background-dark dark:text-background-light">
@@ -120,7 +120,7 @@ const MyRecipes: React.FC = () => {
           </div>
 
           {loading ? (
-             <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8">
+             <div className="mt-6 grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8">
                {[1, 2, 3, 4].map(i => (
                  <div key={i} className="flex flex-col gap-2">
                    <div className="aspect-square w-full rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
@@ -130,7 +130,7 @@ const MyRecipes: React.FC = () => {
              </div>
           ) : recipes.length > 0 ? (
             <>
-              <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8">
+              <div className="mt-6 grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8">
                 {recipes.map(recipe => (
                   <div key={recipe.id} className="flex flex-col group cursor-pointer" onClick={() => navigate(`/recipe/${recipe.id}`)}>
                     <div className="aspect-square w-full overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 shadow-sm relative">
