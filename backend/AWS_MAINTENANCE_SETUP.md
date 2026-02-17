@@ -1,16 +1,19 @@
 # AWS Maintenance Task Setup (EventBridge + Lambda)
 
-This document explains how to set up automated maintenance tasks for your Recipe App using AWS Serverless infrastructure. This approach replaces `celery beat` and saves RAM on your server.
+This document explains how to set up automated maintenance tasks (like orphaned media cleanup) for your Recipe App using AWS Serverless infrastructure. This approach saves ~80MB of RAM on your EC2 instance by avoiding the need for a local `celery beat` process.
 
 ---
 
 ## 1. The AWS Lambda Function
 
-This function sends a message to your SQS queue that your Celery worker understands.
+This function acts as the "bridge." It is triggered by a timer and sends a correctly formatted message to your SQS queue that your Celery worker understands.
 
 ### Setup Steps:
-1. Create a Lambda function named `RecipeApp_TaskTrigger` (Python 3.12+).
-2. Give the Lambda's role `sqs:SendMessage` permission for your Celery queue.
+1. Go to the **AWS Lambda Console**.
+2. Click **Create function** -> **Author from scratch**.
+3. **Function name**: `RecipeApp_MaintenanceTrigger`.
+4. **Runtime**: `Python 3.12` (or latest).
+5. **Permissions**: Ensure the Lambda's execution role has `sqs:SendMessage` permission for your Celery queue.
 
 ### Lambda Code (`lambda_function.py`):
 
@@ -18,35 +21,38 @@ This function sends a message to your SQS queue that your Celery worker understa
 import boto3
 import json
 import base64
-import os
 
 def lambda_handler(event, context):
     sqs = boto3.client('sqs')
     
-    # ⚠️ Environment Variable or hardcoded
-    queue_url = os.environ.get("SQS_QUEUE_URL", "https://sqs.us-east-1.amazonaws.com/your-id/celery")
+    #  UPDATE THIS to your production SQS URL
+    queue_url = "https://sqs.us-east-1.amazonaws.com/123456789012/celery"
     
-    # Determine which task to run based on the EventBridge input
-    # Expected input: {"task": "maintenance"} or {"task": "user_sync"}
-    task_type = event.get("task", "maintenance")
+    # 1. The Task Payload (Arguments for the function)
+    # Our cleanup task takes no arguments.
+    task_args = []
+    task_kwargs = {}
     
-    task_map = {
-        "maintenance": "app.tasks.maintenance.run_all_maintenance",
-        "user_sync": "app.tasks.user_sync.sync_oauth_details"
-    }
+    # 2. Celery Protocol Format
+    # The message body must be: [args, kwargs, embed_metadata]
+    message_body = [
+        task_args, 
+        task_kwargs, 
+        {"callbacks": None, "errbacks": None, "chain": None, "chord": None}
+    ]
     
-    task_name = task_map.get(task_type)
-    
-    # Celery Protocol Format
-    message_body = [[], {}, {"callbacks": None, "errbacks": None, "chain": None, "chord": None}]
+    # Base64 encode the body (Celery standard for SQS)
     body_json = json.dumps(message_body)
     body_b64 = base64.b64encode(body_json.encode('utf-8')).decode('utf-8')
     
+    # 3. Construct the Full SQS Message
     celery_message = {
         "body": body_b64,
         "content-encoding": "utf-8",
         "content-type": "application/json",
-        "headers": {"task": task_name},
+        "headers": {
+            "task": "app.tasks.maintenance.run_all_maintenance"
+        },
         "properties": {
             "delivery_mode": 2,
             "delivery_info": {"exchange": "", "routing_key": "celery"},
@@ -54,27 +60,41 @@ def lambda_handler(event, context):
         }
     }
     
-    sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(celery_message))
-    return {"statusCode": 200, "body": f"Enqueued: {task_name}"}
+    # 4. Send to SQS
+    sqs.send_message(
+        QueueUrl=queue_url, 
+        MessageBody=json.dumps(celery_message)
+    )
+    
+    return {
+        "statusCode": 200,
+        "body": json.dumps("Maintenance Task Enqueued Successfully")
+    }
 ```
 
 ---
 
-## 2. EventBridge Rules (The Schedules)
+## 2. The EventBridge Rule (The Alarm)
 
-You should now create **two** rules in EventBridge, both pointing to the same Lambda function but with different "Constant JSON" inputs.
+This service will trigger the Lambda function on a schedule.
 
-### Rule A: Hourly Maintenance
-- **Schedule**: Cron `0 * * * ? *` (Every hour)
-- **Target**: Lambda `RecipeApp_TaskTrigger`
-- **Configure Input**: Select **Constant (JSON text)** and enter: `{"task": "maintenance"}`
-
-### Rule B: Nightly User Sync
-- **Schedule**: Cron `0 2 * * ? *` (Daily at 2 AM UTC)
-- **Target**: Lambda `RecipeApp_TaskTrigger`
-- **Configure Input**: Select **Constant (JSON text)** and enter: `{"task": "user_sync"}`
+### Setup Steps:
+1. Go to the **Amazon EventBridge Console**.
+2. Select **Rules** -> **Create rule**.
+3. **Name**: `DailyOrphanedMediaCleanup`.
+4. **Rule type**: `Schedule`.
+5. **Schedule pattern**:
+   - Select **A schedule that runs at a regular rate or on a specific time**.
+   - Use **Cron expression**: `0 0 * * ? *` (This runs every day at 00:00 UTC).
+6. **Target types**: `AWS service`.
+7. **Select a target**: `Lambda function`.
+8. **Function**: Select `RecipeApp_MaintenanceTrigger`.
+9. Click **Create**.
 
 ---
 
-## 3. Local Development Note
-If you want to test these schedules locally without AWS, you can still run `celery beat` using the schedule I added to `celery_app.py`. However, for your production EC2 instance, you can safely ignore `celery beat` entirely.
+## 3. Benefits for your t3.micro (1GB RAM)
+
+1. **Memory Efficiency**: Your EC2 instance only runs the API and the Worker. It doesn't waste RAM waiting for a clock to tick.
+2. **Cost**: Both EventBridge and Lambda have massive free tiers (1 Million events/month). You will likely pay $0.00 for this.
+3. **Reliability**: If your EC2 instance is down for maintenance, the tasks stay in SQS and will be processed immediately once the instance comes back up.

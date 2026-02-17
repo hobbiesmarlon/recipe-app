@@ -71,6 +71,16 @@ interface AddRecipeState {
   reset: () => void;
 }
 
+const CATEGORY_MAP: Record<string, number> = {
+  'Breakfast': 1, 'Lunch': 2, 'Dinner': 3, 'Snack': 4, 'Appetizer': 5, 'Dessert': 6, 'Sauce': 7,
+  'Baking': 8, 'Frying': 9, 'Grilling': 10, 'Roasting': 11, 'Slow Cook': 12, 'No-Cook': 13,
+  'Vegetarian': 14, 'Vegan': 15, 'Gluten-Free': 16, 'Dairy-Free': 17, 'Low-Carb': 18,
+  'Sweet': 19, 'Savory': 20, 'Spicy': 21, 'Sour': 22, 'Bitter': 23,
+  'Budget Friendly': 24, 'Beginner Friendly': 25, 'Low Effort': 26, '30 Minutes or Less': 27,
+  'Cocktail': 28, 'Mocktail': 29, 'Coffee/Tea': 30, 'Juice': 31, 'Milkshake': 32, 'Smoothie': 33,
+  'Condiment': 55, 'Salad': 56
+};
+
 export const useAddRecipeStore = create<AddRecipeState>((set) => ({
   editId: null,
   existingMedia: [],
@@ -128,7 +138,7 @@ export const useAddRecipeStore = create<AddRecipeState>((set) => ({
         description: step.instruction
     })) || [],
     // Map categories
-    categories: [] 
+    categories: recipe.categories?.map((name: string) => CATEGORY_MAP[name]).filter(Boolean) || []
   }),
 
   setExistingMedia: (media) => set((state) => ({

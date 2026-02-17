@@ -473,7 +473,8 @@ async def update_recipe(
     for field, value in data.dict(exclude_unset=True).items():
         if field in {"ingredients", "steps", "category_ids", "media"}:
             continue
-        if field == "is_public" and value is True:
+        # Only validate if we are switching from Private -> Public
+        if field == "is_public" and value is True and recipe.is_public is False:
             publish_requested = True
         setattr(recipe, field, value)
 

@@ -11,6 +11,7 @@ interface CategoryItem {
 const MEAL_TYPES: CategoryItem[] = [
   { id: 1, name: 'Breakfast' }, { id: 2, name: 'Lunch' }, { id: 3, name: 'Dinner' },
   { id: 4, name: 'Snack' }, { id: 5, name: 'Appetizer' }, { id: 6, name: 'Dessert' }, { id: 7, name: 'Sauce' },
+  { id: 55, name: 'Condiment' }, { id: 56, name: 'Salad' },
 ];
 
 const COOKING_METHODS: CategoryItem[] = [
