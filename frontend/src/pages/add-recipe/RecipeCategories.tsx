@@ -21,7 +21,7 @@ const COOKING_METHODS: CategoryItem[] = [
 
 const DIETARY: CategoryItem[] = [
   { id: 14, name: 'Vegetarian' }, { id: 15, name: 'Vegan' }, { id: 16, name: 'Gluten-Free' },
-  { id: 17, name: 'Dairy-Free' }, { id: 18, name: 'Low-Carb' },
+  { id: 17, name: 'Dairy-Free' }, { id: 18, name: 'Low-Carb' }, { id: 57, name: 'Fruit-Based' },
 ];
 
 const FLAVOURS: CategoryItem[] = [

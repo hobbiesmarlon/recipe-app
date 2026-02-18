@@ -33,9 +33,7 @@ export const DesktopNav: React.FC = () => {
         <div className="flex h-14 items-center justify-between gap-6">
           {/* Logo */}
           <NavLink to="/" className="flex items-center gap-2 flex-shrink-0">
-             <svg className="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-                <path d="M240,64V192a16,16,0,0,1-16,16H160a24,24,0,0,0-24,24,8,8,0,0,1-16,0,24,24,0,0,0-24-24H32a16,16,0,0,1-16-16V64A16,16,0,0,1,32,48H88a32,32,0,0,1,32,32v88a8,8,0,0,0,16,0V80a32,32,0,0,1,32-32h56A16,16,0,0,1,240,64Z"></path>
-             </svg>
+             <img src="/logo.svg" alt="Recipefy Logo" className="w-8 h-8" />
              <span className="text-lg font-bold text-text-light dark:text-text-dark tracking-tight">Recipefy</span>
           </NavLink>
 

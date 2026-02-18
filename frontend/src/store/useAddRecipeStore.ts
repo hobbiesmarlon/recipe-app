@@ -78,7 +78,7 @@ const CATEGORY_MAP: Record<string, number> = {
   'Sweet': 19, 'Savory': 20, 'Spicy': 21, 'Sour': 22, 'Bitter': 23,
   'Budget Friendly': 24, 'Beginner Friendly': 25, 'Low Effort': 26, '30 Minutes or Less': 27,
   'Cocktail': 28, 'Mocktail': 29, 'Coffee/Tea': 30, 'Juice': 31, 'Milkshake': 32, 'Smoothie': 33,
-  'Condiment': 55, 'Salad': 56
+  'Condiment': 55, 'Salad': 56, 'Fruit-Based': 57
 };
 
 export const useAddRecipeStore = create<AddRecipeState>((set) => ({
