@@ -25,11 +25,6 @@ jobs:
           POSTGRES_USER: postgres
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
       minio:
         image: minio/minio
         command: server /data
@@ -40,48 +35,46 @@ jobs:
           - 9000:9000
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-        cache: 'pip'
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install ruff pytest pytest-asyncio
-        pip install -r backend/requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff pytest pytest-asyncio
+          pip install -r backend/requirements.txt
 
-    - name: Lint with ruff
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        ruff check backend --select E9,F63,F7,F82 --target-version py312
-        # exit-zero treats all errors as warnings.
-        ruff check backend --exit-zero --target-version py312
+      - name: Lint with ruff
+        run: |
+          ruff check backend --select E9,F63,F7,F82 --target-version py312
+          ruff check backend --exit-zero --target-version py312
 
-    - name: Run Alembic migrations
-      env:
-        DATABASE_URL: postgresql+asyncpg://postgres:admin@localhost:5432/recipe_app
-      working-directory: ./backend
-      run: alembic upgrade head
+      - name: Run Alembic migrations
+        env:
+          DATABASE_URL: postgresql+asyncpg://postgres:admin@localhost:5432/recipe_app
+        working-directory: ./backend
+        run: alembic upgrade head
 
-    - name: Run tests with pytest
-      env:
-        DATABASE_URL: postgresql+asyncpg://postgres:admin@localhost:5432/recipe_app
-        SECRET_KEY: ci-test-secret-key-not-for-production
-        MINIO_ENDPOINT: http://localhost:9000
-        MINIO_ACCESS_KEY: minioadmin
-        MINIO_SECRET_KEY: minioadmin
-        MEDIA_CDN_BASE_URL: http://localhost:9000
-        MEDIA_PUBLIC_BASE_URL: http://localhost:9000
-        MEDIA_BUCKET_NAME: recipe-media
-        X_CLIENT_ID: mock
-        X_CLIENT_SECRET: mock
-        X_REDIRECT_URI: http://localhost:3000/callback
-        GOOGLE_CLIENT_ID: mock
-        GOOGLE_CLIENT_SECRET: mock
-        GOOGLE_REDIRECT_URI: http://localhost:3000/callback
-      working-directory: ./backend
-      run: pytest
+      - name: Run tests with pytest
+        env:
+          DATABASE_URL: postgresql+asyncpg://postgres:admin@localhost:5432/recipe_app
+          SECRET_KEY: ci-test-secret-key-not-for-production
+          MINIO_ENDPOINT: http://localhost:9000
+          MINIO_ACCESS_KEY: minioadmin
+          MINIO_SECRET_KEY: minioadmin
+          MEDIA_CDN_BASE_URL: http://localhost:9000
+          MEDIA_PUBLIC_BASE_URL: http://localhost:9000
+          MEDIA_BUCKET_NAME: recipe-media
+          X_CLIENT_ID: mock
+          X_CLIENT_SECRET: mock
+          X_REDIRECT_URI: http://localhost:3000/callback
+          GOOGLE_CLIENT_ID: mock
+          GOOGLE_CLIENT_SECRET: mock
+          GOOGLE_REDIRECT_URI: http://localhost:3000/callback
+        working-directory: ./backend
+        run: pytest
