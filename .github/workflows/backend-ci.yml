@@ -33,6 +33,22 @@ jobs:
         ports:
           - 9000:9000
 
+    env:
+      DATABASE_URL: postgresql+asyncpg://postgres:admin@localhost:5432/recipe_app
+      SECRET_KEY: ci-test-secret-key-not-for-production
+      MINIO_ENDPOINT: http://localhost:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MEDIA_CDN_BASE_URL: http://localhost:9000
+      MEDIA_PUBLIC_BASE_URL: http://localhost:9000
+      MEDIA_BUCKET_NAME: recipe-media
+      X_CLIENT_ID: mock
+      X_CLIENT_SECRET: mock
+      X_REDIRECT_URI: http://localhost:3000/callback
+      GOOGLE_CLIENT_ID: mock
+      GOOGLE_CLIENT_SECRET: mock
+      GOOGLE_REDIRECT_URI: http://localhost:3000/callback
+
     steps:
       - uses: actions/checkout@v4
 
@@ -54,26 +70,9 @@ jobs:
           ruff check backend --exit-zero --target-version py312
 
       - name: Run Alembic migrations
-        env:
-          DATABASE_URL: postgresql+asyncpg://postgres:admin@localhost:5432/recipe_app
         working-directory: ./backend
         run: alembic upgrade head
 
       - name: Run tests with pytest
-        env:
-          DATABASE_URL: postgresql+asyncpg://postgres:admin@localhost:5432/recipe_app
-          SECRET_KEY: ci-test-secret-key-not-for-production
-          MINIO_ENDPOINT: http://localhost:9000
-          MINIO_ACCESS_KEY: minioadmin
-          MINIO_SECRET_KEY: minioadmin
-          MEDIA_CDN_BASE_URL: http://localhost:9000
-          MEDIA_PUBLIC_BASE_URL: http://localhost:9000
-          MEDIA_BUCKET_NAME: recipe-media
-          X_CLIENT_ID: mock
-          X_CLIENT_SECRET: mock
-          X_REDIRECT_URI: http://localhost:3000/callback
-          GOOGLE_CLIENT_ID: mock
-          GOOGLE_CLIENT_SECRET: mock
-          GOOGLE_REDIRECT_URI: http://localhost:3000/callback
         working-directory: ./backend
         run: pytest
