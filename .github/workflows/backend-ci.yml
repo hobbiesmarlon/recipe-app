@@ -25,14 +25,6 @@ jobs:
           POSTGRES_USER: postgres
         ports:
           - 5432:5432
-      minio:
-        image: minio/minio
-        env:
-          MINIO_ROOT_USER: minioadmin
-          MINIO_ROOT_PASSWORD: minioadmin
-        ports:
-          - 9000:9000
-        options: server /data
 
     env:
       DATABASE_URL: postgresql+asyncpg://postgres:admin@localhost:5432/recipe_app
@@ -65,6 +57,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff pytest pytest-asyncio requests
           pip install -r backend/requirements.txt
+
+      - name: Start MinIO
+        run: |
+          docker run -d -p 9000:9000 --name minio \
+            -e "MINIO_ROOT_USER=minioadmin" \
+            -e "MINIO_ROOT_PASSWORD=minioadmin" \
+            minio/minio server /data
 
       - name: Wait for services
         run: |
