@@ -27,7 +27,6 @@ jobs:
           - 5432:5432
       minio:
         image: minio/minio
-        command: server /data
         env:
           MINIO_ROOT_USER: minioadmin
           MINIO_ROOT_PASSWORD: minioadmin
