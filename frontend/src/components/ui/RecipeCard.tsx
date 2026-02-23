@@ -39,6 +39,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
         {/* Like Button */}
         <button 
           onClick={(e) => onToggleLike(e, recipe.id)}
+          aria-label="Toggle Like"
           className="absolute top-3 right-3 p-1 transition-all active:scale-90 z-10"
         >
           <svg 
@@ -86,6 +87,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
                  e.stopPropagation();
                  onShare(e, recipe);
                }}
+               aria-label="Share Recipe"
                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-white/5 text-text-muted-light dark:text-text-muted-dark hover:bg-gray-100 dark:hover:bg-white/10 transition-colors border border-gray-100 dark:border-white/5"
              >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
