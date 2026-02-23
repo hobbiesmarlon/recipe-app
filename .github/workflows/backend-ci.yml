@@ -74,5 +74,7 @@ jobs:
         run: alembic upgrade head
 
       - name: Run tests with pytest
+        env:
+          PYTHONPATH: .
         working-directory: ./backend
         run: pytest
