@@ -72,10 +72,8 @@ async def create_recipe(
 
     # Categories
     if data.category_ids:
-        result = await db.execute(
-            select(Category).where(Category.id.in_(data.category_ids))
-        )
-        recipe.categories = result.scalars().all()
+        for cat_id in data.category_ids:
+            db.add(RecipeCategory(recipe_id=recipe.id, category_id=cat_id))
 
     await db.commit()
     # Return fully populated recipe

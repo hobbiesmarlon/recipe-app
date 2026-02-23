@@ -39,7 +39,7 @@ def generate_presigned_post(
     )
     
     # Fix for mobile/external access: replace internal docker hostname with public IP
-    if settings.MEDIA_PUBLIC_BASE_URL and "minio:9000" in response["url"]:
+    if settings.MEDIA_PUBLIC_BASE_URL and settings.MINIO_ENDPOINT in response["url"]:
         # MEDIA_PUBLIC_BASE_URL is likely http://IP:9000/recipe-media
         # We want http://IP:9000
         # Check if the public base url has the bucket name at the end, and strip it if we are switching buckets
@@ -61,6 +61,6 @@ def generate_presigned_post(
         # response["url"] comes as http://minio:9000/bucket-name
         # We want http://192.168.1.10:9000/bucket-name
         
-        response["url"] = response["url"].replace("http://minio:9000", base_host)
+        response["url"] = response["url"].replace(settings.MINIO_ENDPOINT, base_host)
         
     return response
