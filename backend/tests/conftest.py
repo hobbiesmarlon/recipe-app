@@ -8,11 +8,11 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy import text
 
 # SET ENVIRONMENT VARIABLES
-TEST_DATABASE_URL = "postgresql+asyncpg://postgres:admin@localhost:5434/test_recipe_app"
+TEST_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:admin@localhost:5434/test_recipe_app")
 os.environ["DATABASE_URL"] = TEST_DATABASE_URL
-os.environ["MINIO_ENDPOINT"] = "http://localhost:9090"
-os.environ["MEDIA_PUBLIC_BASE_URL"] = "http://localhost:9090/recipe-media"
-os.environ["SECRET_KEY"] = "testsecret"
+os.environ["MINIO_ENDPOINT"] = os.getenv("MINIO_ENDPOINT", "http://localhost:9090")
+os.environ["MEDIA_PUBLIC_BASE_URL"] = os.getenv("MEDIA_PUBLIC_BASE_URL", "http://localhost:9090/recipe-media")
+os.environ["SECRET_KEY"] = os.getenv("SECRET_KEY", "testsecret")
 
 # Import app components
 from app.main import app
