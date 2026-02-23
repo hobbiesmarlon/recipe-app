@@ -32,6 +32,7 @@ jobs:
           MINIO_ROOT_PASSWORD: minioadmin
         ports:
           - 9000:9000
+        options: server /data
 
     env:
       DATABASE_URL: postgresql+asyncpg://postgres:admin@localhost:5432/recipe_app
@@ -42,6 +43,7 @@ jobs:
       MEDIA_CDN_BASE_URL: http://localhost:9000
       MEDIA_PUBLIC_BASE_URL: http://localhost:9000
       MEDIA_BUCKET_NAME: recipe-media
+      PROFILE_PICTURE_BUCKET_NAME: profile-pictures
       X_CLIENT_ID: mock
       X_CLIENT_SECRET: mock
       X_REDIRECT_URI: http://localhost:3000/callback
@@ -61,8 +63,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff pytest pytest-asyncio
+          pip install ruff pytest pytest-asyncio requests
           pip install -r backend/requirements.txt
+
+      - name: Wait for services
+        run: |
+          for i in {1..30}; do
+            curl -s http://localhost:9000/minio/health/live && break
+            echo "Waiting for MinIO..."
+            sleep 1
+          done
 
       - name: Lint with ruff
         run: |
