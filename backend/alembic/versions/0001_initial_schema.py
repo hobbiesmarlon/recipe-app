@@ -22,19 +22,24 @@ def upgrade() -> None:
     op.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')
     op.execute('CREATE EXTENSION IF NOT EXISTS "pg_trgm"')
 
-    # 2. Define Enums
-    oauth_provider = postgresql.ENUM('x', 'google', 'local', 'other', name='oauth_provider')
-    unit_type = postgresql.ENUM('weight', 'volume', 'count', 'other', name='unit_type')
-    recipe_status = postgresql.ENUM('draft', 'published', name='recipe_status')
-    storage_provider = postgresql.ENUM('minio', 's3', name='storage_provider')
-    media_type = postgresql.ENUM('image', 'video', name='media_type')
+    # 2. Defensive Enum Creation
+    def create_enum_if_not_exists(name, values):
+        values_str = ", ".join([f"'{v}'" for v in values])
+        op.execute(f"""
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = '{name}') THEN
+                    CREATE TYPE {name} AS ENUM ({values_str});
+                END IF;
+            END
+            $$;
+        """)
 
-    # Create Enums in DB
-    oauth_provider.create(op.get_bind(), checkfirst=True)
-    unit_type.create(op.get_bind(), checkfirst=True)
-    recipe_status.create(op.get_bind(), checkfirst=True)
-    storage_provider.create(op.get_bind(), checkfirst=True)
-    media_type.create(op.get_bind(), checkfirst=True)
+    create_enum_if_not_exists('oauth_provider', ['x', 'google', 'local', 'other'])
+    create_enum_if_not_exists('unit_type', ['weight', 'volume', 'count', 'other'])
+    create_enum_if_not_exists('recipe_status', ['draft', 'published'])
+    create_enum_if_not_exists('storage_provider', ['minio', 's3'])
+    create_enum_if_not_exists('media_type', ['image', 'video'])
 
     # 3. Independent Tables
     op.create_table('users',
@@ -79,7 +84,7 @@ def upgrade() -> None:
         sa.Column('id', sa.BigInteger(), nullable=False),
         sa.Column('name', sa.Text(), nullable=False),
         sa.Column('symbol', sa.Text(), nullable=True),
-        sa.Column('unit_type', unit_type, server_default='other', nullable=False),
+        sa.Column('unit_type', postgresql.ENUM(name='unit_type', create_type=False), server_default='other', nullable=False),
         sa.Column('conversion_to_base', sa.Float(), nullable=True),
         sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
@@ -91,7 +96,7 @@ def upgrade() -> None:
     op.create_table('oauth_accounts',
         sa.Column('id', sa.BigInteger(), nullable=False),
         sa.Column('user_id', sa.BigInteger(), nullable=False),
-        sa.Column('provider', oauth_provider, nullable=False),
+        sa.Column('provider', postgresql.ENUM(name='oauth_provider', create_type=False), nullable=False),
         sa.Column('provider_user_id', sa.Text(), nullable=False),
         sa.Column('provider_username', sa.Text(), nullable=True),
         sa.Column('provider_display_name', sa.Text(), nullable=True),
@@ -128,7 +133,7 @@ def upgrade() -> None:
         sa.Column('cook_time_minutes', sa.Integer(), nullable=True),
         sa.Column('servings', sa.Integer(), nullable=True),
         sa.Column('is_public', sa.Boolean(), server_default='true', nullable=False),
-        sa.Column('status', recipe_status, server_default='draft', nullable=False),
+        sa.Column('status', postgresql.ENUM(name='recipe_status', create_type=False), server_default='draft', nullable=False),
         sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('search_vector', postgresql.TSVECTOR(), sa.Computed("to_tsvector('english', coalesce(name, '') || ' ' || coalesce(description, '') || ' ' || coalesce(chefs_note, ''))", persisted=True), nullable=True),
@@ -172,10 +177,10 @@ def upgrade() -> None:
         sa.Column('id', sa.BigInteger(), nullable=False),
         sa.Column('recipe_id', sa.BigInteger(), nullable=False),
         sa.Column('recipe_uuid', sa.UUID(), nullable=True),
-        sa.Column('storage_provider', storage_provider, nullable=False),
+        sa.Column('storage_provider', postgresql.ENUM(name='storage_provider', create_type=False), nullable=False),
         sa.Column('bucket', sa.Text(), nullable=False),
         sa.Column('object_key', sa.Text(), nullable=False),
-        sa.Column('media_type', media_type, nullable=False),
+        sa.Column('media_type', postgresql.ENUM(name='media_type', create_type=False), nullable=False),
         sa.Column('content_type', sa.Text(), nullable=False),
         sa.Column('size_bytes', sa.BigInteger(), nullable=False),
         sa.Column('width', sa.Integer(), nullable=True),
