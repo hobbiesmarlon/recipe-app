@@ -82,8 +82,25 @@ async def get_current_user(
             result = await db.execute(stmt)
             user = result.scalar_one_or_none()
             
+            # 🆕 AUTO-REGISTRATION: Create local user if they don't exist
+            if user is None:
+                # Use email prefix or sub as username if not provided
+                base_username = payload.get("cognito:username") or (email.split('@')[0] if email else f"user_{cognito_sub[:8]}")
+                user = User(
+                    username=base_username,
+                    display_name=payload.get("name") or base_username,
+                    email=email,
+                    cognito_sub=cognito_sub,
+                    username_sourced_from_provider=True,
+                    display_name_sourced_from_provider=True,
+                    profile_pic_sourced_from_provider=True
+                )
+                db.add(user)
+                await db.flush() # Ensure user.id is generated
+                await db.commit()
+            
             # If found by email but sub is missing, update the sub for next time
-            if user and not user.cognito_sub:
+            elif not user.cognito_sub:
                 user.cognito_sub = cognito_sub
                 await db.commit()
         else:

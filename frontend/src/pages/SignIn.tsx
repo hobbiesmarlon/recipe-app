@@ -1,10 +1,16 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router';
-import BottomNav from '../components/BottomNav';
+import { useNavigate } from 'react-router';
+import { useAuthStore } from '../store/useAuthStore';
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
+  const { loginWithCognito } = useAuthStore();
+
   const handleLogin = (provider: string) => {
+    if (import.meta.env.VITE_USE_COGNITO === 'true') {
+      loginWithCognito();
+      return;
+    }
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
     window.location.href = `${apiUrl}/auth/${provider}/login`;
   };
