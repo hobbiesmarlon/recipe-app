@@ -11,9 +11,9 @@ from botocore.client import Config
 import unittest.mock
 
 # 1. SET ENVIRONMENT VARIABLES FIRST
-# We hardcode the test DB URL to avoid accidental wipes of dev/prod data
-os.environ["DATABASE_URL"] = "postgresql+asyncpg://postgres:admin@localhost:5434/test_recipe_app"
-os.environ["MINIO_ENDPOINT"] = "http://localhost:9000"
+# We use a default but allow environment overrides for CI/CD
+os.environ["DATABASE_URL"] = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:admin@localhost:5432/test_recipe_app")
+os.environ["MINIO_ENDPOINT"] = os.getenv("MINIO_ENDPOINT", "http://localhost:9000")
 os.environ["MEDIA_PUBLIC_BASE_URL"] = "http://localhost:9000/recipe-media"
 os.environ["SECRET_KEY"] = "testsecret"
 os.environ["AWS_ACCESS_KEY_ID"] = "minioadmin"
