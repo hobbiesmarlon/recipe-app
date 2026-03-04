@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     MINIO_SECRET_KEY: str
     s3_bucket_name: str = "recipe-media"
 
+    AWS_REGION: str = "us-east-1"
+
     X_CLIENT_ID: str
     X_CLIENT_SECRET: str
     X_REDIRECT_URI: str
@@ -39,6 +41,9 @@ class Settings(BaseSettings):
     CELERY_BROKER_URL: str = "sqs://"
     AWS_SQS_ENDPOINT_URL: str | None = None
     
+    AWS_ACCESS_KEY_ID: str | None = None
+    AWS_SECRET_ACCESS_KEY: str | None = None
+
     FRONTEND_URL: str | None = None
 
     # AWS Cognito

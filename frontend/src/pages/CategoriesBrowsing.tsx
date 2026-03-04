@@ -10,32 +10,32 @@ interface CategoryItem {
 const MEAL_TYPES: CategoryItem[] = [
   { id: 1, name: 'Breakfast' }, { id: 2, name: 'Lunch' }, { id: 3, name: 'Dinner' },
   { id: 4, name: 'Snack' }, { id: 5, name: 'Appetizer' }, { id: 6, name: 'Dessert' }, { id: 7, name: 'Sauce' },
-  { id: 55, name: 'Condiment' }, { id: 56, name: 'Salad' },
+  { id: 8, name: 'Condiment' }, { id: 9, name: 'Salad' },
 ];
 
 const COOKING_METHODS: CategoryItem[] = [
-  { id: 8, name: 'Baking' }, { id: 9, name: 'Frying' }, { id: 10, name: 'Grilling' },
-  { id: 11, name: 'Roasting' }, { id: 12, name: 'Slow Cook' }, { id: 13, name: 'No-Cook' },
+  { id: 10, name: 'Baking' }, { id: 11, name: 'Frying' }, { id: 12, name: 'Grilling' },
+  { id: 13, name: 'Roasting' }, { id: 14, name: 'Slow Cook' }, { id: 15, name: 'No-Cook' },
 ];
 
 const DIETARY: CategoryItem[] = [
-  { id: 14, name: 'Vegetarian' }, { id: 15, name: 'Vegan' }, { id: 16, name: 'Gluten-Free' },
-  { id: 17, name: 'Dairy-Free' }, { id: 18, name: 'Low-Carb' }, { id: 57, name: 'Fruit-Based' },
+  { id: 16, name: 'Vegetarian' }, { id: 17, name: 'Vegan' }, { id: 18, name: 'Gluten-Free' },
+  { id: 19, name: 'Dairy-Free' }, { id: 20, name: 'Low-Carb' }, { id: 21, name: 'Fruit-Based' },
 ];
 
 const FLAVOURS: CategoryItem[] = [
-  { id: 19, name: 'Sweet' }, { id: 20, name: 'Savory' }, { id: 21, name: 'Spicy' },
-  { id: 22, name: 'Sour' }, { id: 23, name: 'Bitter' },
+  { id: 22, name: 'Sweet' }, { id: 23, name: 'Savory' }, { id: 24, name: 'Spicy' },
+  { id: 25, name: 'Sour' }, { id: 26, name: 'Bitter' },
 ];
 
 const BUDGET_EASE: CategoryItem[] = [
-  { id: 24, name: 'Budget Friendly' }, { id: 25, name: 'Beginner Friendly' },
-  { id: 26, name: 'Low Effort' }, { id: 27, name: '30 Minutes or Less' },
+  { id: 27, name: 'Budget Friendly' }, { id: 28, name: 'Beginner Friendly' },
+  { id: 29, name: 'Low Effort' }, { id: 30, name: '30 Minutes or Less' },
 ];
 
 const DRINKS: CategoryItem[] = [
-  { id: 28, name: 'Cocktail' }, { id: 29, name: 'Mocktail' }, { id: 30, name: 'Coffee/Tea' },
-  { id: 31, name: 'Juice' }, { id: 32, name: 'Milkshake' }, { id: 33, name: 'Smoothie' },
+  { id: 31, name: 'Cocktail' }, { id: 32, name: 'Mocktail' }, { id: 33, name: 'Coffee/Tea' },
+  { id: 34, name: 'Juice' }, { id: 35, name: 'Milkshake' }, { id: 36, name: 'Smoothie' },
 ];
 
 const CategoriesBrowsing: React.FC = () => {

@@ -25,10 +25,6 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:admin@db:5432/recipe_app
       - MINIO_ENDPOINT=http://minio:9000
-      - CELERY_BROKER_URL=sqs://x:x@sqs:9324
-      - AWS_ACCESS_KEY_ID=x
-      - AWS_SECRET_ACCESS_KEY=x
-      - AWS_REGION=us-east-1
     ports:
       - "8000:8000"
     depends_on:
@@ -51,10 +47,6 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:admin@db:5432/recipe_app
       - MINIO_ENDPOINT=http://minio:9000
-      - CELERY_BROKER_URL=sqs://x:x@sqs:9324
-      - AWS_ACCESS_KEY_ID=x
-      - AWS_SECRET_ACCESS_KEY=x
-      - AWS_REGION=us-east-1
     depends_on:
       - db
       - minio

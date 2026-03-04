@@ -73,12 +73,12 @@ interface AddRecipeState {
 
 const CATEGORY_MAP: Record<string, number> = {
   'Breakfast': 1, 'Lunch': 2, 'Dinner': 3, 'Snack': 4, 'Appetizer': 5, 'Dessert': 6, 'Sauce': 7,
-  'Baking': 8, 'Frying': 9, 'Grilling': 10, 'Roasting': 11, 'Slow Cook': 12, 'No-Cook': 13,
-  'Vegetarian': 14, 'Vegan': 15, 'Gluten-Free': 16, 'Dairy-Free': 17, 'Low-Carb': 18,
-  'Sweet': 19, 'Savory': 20, 'Spicy': 21, 'Sour': 22, 'Bitter': 23,
-  'Budget Friendly': 24, 'Beginner Friendly': 25, 'Low Effort': 26, '30 Minutes or Less': 27,
-  'Cocktail': 28, 'Mocktail': 29, 'Coffee/Tea': 30, 'Juice': 31, 'Milkshake': 32, 'Smoothie': 33,
-  'Condiment': 55, 'Salad': 56, 'Fruit-Based': 57
+  'Condiment': 8, 'Salad': 9,
+  'Baking': 10, 'Frying': 11, 'Grilling': 12, 'Roasting': 13, 'Slow Cook': 14, 'No-Cook': 15,
+  'Vegetarian': 16, 'Vegan': 17, 'Gluten-Free': 18, 'Dairy-Free': 19, 'Low-Carb': 20, 'Fruit-Based': 21,
+  'Sweet': 22, 'Savory': 23, 'Spicy': 24, 'Sour': 25, 'Bitter': 26,
+  'Budget Friendly': 27, 'Beginner Friendly': 28, 'Low Effort': 29, '30 Minutes or Less': 30,
+  'Cocktail': 31, 'Mocktail': 32, 'Coffee/Tea': 33, 'Juice': 34, 'Milkshake': 35, 'Smoothie': 36
 };
 
 export const useAddRecipeStore = create<AddRecipeState>((set) => ({

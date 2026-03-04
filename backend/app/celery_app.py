@@ -14,12 +14,14 @@ celery_app = Celery(
 
 # SQS transport options
 transport_options = {
-    "region": "us-east-1",
+    "region": settings.AWS_REGION,
     "visibility_timeout": 3600,
     "polling_interval": 10,
 }
 
-if "localhost" in settings.CELERY_BROKER_URL or "sqs:" in settings.CELERY_BROKER_URL:
+# Only apply local/custom endpoint settings if an override URL is provided
+# This ensures production (real AWS SQS) uses default secure connections
+if settings.AWS_SQS_ENDPOINT_URL:
     transport_options.update({
         "is_secure": False,
         "port": 9324,
@@ -32,6 +34,7 @@ celery_app.conf.update(
     timezone="UTC",
     enable_utc=True,
     broker_transport_options=transport_options,
+    task_default_queue="recipefy", # Match your SQS queue name
     worker_max_tasks_per_child=10,
     worker_prefetch_multiplier=1,
 )
