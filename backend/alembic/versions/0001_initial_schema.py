@@ -255,6 +255,7 @@ def upgrade() -> None:
 
     # 5. Indexes
     op.create_index('idx_recipes_search_vector', 'recipes', ['search_vector'], postgresql_using='gin')
+    op.create_index('idx_recipes_name_desc_fts', 'recipes', [sa.text("to_tsvector('english', coalesce(name, '') || ' ' || coalesce(description, '') || ' ' || coalesce(chefs_note, ''))")], postgresql_using='gin')
     op.create_index('idx_recipes_name_trgm', 'recipes', ['name'], postgresql_using='gin', postgresql_ops={'name': 'gin_trgm_ops'})
     op.create_index('idx_recipes_description_trgm', 'recipes', ['description'], postgresql_using='gin', postgresql_ops={'description': 'gin_trgm_ops'})
     op.create_index('idx_recipe_media_recipe_id', 'recipe_media', ['recipe_id'])
