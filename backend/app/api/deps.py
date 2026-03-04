@@ -69,15 +69,23 @@ async def get_current_user(
         if settings.USE_COGNITO:
             # 🚀 Production Mode: Verify via AWS Cognito
             payload = await verify_cognito_token(token)
-            # Cognito usually uses 'sub' (a UUID) as the unique ID.
-            # We map this to our local user table.
-            external_id = payload.get("sub")
-            # You might need to find the user by their cognito_sub or email
-            # For now, we'll assume email is the bridge:
+            
+            # Cognito 'sub' is the permanent unique ID
+            cognito_sub = payload.get("sub")
             email = payload.get("email")
+            
             from sqlalchemy import select
-            result = await db.execute(select(User).where(User.email == email))
+            # Try to find by sub first, then fallback to email for legacy/transition
+            stmt = select(User).where(
+                (User.cognito_sub == cognito_sub) | (User.email == email)
+            )
+            result = await db.execute(stmt)
             user = result.scalar_one_or_none()
+            
+            # If found by email but sub is missing, update the sub for next time
+            if user and not user.cognito_sub:
+                user.cognito_sub = cognito_sub
+                await db.commit()
         else:
             # 🛠️ Local Mode: Verify using your local SECRET_KEY
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])

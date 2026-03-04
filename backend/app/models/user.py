@@ -14,6 +14,7 @@ class User(Base, TimestampMixin):
     display_name_sourced_from_provider = Column(Boolean, default=True)
     profile_pic_sourced_from_provider = Column(Boolean, default=True)
     email = Column(Text, unique=True, nullable=True)
+    cognito_sub = Column(Text, unique=True, nullable=True)
 
     # Relationship to OAuthAccount
     oauth_accounts = relationship(
