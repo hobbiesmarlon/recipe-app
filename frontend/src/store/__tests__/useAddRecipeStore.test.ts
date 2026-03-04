@@ -48,7 +48,7 @@ describe('useAddRecipeStore', () => {
     expect(state.ingredients[0].name).toBe('Flour');
     expect(state.ingredients[0].measurementType).toBe('weight'); // Correctly mapped 'g'
     expect(state.instructions).toHaveLength(1);
-    expect(state.categories).toEqual([1, 15]); // Breakfast=1, Vegan=15
+    expect(state.categories).toEqual([1, 17]); // Breakfast=1, Vegan=17
   });
 
   it('should mark media as deleted', () => {
