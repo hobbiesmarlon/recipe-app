@@ -36,6 +36,7 @@ jobs:
       MEDIA_PUBLIC_BASE_URL: http://localhost:9000
       MEDIA_BUCKET_NAME: recipe-media
       PROFILE_PICTURE_BUCKET_NAME: profile-pictures
+      AWS_REGION: af-south-1
       X_CLIENT_ID: mock
       X_CLIENT_SECRET: mock
       X_REDIRECT_URI: http://localhost:3000/callback
@@ -85,5 +86,6 @@ jobs:
       - name: Run tests with pytest
         env:
           PYTHONPATH: .
+          DATABASE_URL: postgresql+asyncpg://postgres:admin@localhost:5432/recipe_app
         working-directory: ./backend
         run: pytest
