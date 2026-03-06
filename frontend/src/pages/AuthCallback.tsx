@@ -59,7 +59,7 @@ const AuthCallback: React.FC = () => {
     <div className="flex min-h-screen flex-col items-center justify-center bg-background-light dark:bg-background-dark">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-text-muted-light dark:text-text-muted-dark font-medium">Authenticating...</p>
+        <p className="text-text-muted-light dark:text-text-muted-dark font-medium">Signing in...</p>
       </div>
     </div>
   );

@@ -23,6 +23,8 @@ interface AuthState {
   user: User | null;
   pendingUser: PendingUser | null;
   isLoading: boolean;
+  isAuthenticating: boolean;
+  isLoggingOut: boolean;
   error: string | null;
   fetchUser: () => Promise<void>;
   fetchSession: () => Promise<string | null>;
@@ -34,25 +36,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   pendingUser: null,
   isLoading: false,
+  isAuthenticating: false,
+  isLoggingOut: false,
   error: null,
 
-loginWithCognito: async (provider?: string): Promise<boolean> => {
-  localStorage.removeItem('token');
-  set({ user: null, pendingUser: null });
+  loginWithCognito: async (provider?: string): Promise<boolean> => {
+    localStorage.removeItem('token');
+    set({ user: null, pendingUser: null, isAuthenticating: true });
 
-  try {
-    await signInWithRedirect({
-      provider: provider === 'google' ? 'Google' : { custom: provider ?? 'Google' },
-      options: {
-        prompt: 'SELECT_ACCOUNT',  // ← Amplify's native prompt field
-      },
-    });
-    return true;
-  } catch (err) {
-    console.error(err);
-    return false;
-  }
-},
+    try {
+      await signInWithRedirect({
+        provider: provider === 'google' ? 'Google' : { custom: provider ?? 'Google' },
+        options: {
+          prompt: 'SELECT_ACCOUNT',  // ← Amplify's native prompt field
+        },
+      });
+      // Do not reset isAuthenticating here, as the page is about to redirect
+      return true;
+    } catch (err) {
+      console.error(err);
+      set({ isAuthenticating: false });
+      return false;
+    }
+  },
 
   fetchSession: async () => {
     if (import.meta.env.VITE_USE_COGNITO !== 'true') return null;
@@ -102,25 +108,31 @@ loginWithCognito: async (provider?: string): Promise<boolean> => {
       set({ user: null, pendingUser: null, error: 'Failed to fetch user', isLoading: false });
     }
   },
-logout: async () => {
-  const isCognito = import.meta.env.VITE_USE_COGNITO === 'true';
 
-  if (isCognito) {
-    try {
-      // Amplify will handle the redirect to VITE_COGNITO_LOGOUT_URI automatically
-      await signOut({ global: true });
-    } catch (err) {
-      console.error('Cognito logout error:', err);
+  logout: async () => {
+    set({ isLoggingOut: true });
+    const isCognito = import.meta.env.VITE_USE_COGNITO === 'true';
+
+    if (isCognito) {
+      try {
+        // Amplify will handle the redirect to VITE_COGNITO_LOGOUT_URI automatically
+        await signOut({ global: true });
+        // The redirect happens here, so we might not reach the code below in some cases,
+        // but if we do (or if it's async), we keep isLoggingOut true until unload.
+      } catch (err) {
+        console.error('Cognito logout error:', err);
+        set({ isLoggingOut: false });
+      }
     }
-  }
 
-  localStorage.clear();
-  sessionStorage.clear();
-  set({ user: null, pendingUser: null });
+    localStorage.clear();
+    sessionStorage.clear();
+    set({ user: null, pendingUser: null });
 
-  // Only redirect manually if NOT using Cognito
-  if (!isCognito) {
-    window.location.href = '/';
-  }
-},
+    // Only redirect manually if NOT using Cognito
+    if (!isCognito) {
+      window.location.href = '/';
+      set({ isLoggingOut: false });
+    }
+  },
 }));

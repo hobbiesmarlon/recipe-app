@@ -8,10 +8,7 @@ const SignIn: React.FC = () => {
 
   const handleLogin = async (provider: string) => {
     if (import.meta.env.VITE_USE_COGNITO === 'true') {
-      const alreadyLoggedIn = await loginWithCognito(provider);
-      if (alreadyLoggedIn) {
-        navigate('/', { replace: true });
-      }
+      await loginWithCognito(provider);
       return;
     }
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -24,7 +21,7 @@ const SignIn: React.FC = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-text-muted-light dark:text-text-muted-dark font-medium">
-            {isLoggingOut ? 'Signing out...' : 'Redirecting to login...'}
+            {isLoggingOut ? 'Signing out...' : 'Just a moment...'}
           </p>
         </div>
       </div>
@@ -51,7 +48,7 @@ const SignIn: React.FC = () => {
         <div className="mb-8 p-4 rounded-full bg-primary/10">
           <span className="material-symbols-outlined text-6xl text-primary">lock_open</span>
         </div>
-        <h2 className="text-2xl font-bold mb-2 text-black dark:text-white">Welcome to Recipe App</h2>
+        <h2 className="text-2xl font-bold mb-2 text-black dark:text-white">Welcome to Recipefy</h2>
         <p className="text-base text-black/70 dark:text-white/70 mb-8 max-w-xs mx-auto">
           Sign in to upload, like and save recipes.
         </p>
