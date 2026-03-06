@@ -45,6 +45,7 @@ def lambda_handler(event, context):
     body_json = json.dumps(message_body)
     body_b64 = base64.b64encode(body_json.encode('utf-8')).decode('utf-8')
     
+
     # 3. Construct the Full SQS Message
     celery_message = {
         "body": body_b64,

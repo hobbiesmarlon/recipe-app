@@ -1,42 +1,27 @@
 from fastapi import APIRouter, Depends, HTTPException, Body
-from fastapi.security import HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.core.db import get_db
 from app.core.config import settings
 from app.models.user import User
 from app.schemas.user import UserUpdate, UserResponse, PresignedUrlResponse
-from app.utils.jwt import decode_access_token
+from app.api.deps import get_current_user
 from app.services import storage_service
 import uuid
 import json
 
 router = APIRouter()
-security = HTTPBearer()
 
 @router.get("/me", response_model=UserResponse)
-async def me(token=Depends(security), db: AsyncSession = Depends(get_db)):
-    user_id = decode_access_token(token.credentials)
-    if not user_id:
-        raise HTTPException(status_code=401)
-
-    user = await db.get(User, user_id)
+async def me(user: User = Depends(get_current_user)):
     return user
 
 @router.patch("/me", response_model=UserResponse)
 async def update_me(
     user_update: UserUpdate,
-    token=Depends(security), 
+    user: User = Depends(get_current_user), 
     db: AsyncSession = Depends(get_db)
 ):
-    user_id = decode_access_token(token.credentials)
-    if not user_id:
-        raise HTTPException(status_code=401)
-
-    user = await db.get(User, user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
     # Prevent updates if sourced from provider (double check, though frontend disables inputs)
     if user_update.username is not None:
         if user.username_sourced_from_provider:
@@ -65,12 +50,8 @@ async def update_me(
 @router.post("/me/profile-picture-upload-url", response_model=PresignedUrlResponse)
 async def get_profile_upload_url(
     file_type: str = Body(..., embed=True),
-    token=Depends(security)
+    user: User = Depends(get_current_user)
 ):
-    user_id = decode_access_token(token.credentials)
-    if not user_id:
-        raise HTTPException(status_code=401)
-    
     allowed_types = ["image/jpeg", "image/png", "image/jpg"]
     if file_type not in allowed_types:
         raise HTTPException(status_code=400, detail="Only .jpg, .jpeg, and .png files are allowed.")
@@ -79,7 +60,7 @@ async def get_profile_upload_url(
     if file_extension == "jpeg": file_extension = "jpg"
     
     # Generate a unique filename
-    filename = f"user_{user_id}_{uuid.uuid4().hex[:8]}.{file_extension}"
+    filename = f"user_{user.id}_{uuid.uuid4().hex[:8]}.{file_extension}"
     
     # Use the specific profile picture bucket
     bucket_name = settings.PROFILE_PICTURE_BUCKET_NAME
@@ -110,7 +91,6 @@ async def get_profile_upload_url(
         )
     except Exception as e:
         print(f"Failed to ensure bucket policy for {bucket_name}: {e}")
-        # Proceed hoping it exists or is transient error
 
     presigned = storage_service.generate_presigned_post(
         key=filename,
@@ -120,18 +100,11 @@ async def get_profile_upload_url(
     )
     
     # Calculate public URL
-    # Assuming MEDIA_PUBLIC_BASE_URL ends with /recipe-media (or whatever the default bucket is)
     base_url = settings.MEDIA_PUBLIC_BASE_URL
     default_bucket = settings.MEDIA_BUCKET_NAME
     
     if base_url.endswith(f"/{default_bucket}"):
-        # Replace default bucket with profile bucket
         base_url = base_url[:-len(default_bucket)] + bucket_name
-    else:
-        # Fallback: just append bucket if it wasn't there? Or assumes host only?
-        # If it doesn't match, maybe it's just the host.
-        # But based on .env it matches.
-        pass
         
     public_url = f"{base_url}/{filename}"
     

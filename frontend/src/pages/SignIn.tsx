@@ -4,16 +4,32 @@ import { useAuthStore } from '../store/useAuthStore';
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
-  const { loginWithCognito } = useAuthStore();
+  const { loginWithCognito, isAuthenticating, isLoggingOut } = useAuthStore();
 
-  const handleLogin = (provider: string) => {
+  const handleLogin = async (provider: string) => {
     if (import.meta.env.VITE_USE_COGNITO === 'true') {
-      loginWithCognito();
+      const alreadyLoggedIn = await loginWithCognito(provider);
+      if (alreadyLoggedIn) {
+        navigate('/', { replace: true });
+      }
       return;
     }
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
     window.location.href = `${apiUrl}/auth/${provider}/login`;
   };
+
+  if (isAuthenticating || isLoggingOut) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background-light dark:bg-background-dark">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-text-muted-light dark:text-text-muted-dark font-medium">
+            {isLoggingOut ? 'Signing out...' : 'Redirecting to login...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">

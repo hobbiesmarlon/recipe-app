@@ -10,10 +10,10 @@ export const configureAmplify = () => {
         loginWith: {
           oauth: {
             domain: import.meta.env.VITE_COGNITO_DOMAIN || '',
-            scopes: ['email', 'openid', 'profile', 'aws.cognito.signin.user.admin'],
-            redirectSignIn: [import.meta.env.VITE_COGNITO_REDIRECT_URI || 'http://localhost:3000/callback'],
-            redirectSignOut: [import.meta.env.VITE_COGNITO_REDIRECT_URI || 'http://localhost:3000/callback'],
-            responseType: 'code',
+            scopes: ['email', 'openid'],
+            redirectSignIn: [import.meta.env.VITE_COGNITO_REDIRECT_URI],
+            redirectSignOut: [import.meta.env.VITE_COGNITO_LOGOUT_URI],
+            responseType: 'code' as const,
           },
         },
       },

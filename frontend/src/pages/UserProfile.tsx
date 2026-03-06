@@ -114,7 +114,6 @@ const UserProfile: React.FC = () => {
 
   const handleSignOut = () => {
     logout();
-    navigate('/signin');
   };
 
   const handleShareProfile = () => {

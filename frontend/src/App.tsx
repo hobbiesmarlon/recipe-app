@@ -34,6 +34,7 @@ function App() {
           <Route path="browse" element={<CategoriesBrowsing />} />
           <Route path="u/:userId" element={<PublicProfile />} />
           <Route path="signin" element={<SignIn />} />
+          <Route path="callback" element={<AuthCallback />} />
           <Route path="auth/callback" element={<AuthCallback />} />
           
           {/* Protected Routes */}

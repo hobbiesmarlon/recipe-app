@@ -2,7 +2,7 @@
 import secrets
 import urllib.parse
 import os
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Depends, Request, Body
 from fastapi.responses import RedirectResponse, JSONResponse
 from app.core.security import generate_code_verifier, generate_code_challenge, create_access_token
 from app.core.db import get_db
@@ -11,6 +11,7 @@ from app.models.oauth_account import OAuthAccount, OAuthProvider
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 import httpx
+from app.api.deps import verify_cognito_token
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -18,38 +19,74 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 pkce_store = {}
 
 def get_redirect_uri(request: Request, provider: str):
-    """
-    Dynamically determine the redirect URI based on the request's host.
-    This allows both localhost and IP-based access to work correctly.
-    """
     host = request.headers.get("host")
     scheme = request.url.scheme
-    
-    # X (Twitter) often blocks 'localhost', so we force 127.0.0.1
     if provider == "x" and "localhost" in host:
         host = host.replace("localhost", "127.0.0.1")
-        
     return f"{scheme}://{host}/auth/{provider}/callback"
 
 # ---------------- Providers Config ----------------
 OAUTH_PROVIDERS = {
     "google": {
-        "client_id": os.environ["GOOGLE_CLIENT_ID"],
-        "client_secret": os.environ["GOOGLE_CLIENT_SECRET"],
+        "client_id": os.getenv("GOOGLE_CLIENT_ID", ""),
+        "client_secret": os.getenv("GOOGLE_CLIENT_SECRET", ""),
         "auth_url": "https://accounts.google.com/o/oauth2/v2/auth",
         "token_url": "https://oauth2.googleapis.com/token",
         "user_info_url": "https://openidconnect.googleapis.com/v1/userinfo",
         "scope": "openid email profile",
     },
     "x": {
-        "client_id": os.environ["X_CLIENT_ID"],
-        "client_secret": os.environ["X_CLIENT_SECRET"],
+        "client_id": os.getenv("X_CLIENT_ID", ""),
+        "client_secret": os.getenv("X_CLIENT_SECRET", ""),
         "auth_url": "https://twitter.com/i/oauth2/authorize",
         "token_url": "https://api.twitter.com/2/oauth2/token",
         "user_info_url": "https://api.twitter.com/2/users/me",
         "scope": "tweet.read users.read offline.access",
     }
 }
+
+# ---------------- Cognito Registration ----------------
+@router.post("/cognito-register")
+async def cognito_register(
+    payload: dict = Body(...),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Final step of the bulletproof registration flow.
+    Creates a user in our DB after they choose a username.
+    """
+    token = payload.get("token")
+    username = payload.get("username")
+    display_name = payload.get("display_name")
+
+    if not token or not username:
+        raise HTTPException(status_code=400, detail="Token and username are required")
+
+    # 1. Verify token one last time to get email and sub
+    cognito_payload = await verify_cognito_token(token)
+    cognito_sub = cognito_payload.get("sub")
+    email = cognito_payload.get("email")
+
+    # 2. Check if username is taken
+    existing = await db.execute(select(User).where(User.username == username))
+    if existing.scalars().first():
+        raise HTTPException(status_code=400, detail="Username already taken")
+
+    # 3. Create the real user
+    new_user = User(
+        username=username,
+        display_name=display_name or username,
+        email=email,
+        cognito_sub=cognito_sub,
+        username_sourced_from_provider=False,
+        display_name_sourced_from_provider=False,
+        profile_pic_sourced_from_provider=False # Allow manual updates
+    )
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+
+    return new_user
 
 # ---------------- Step 1: Login URL ----------------
 @router.get("/{provider}/login")
@@ -74,11 +111,7 @@ async def login(provider: str, request: Request):
         "state": state,
     }
 
-    # Only add PKCE params for providers that support it
-    if provider == "google":
-        params["code_challenge"] = code_challenge
-        params["code_challenge_method"] = "S256"
-    elif provider == "x":
+    if provider == "google" or provider == "x":
         params["code_challenge"] = code_challenge
         params["code_challenge_method"] = "S256"
 
@@ -99,7 +132,6 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
     conf = OAUTH_PROVIDERS[provider]
     redirect_uri = get_redirect_uri(request, provider)
 
-    # ---------------- Exchange code for access token ----------------
     data = {
         "grant_type": "authorization_code",
         "code": code,
@@ -114,10 +146,8 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
         request_body_data["code_verifier"] = code_verifier
         request_body_data["client_id"] = conf["client_id"]
         request_body_data["client_secret"] = conf["client_secret"]
-
     elif provider == "x":
         request_body_data["code_verifier"] = code_verifier
-        # X requires Basic Auth in header, NOT in body
         auth = (conf["client_id"], conf["client_secret"])
         headers["Content-Type"] = "application/x-www-form-urlencoded"
 
@@ -133,11 +163,9 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
 
         token_json = token_resp.json()
         access_token = token_json.get("access_token")
-        refresh_token = token_json.get("refresh_token")
         if not access_token:
             raise HTTPException(status_code=400, detail="No access token returned")
 
-        # ---------------- Fetch user info ----------------
         user_resp = await client.get(
             conf["user_info_url"],
             headers={"Authorization": f"Bearer {access_token}"}
@@ -157,8 +185,6 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
                 headers={"Authorization": f"Bearer {access_token}"},
                 params={"user.fields": "id,name,username,profile_image_url"}
             )
-            if user_resp.status_code != 200:
-                raise HTTPException(status_code=400, detail="Failed to fetch user info")
             user_json = user_resp.json()
             user_data = user_json.get("data", {})
             provider_user_id = user_data.get("id")
@@ -166,11 +192,9 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
             name = user_data.get("name") or x_username or f"user_{provider_user_id}"
             email = f"{provider_user_id}@x.com"
             profile_pic_url = user_data.get("profile_image_url")
-            # X returns normal size by default, replace '_normal' for higher res if needed
             if profile_pic_url:
                 profile_pic_url = profile_pic_url.replace("_normal", "")
 
-    # ---------------- Step 3: Upsert user ----------------
     result = await db.execute(
         select(OAuthAccount).where(
             OAuthAccount.provider == OAuthProvider(provider),
@@ -178,42 +202,18 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
         )
     )
     oauth_acc = result.scalars().first()
-    
     is_new_user = False
 
     if oauth_acc:
         user = await db.get(User, oauth_acc.user_id)
-        # Update OAuth info
-        oauth_acc.provider_username = x_username if provider == "x" else None
-        oauth_acc.provider_display_name = name
-        oauth_acc.provider_profile_pic_url = profile_pic_url
-        oauth_acc.access_token = access_token # Update token
-        if refresh_token:
-            oauth_acc.refresh_token = refresh_token
-        
-        # Update User info if sourced from provider
-        if user.username_sourced_from_provider and x_username and user.username != x_username:
-             user.username = x_username
-        
-        if user.profile_pic_sourced_from_provider and profile_pic_url:
-             user.profile_picture_url = profile_pic_url
-        if user.display_name_sourced_from_provider and name:
-             user.display_name = name
-        
-        # We don't necessarily want to reset sourcing flags on every login, 
-        # but we do want to ensure details are updated if flags are True.
     else:
         is_new_user = True
         if provider == "x":
             username = x_username if x_username else email.split("@")[0]
-            # X users have details sourced from provider by default
             sourced = True
         else:
-            # Google users: Start with blank details as requested
-            # Username must be unique, so we generate a temp one
             username = f"temp_user_{secrets.token_hex(4)}"
             name = "" 
-            # Google users can choose their own details
             sourced = False
 
         user = User(
@@ -231,7 +231,6 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
             provider=OAuthProvider(provider),
             provider_user_id=provider_user_id,
             access_token=access_token,
-            refresh_token=refresh_token,
             provider_username=x_username if provider == "x" else None,
             provider_display_name=name,
             provider_profile_pic_url=profile_pic_url
@@ -239,11 +238,7 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
         db.add(oauth_acc)
 
     await db.commit()
-
-    # ---------------- Step 4: Return JWT ----------------
     token = create_access_token(subject=str(user.id))
-    
     frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173")
     redirect_url = f"{frontend_url}/auth/callback?token={token}&provider={provider}&is_new_user={str(is_new_user).lower()}"
-    
     return RedirectResponse(url=redirect_url)

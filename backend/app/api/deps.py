@@ -11,7 +11,6 @@ from app.models.user import User
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
 # --- Cognito Public Key Cache ---
-# In production, we fetch AWS public keys once and cache them.
 cognito_jwks: Optional[dict] = None
 
 async def get_cognito_jwks() -> dict:
@@ -31,7 +30,6 @@ async def verify_cognito_token(token: str) -> dict:
         unverified_header = jwt.get_unverified_header(token)
         kid = unverified_header.get("kid")
         
-        # Find the correct public key
         key = next((k for kid_val in jwks.get("keys", []) if (k := kid_val).get("kid") == kid), None)
         if not key:
             raise JWTError("Public key not found in JWKS")
@@ -41,7 +39,8 @@ async def verify_cognito_token(token: str) -> dict:
             key,
             algorithms=["RS256"],
             audience=settings.COGNITO_APP_CLIENT_ID,
-            issuer=f"https://cognito-idp.{settings.COGNITO_REGION}.amazonaws.com/{settings.COGNITO_USER_POOL_ID}"
+            issuer=f"https://cognito-idp.{settings.COGNITO_REGION}.amazonaws.com/{settings.COGNITO_USER_POOL_ID}",
+            options={"verify_at_hash": False}
         )
         return payload
     except Exception as e:
@@ -56,51 +55,45 @@ async def get_current_user(
     db: AsyncSession = Depends(get_db),
     token: Optional[str] = Depends(oauth2_scheme),
 ) -> User:
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token missing",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
-    if not token:
-        raise credentials_exception
 
     try:
         if settings.USE_COGNITO:
             # 🚀 Production Mode: Verify via AWS Cognito
             payload = await verify_cognito_token(token)
-            
-            # Cognito 'sub' is the permanent unique ID
             cognito_sub = payload.get("sub")
             email = payload.get("email")
             
             from sqlalchemy import select
-            # Try to find by sub first, then fallback to email for legacy/transition
             stmt = select(User).where(
                 (User.cognito_sub == cognito_sub) | (User.email == email)
             )
             result = await db.execute(stmt)
             user = result.scalar_one_or_none()
             
-            # 🆕 AUTO-REGISTRATION: Create local user if they don't exist
+            # 🛑 BULLETPROOF REGISTRATION: If user doesn't exist, don't create them.
             if user is None:
-                # Use email prefix or sub as username if not provided
-                base_username = payload.get("cognito:username") or (email.split('@')[0] if email else f"user_{cognito_sub[:8]}")
-                user = User(
-                    username=base_username,
-                    display_name=payload.get("name") or base_username,
-                    email=email,
-                    cognito_sub=cognito_sub,
-                    username_sourced_from_provider=True,
-                    display_name_sourced_from_provider=True,
-                    profile_pic_sourced_from_provider=True
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail={
+                        "code": "registration_incomplete",
+                        "cognito_sub": cognito_sub,
+                        "email": email
+                    }
                 )
-                db.add(user)
-                await db.flush() # Ensure user.id is generated
-                await db.commit()
             
-            # If found by email but sub is missing, update the sub for next time
-            elif not user.cognito_sub:
+            if not user.cognito_sub:
                 user.cognito_sub = cognito_sub
                 await db.commit()
         else:

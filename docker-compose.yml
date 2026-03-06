@@ -70,6 +70,8 @@ services:
     restart: always
     ports:
       - "3000:5173"
+    env_file:
+      - .env
     environment:
       - VITE_API_URL=http://localhost:8000
     volumes:
