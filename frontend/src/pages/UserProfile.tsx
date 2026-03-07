@@ -164,7 +164,7 @@ const UserProfile: React.FC = () => {
       const primary = recipe.media.find(m => m.is_primary);
       if (primary) return primary.url;
       if (recipe.media.length > 0) return recipe.media[0].url;
-      return 'https://via.placeholder.com/300?text=No+Image';
+      return 'https://placehold.co/300?text=No+Image';
   };
 
   const renderRecipeGrid = () => (
@@ -320,7 +320,7 @@ const UserProfile: React.FC = () => {
                    <img 
                       alt={user.display_name} 
                       className="h-full w-full rounded-full object-cover shadow-lg border-4 border-white dark:border-stone-800" 
-                      src={user.profile_picture_url || "https://via.placeholder.com/150"} 
+                      src={user.profile_picture_url || "https://placehold.co/150"} 
                    />
                 ) : (
                    <div className="h-full w-full rounded-full bg-gray-200 dark:bg-gray-800 animate-pulse border-4 border-white dark:border-stone-800"></div>

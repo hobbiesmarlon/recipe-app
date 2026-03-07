@@ -93,7 +93,7 @@ const MyRecipes: React.FC = () => {
     const primary = recipe.media?.find(m => m.is_primary);
     if (primary) return primary.url;
     if (recipe.media?.length > 0) return recipe.media[0].url;
-    return 'https://via.placeholder.com/300?text=No+Image';
+    return 'https://placehold.co/300?text=No+Image';
   };
 
   return (

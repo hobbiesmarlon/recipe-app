@@ -7,7 +7,7 @@ const EditProfile: React.FC = () => {
   const navigate = useNavigate();
   const { user, pendingUser, fetchUser } = useAuthStore();
   
-  const [photo, setPhoto] = useState<string>('https://via.placeholder.com/150');
+  const [photo, setPhoto] = useState<string>('https://placehold.co/150');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [displayName, setDisplayName] = useState('');
   const [username, setUsername] = useState('');
@@ -15,7 +15,7 @@ const EditProfile: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      setPhoto(user.profile_picture_url || 'https://via.placeholder.com/150');
+      setPhoto(user.profile_picture_url || 'https://placehold.co/150');
       setDisplayName(user.display_name);
       
       // If it's a temp username (old custom logic), show blank

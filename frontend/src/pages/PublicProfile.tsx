@@ -61,7 +61,7 @@ const PublicProfile: React.FC = () => {
       const primary = recipe.media.find(m => m.is_primary);
       if (primary) return primary.url;
       if (recipe.media.length > 0) return recipe.media[0].url;
-      return 'https://via.placeholder.com/300?text=No+Image';
+      return 'https://placehold.co/300?text=No+Image';
   };
 
   if (loading) {
@@ -103,7 +103,7 @@ const PublicProfile: React.FC = () => {
                    <img 
                       alt={user.display_name} 
                       className="h-full w-full rounded-full object-cover shadow-lg border-4 border-white dark:border-stone-800" 
-                      src={user.profile_picture_url || "https://via.placeholder.com/150"} 
+                      src={user.profile_picture_url || "https://placehold.co/150"} 
                    />
               </div>
               <div className="flex flex-col items-center md:items-start mb-2">

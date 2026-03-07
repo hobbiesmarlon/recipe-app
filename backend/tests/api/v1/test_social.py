@@ -60,4 +60,4 @@ async def test_share_recipe_og_tags(client: AsyncClient, auth_headers: dict):
     html = response.text
     assert '<meta property="og:type" content="article"' in html
     assert "Share Me Recipe" in html
-    assert 'content="https://via.placeholder.com/1200x630?text=No+Image"' in html
+    assert 'content="https://placehold.co/1200x630?text=No+Image"' in html

@@ -98,11 +98,8 @@ const DiscoveryFeed: React.FC = () => {
         params 
       });
       
-      console.log('Raw Backend Response:', response.data);
-      
       if (response.data && Array.isArray(response.data.recipes)) {
         const fetchedRecipes = response.data.recipes;
-        console.log(`Found ${fetchedRecipes.length} recipes`);
         
         // Update hasMore based on whether we received fewer items than requested (default 12)
         // Or strictly if current count < total
@@ -130,7 +127,7 @@ const DiscoveryFeed: React.FC = () => {
           // Remove duplicates based on URL
           const uniqueMedia = mediaItems.filter((v, i, a) => a.findIndex(t => t.url === v.url) === i);
           
-          const placeholderUrl = 'https://via.placeholder.com/800x600?text=No+Image';
+          const placeholderUrl = 'https://placehold.co/800x600?text=No+Image';
 
           return {
             id: r.id.toString(),

@@ -29,7 +29,7 @@ async def share_user(
     description = f"Check out {display_name}'s recipes and profile!"
     
     # Profile Picture or Fallback
-    image_url = user.profile_picture_url or "https://via.placeholder.com/1200x630?text=No+Profile+Pic"
+    image_url = user.profile_picture_url or "https://placehold.co/1200x630?text=No+Profile+Pic"
 
     # 3. Construct Frontend Redirect URL
     frontend_base = settings.FRONTEND_URL or "http://localhost:5173"
@@ -96,7 +96,7 @@ async def share_recipe(
     description = recipe.description or f"Check out this delicious {recipe.name} recipe!"
     
     # Find primary image, or first image, or fallback
-    image_url = "https://via.placeholder.com/1200x630?text=No+Image"
+    image_url = "https://placehold.co/1200x630?text=No+Image"
     
     # Sort media to prioritize primary
     sorted_media = sorted(recipe.media, key=lambda m: (not m.is_primary, m.display_order))
