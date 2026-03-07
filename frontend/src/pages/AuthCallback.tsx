@@ -13,12 +13,27 @@ const AuthCallback: React.FC = () => {
       if (authHandled.current) return;
       authHandled.current = true;
 
-      // 🚀 AWS Cognito Flow
+      const tokenFromUrl = searchParams.get('token');
+      const provider = searchParams.get('provider');
+      const isNewUser = searchParams.get('is_new_user') === 'true';
+
+      // 🛠️ Custom Local Flow (e.g., from X)
+      if (tokenFromUrl) {
+        localStorage.setItem('token', tokenFromUrl);
+        
+        if (isNewUser) {
+          navigate('/edit-profile', { replace: true });
+        } else {
+          navigate('/', { replace: true });
+        }
+        return;
+      }
+
+      // 🚀 AWS Cognito Flow (e.g., from Google)
       if (import.meta.env.VITE_USE_COGNITO === 'true') {
         try {
           const token = await fetchSession();
           if (token) {
-            // Check if registration is incomplete (from the 403 handled in fetchUser)
             const { pendingUser } = useAuthStore.getState();
             if (pendingUser) {
               navigate('/edit-profile', { replace: true });
@@ -30,22 +45,6 @@ const AuthCallback: React.FC = () => {
           }
         } catch (err: any) {
           navigate('/signin', { replace: true });
-        }
-        return;
-      }
-
-      // 🛠️ Custom Local Flow
-      const token = searchParams.get('token');
-      const provider = searchParams.get('provider');
-      const isNewUser = searchParams.get('is_new_user') === 'true';
-      
-      if (token) {
-        localStorage.setItem('token', token);
-        
-        if (isNewUser && provider === 'google') {
-          navigate('/edit-profile', { replace: true });
-        } else {
-          navigate('/', { replace: true });
         }
       } else {
         navigate('/signin', { replace: true });

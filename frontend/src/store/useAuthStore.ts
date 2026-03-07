@@ -61,7 +61,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   fetchSession: async () => {
-    if (import.meta.env.VITE_USE_COGNITO !== 'true') return null;
+    if (import.meta.env.VITE_USE_COGNITO !== 'true') return localStorage.getItem('token');
     
     try {
       const session = await fetchAuthSession();
@@ -72,9 +72,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         await get().fetchUser();
         return token;
       }
-      return null;
+      // If Cognito session is missing, but we have a token (maybe local/X), return it
+      return localStorage.getItem('token');
     } catch (err) {
-      return null;
+      // On error, return existing token if any
+      return localStorage.getItem('token');
     }
   },
 
@@ -111,28 +113,40 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: async () => {
     set({ isLoggingOut: true });
-    const isCognito = import.meta.env.VITE_USE_COGNITO === 'true';
-
-    if (isCognito) {
+    
+    // 1. Identify Cognito session
+    let hasCognitoSession = false;
+    if (import.meta.env.VITE_USE_COGNITO === 'true') {
       try {
-        // Amplify will handle the redirect to VITE_COGNITO_LOGOUT_URI automatically
-        await signOut({ global: true });
-        // The redirect happens here, so we might not reach the code below in some cases,
-        // but if we do (or if it's async), we keep isLoggingOut true until unload.
+        const session = await fetchAuthSession();
+        hasCognitoSession = !!(session.tokens?.idToken || session.tokens?.accessToken);
       } catch (err) {
-        console.error('Cognito logout error:', err);
-        set({ isLoggingOut: false });
+        hasCognitoSession = false;
       }
     }
 
-    localStorage.clear();
-    sessionStorage.clear();
+    // 2. Clear ONLY our custom token first to trigger immediate UI response in protected routes
+    localStorage.removeItem('token');
     set({ user: null, pendingUser: null });
 
-    // Only redirect manually if NOT using Cognito
-    if (!isCognito) {
-      window.location.href = '/';
-      set({ isLoggingOut: false });
+    // 3. Robust "At Least" Delay Pattern
+    // Ensures the spinner is visible for at least 600ms, but waits longer if tasks take more time.
+    const MIN_DELAY = 600;
+    const logoutWork = hasCognitoSession ? signOut({ global: true }) : Promise.resolve();
+    const delay = new Promise(resolve => setTimeout(resolve, MIN_DELAY));
+
+    try {
+      await Promise.all([logoutWork, delay]);
+    } catch (err) {
+      console.error('Logout error during tasks:', err);
     }
+
+    // 4. Final Cleanup (for X users or if signOut returns/fails)
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // The browser might have already redirected if Cognito signOut triggered it.
+    // If we're still here, we perform the manual redirect.
+    window.location.href = '/';
   },
 }));

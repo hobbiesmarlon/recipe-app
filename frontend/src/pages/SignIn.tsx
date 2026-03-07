@@ -7,10 +7,12 @@ const SignIn: React.FC = () => {
   const { loginWithCognito, isAuthenticating, isLoggingOut } = useAuthStore();
 
   const handleLogin = async (provider: string) => {
-    if (import.meta.env.VITE_USE_COGNITO === 'true') {
+    if (provider === 'google' && import.meta.env.VITE_USE_COGNITO === 'true') {
       await loginWithCognito(provider);
       return;
     }
+    
+    // For X, or if Cognito is disabled, use the backend custom OAuth flow
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
     window.location.href = `${apiUrl}/auth/${provider}/login`;
   };

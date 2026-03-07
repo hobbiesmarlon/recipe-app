@@ -68,9 +68,9 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    try:
-        if settings.USE_COGNITO:
-            # 🚀 Production Mode: Verify via AWS Cognito
+    # 1. Try AWS Cognito (if enabled)
+    if settings.USE_COGNITO:
+        try:
             payload = await verify_cognito_token(token)
             cognito_sub = payload.get("sub")
             email = payload.get("email")
@@ -82,7 +82,6 @@ async def get_current_user(
             result = await db.execute(stmt)
             user = result.scalar_one_or_none()
             
-            # 🛑 BULLETPROOF REGISTRATION: If user doesn't exist, don't create them.
             if user is None:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
@@ -96,18 +95,27 @@ async def get_current_user(
             if not user.cognito_sub:
                 user.cognito_sub = cognito_sub
                 await db.commit()
-        else:
-            # 🛠️ Local Mode: Verify using your local SECRET_KEY
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-            user_id = payload.get("sub")
-            if user_id is None:
-                raise credentials_exception
-            user = await db.get(User, int(user_id))
+            
+            return user
+        except HTTPException as e:
+            if e.status_code == 403:
+                raise e
+            # If it's 401, maybe it's not a Cognito token, let's try local
+            pass
+        except Exception:
+            # Fall through to local verification
+            pass
 
+    # 2. Try Local HS256 Token (for X and other local providers)
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        user_id = payload.get("sub")
+        if user_id is None:
+            raise credentials_exception
+        user = await db.get(User, int(user_id))
         if user is None:
             raise credentials_exception
         return user
-
     except (JWTError, ValueError):
         raise credentials_exception
 
