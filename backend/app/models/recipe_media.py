@@ -84,19 +84,14 @@ class RecipeMedia(Base, TimestampMixin):
     processed = Column(Boolean, default=False)
     processing_error = Column(String, nullable=True)
 
-    thumbnail_small_key = Column(Text, nullable=True)  # S3 key for small thumbnail
-    thumbnail_medium_key = Column(Text, nullable=True)  # S3 key for medium thumbnail
-    thumbnail_large_key = Column(Text, nullable=True)  # S3 key for large thumbnail
+    key = Column(String, nullable=False) 
+    type = Column(String, nullable=False) 
 
-    key = Column(String, nullable=False)  # recipes/uuid_filename.jpg
-    type = Column(String, nullable=False)  # image | video
 
-    # Display / behavior
     is_primary = Column(Boolean, nullable=False, default=False)
     display_order = Column(Integer, nullable=False, default=0)
     url = Column(Text, nullable=True)
 
-    # Relationships
     recipe = relationship(
         "Recipe",
         back_populates="media",

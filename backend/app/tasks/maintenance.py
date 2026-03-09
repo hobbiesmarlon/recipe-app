@@ -7,8 +7,8 @@ from app.core.db import async_session, engine
 from app.models.recipe import Recipe
 from app.models.recipe_media import RecipeMedia
 from app.services.media_cleanup import cleanup_media
-from app.services.storage_service import head_object
-from botocore.exceptions import ClientError
+# from app.services.storage_service import head_object # Removed
+# from botocore.exceptions import ClientError # Removed
 
 logger = logging.getLogger(__name__)
 
@@ -79,22 +79,6 @@ async def clean_expired_drafts_logic(days: int = 30):
             await db.commit()
         return f"Cleaned up {count} expired drafts."
 
-async def verify_and_regenerate_thumbnails_logic():
-    """5 & 6. 🔄 Verify integrity and regenerate thumbnails if missing."""
-    from app.tasks.media import process_recipe_media_task
-    async with async_session() as db:
-        stmt = select(RecipeMedia).where(RecipeMedia.processed == True).limit(50)
-        items = (await db.execute(stmt)).scalars().all()
-        regenerated = 0
-        for media in items:
-            try:
-                if media.thumbnail_small_key:
-                    head_object(media.thumbnail_small_key)
-            except (ClientError, AttributeError):
-                process_recipe_media_task.delay(media.id)
-                regenerated += 1
-        return f"Verified items, triggered regeneration for {regenerated} items."
-
 # --- CELERY TASK WRAPPERS ---
 
 @celery_app.task(name="app.tasks.maintenance.run_all_maintenance")
@@ -106,7 +90,6 @@ def run_all_maintenance():
         results.append(await delete_failed_media_logic())
         results.append(await retry_stuck_media_logic())
         results.append(await clean_expired_drafts_logic())
-        results.append(await verify_and_regenerate_thumbnails_logic())
         return results
 
     try:
