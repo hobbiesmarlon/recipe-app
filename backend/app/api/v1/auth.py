@@ -5,6 +5,7 @@ import os
 from fastapi import APIRouter, HTTPException, Depends, Request, Body
 from fastapi.responses import RedirectResponse, JSONResponse
 from app.core.security import generate_code_verifier, generate_code_challenge, create_access_token
+from app.core.config import settings
 from app.core.db import get_db
 from app.models.user import User
 from app.models.oauth_account import OAuthAccount, OAuthProvider
