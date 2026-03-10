@@ -32,7 +32,7 @@ async def share_user(
     image_url = user.profile_picture_url or "https://placehold.co/1200x630?text=No+Profile+Pic"
 
     # 3. Construct Frontend Redirect URL
-    frontend_base = settings.FRONTEND_URL or "http://localhost:5173"
+    frontend_base = settings.FRONTEND_URL
     redirect_url = f"{frontend_base.rstrip('/')}/u/{user.id}"
 
     # 4. Generate HTML with OG Tags
@@ -121,8 +121,7 @@ async def share_recipe(
             break
 
     # 3. Construct Frontend Redirect URL
-    # If FRONTEND_URL is set, use it. Otherwise default to localhost.
-    frontend_base = settings.FRONTEND_URL or "http://localhost:5173"
+    frontend_base = settings.FRONTEND_URL
     redirect_url = f"{frontend_base.rstrip('/')}/recipe/{recipe.id}"
 
     # 4. Generate HTML with OG Tags

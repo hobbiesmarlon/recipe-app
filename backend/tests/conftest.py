@@ -11,10 +11,13 @@ from botocore.client import Config
 import unittest.mock
 
 # 1. SET ENVIRONMENT VARIABLES FIRST
-# We use a default but allow environment overrides for CI/CD
-os.environ["DATABASE_URL"] = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:admin@localhost:5432/test_recipe_app")
-os.environ["MINIO_ENDPOINT"] = os.getenv("MINIO_ENDPOINT", "http://localhost:9000")
-os.environ["MEDIA_PUBLIC_BASE_URL"] = "http://localhost:9000/recipe-media"
+# We use TEST_ prefixed variables to avoid clashing with dev environment
+TEST_DB_URL = os.getenv("TEST_DATABASE_URL", "postgresql+asyncpg://postgres:admin@localhost:5432/test_recipe_app")
+TEST_S3_URL = os.getenv("TEST_S3_ENDPOINT", "http://localhost:9000")
+
+os.environ["DATABASE_URL"] = TEST_DB_URL
+os.environ["MINIO_ENDPOINT"] = TEST_S3_URL
+os.environ["MEDIA_PUBLIC_BASE_URL"] = f"{TEST_S3_URL}/recipe-media"
 os.environ["SECRET_KEY"] = "testsecret"
 os.environ["AWS_ACCESS_KEY_ID"] = "minioadmin"
 os.environ["AWS_SECRET_ACCESS_KEY"] = "minioadmin"
@@ -24,7 +27,7 @@ os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 # Intercepts both boto3.client and boto3.Session.client
 def mocked_client(service_name, **kwargs):
     if service_name == "s3":
-        kwargs["endpoint_url"] = "http://localhost:9000"
+        kwargs["endpoint_url"] = TEST_S3_URL
     return boto3.Session(
         aws_access_key_id="minioadmin",
         aws_secret_access_key="minioadmin",

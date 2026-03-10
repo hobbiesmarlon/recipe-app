@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import text
 
 async def list_tables():
-    url = "postgresql+asyncpg://postgres:admin@localhost:5433/recipe_app"
+    url = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:admin@localhost:5433/recipe_app")
     engine = create_async_engine(url)
     async with engine.connect() as conn:
         res = await conn.execute(text("""

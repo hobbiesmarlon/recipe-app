@@ -5,18 +5,13 @@ from app.api.v1.auth import router as auth_router
 from app.api.v1.recipes import router as recipes_router
 from app.api.v1.media import router as media_router
 from app.api.v1.share import router as share_router
+from app.core.config import settings
 
 app = FastAPI(title="Recipe App API")
 
-origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:3000",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

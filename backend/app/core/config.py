@@ -44,7 +44,13 @@ class Settings(BaseSettings):
     AWS_ACCESS_KEY_ID: str | None = None
     AWS_SECRET_ACCESS_KEY: str | None = None
 
-    FRONTEND_URL: str | None = None
+    FRONTEND_URL: str = "http://localhost:5173"
+
+    CORS_ORIGINS: list[str] = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+    ]
 
     # AWS Cognito
     COGNITO_USER_POOL_ID: str | None = None

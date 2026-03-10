@@ -21,6 +21,8 @@ pkce_store = {}
 def get_redirect_uri(request: Request, provider: str):
     host = request.headers.get("host")
     scheme = request.url.scheme
+    # X (Twitter) doesn't allow 'localhost' as a redirect URI for OAuth2.
+    # We must use 127.0.0.1 instead during local development.
     if provider == "x" and "localhost" in host:
         host = host.replace("localhost", "127.0.0.1")
     return f"{scheme}://{host}/auth/{provider}/callback"
@@ -239,6 +241,6 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
 
     await db.commit()
     token = create_access_token(subject=str(user.id))
-    frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173")
+    frontend_url = settings.FRONTEND_URL.rstrip("/")
     redirect_url = f"{frontend_url}/auth/callback?token={token}&provider={provider}&is_new_user={str(is_new_user).lower()}"
     return RedirectResponse(url=redirect_url)
