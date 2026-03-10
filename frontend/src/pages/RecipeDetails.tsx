@@ -31,6 +31,7 @@ interface FullRecipe {
   cook_time_minutes?: number;
   servings?: number;
   author_name: string;
+  author_id?: number;
   ingredients: Ingredient[];
   steps: Step[];
   media: RecipeMedia[];
@@ -269,9 +270,15 @@ const RecipeDetails: React.FC = () => {
           {/* Meta Info Line */}
           <div className="flex items-center justify-between mb-6 text-sm text-gray-600 dark:text-gray-300 font-medium">
             <div className="flex items-center gap-1">
-               <span>By {recipe.author_name}</span>
-               <span>•</span>
-               <span>{recipe.cook_time_minutes} mins</span>
+               <span>By </span>
+               {recipe.author_id ? (
+                 <Link to={`/u/${recipe.author_id}`} className="text-primary hover:underline">
+                   {recipe.author_name}
+                 </Link>
+               ) : (
+                 <span>{recipe.author_name}</span>
+               )}
+               <span>•</span>               <span>{recipe.cook_time_minutes} mins</span>
                <span>•</span>
                <span>Serves {recipe.servings}</span>
             </div>

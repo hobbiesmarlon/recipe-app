@@ -35,6 +35,7 @@ class RecipeRead(BaseModel):
     servings: Optional[int]
     is_public: bool
     author_name: Optional[str] = None
+    author_id: Optional[int] = None
 
     ingredients: List[IngredientRead]
     steps: List[StepRead]

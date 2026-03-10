@@ -186,6 +186,7 @@ async def list_recipes(
                 servings=r.servings,
                 is_public=r.is_public,
                 author_name=r.author.display_name if r.author else "Anonymous",
+                author_id=r.author.id if r.author else None,
                 ingredients=[
                     IngredientRead(
                         id=ing.id,
@@ -247,6 +248,7 @@ async def list_liked_recipes(
                 servings=r.servings,
                 is_public=r.is_public,
                 author_name=r.author.display_name if r.author else "Anonymous",
+                author_id=r.author.id if r.author else None,
                 ingredients=[], # Not needed for list
                 steps=[], # Not needed for list
                 categories=[], # Not needed for list
@@ -296,6 +298,7 @@ async def list_saved_recipes(
                 servings=r.servings,
                 is_public=r.is_public,
                 author_name=r.author.display_name if r.author else "Anonymous",
+                author_id=r.author.id if r.author else None,
                 ingredients=[], # Not needed for list
                 steps=[], # Not needed for list
                 categories=[], # Not needed for list
@@ -352,6 +355,7 @@ async def list_view_history(
                 servings=r.servings,
                 is_public=r.is_public,
                 author_name=r.author.display_name if r.author else "Anonymous",
+                author_id=r.author.id if r.author else None,
                 ingredients=[],
                 steps=[],
                 categories=[],
@@ -416,6 +420,7 @@ async def get_recipe(
         servings=recipe.servings,
         is_public=recipe.is_public,
         author_name=recipe.author.display_name if recipe.author else "Anonymous",
+        author_id=recipe.author.id if recipe.author else None,
         ingredients=[
             IngredientRead(
                 id=ing.id,
