@@ -11,8 +11,8 @@ from botocore.client import Config
 import unittest.mock
 
 # 1. SET ENVIRONMENT VARIABLES FIRST
-# We use TEST_ prefixed variables to avoid clashing with dev environment
-TEST_DB_URL = os.getenv("TEST_DATABASE_URL", "postgresql+asyncpg://postgres:admin@localhost:5432/test_recipe_app")
+# We use the provided DATABASE_URL if available (e.g. from CI), otherwise fallback to local test DB
+TEST_DB_URL = os.getenv("DATABASE_URL") or os.getenv("TEST_DATABASE_URL", "postgresql+asyncpg://postgres:admin@localhost:5432/test_recipe_app")
 TEST_S3_URL = os.getenv("TEST_S3_ENDPOINT", "http://localhost:9000")
 
 os.environ["DATABASE_URL"] = TEST_DB_URL
