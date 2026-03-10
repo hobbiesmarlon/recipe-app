@@ -76,7 +76,7 @@ const PublicProfile: React.FC = () => {
     return (
        <div className="flex min-h-screen flex-col items-center justify-center text-center px-4">
           <h2 className="text-2xl font-bold mb-2">User Not Found</h2>
-          <p className="text-gray-500 mb-6">The user @{username} does not exist.</p>
+          <p className="text-gray-500 mb-6">The user you are looking for does not exist.</p>
           <Link to="/" className="text-primary font-bold hover:underline">Go Home</Link>
           <div className="md:hidden fixed bottom-0 left-0 right-0"><BottomNav /></div>
        </div>

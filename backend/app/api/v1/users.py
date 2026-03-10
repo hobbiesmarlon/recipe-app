@@ -8,7 +8,10 @@ from app.schemas.user import UserUpdate, UserResponse, PresignedUrlResponse
 from app.api.deps import get_current_user
 from app.services import storage_service
 import uuid
+import logging
 import json
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -90,7 +93,7 @@ async def get_profile_upload_url(
             Policy=json.dumps(policy)
         )
     except Exception as e:
-        print(f"Failed to ensure bucket policy for {bucket_name}: {e}")
+        logger.error(f"Failed to ensure bucket policy for {bucket_name}: {e}")
 
     presigned = storage_service.generate_presigned_post(
         key=filename,
