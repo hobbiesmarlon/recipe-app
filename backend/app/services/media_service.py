@@ -5,10 +5,13 @@ from app.core.config import settings
 
 s3_client = boto3.client(
     "s3",
-    endpoint_url=settings.MINIO_ENDPOINT,
-    aws_access_key_id=settings.MINIO_ACCESS_KEY,
-    aws_secret_access_key=settings.MINIO_SECRET_KEY,
-    config=Config(signature_version="s3v4"),
+    aws_access_key_id=settings.S3_ACCESS_KEY,
+    aws_secret_access_key=settings.S3_SECRET_KEY,
+    region_name=settings.S3_REGION,
+    config=Config(
+        signature_version="s3v4",
+        s3={'addressing_style': 'virtual'}
+    ),
 )
 
 def generate_presigned_upload_url(key: str, content_type: str, expires_in: int = 3600) -> str:
@@ -43,7 +46,6 @@ def upload_file_object(
         Key=key,
         ExtraArgs={
             "ContentType": content_type,
-            "ACL": "public-read",  # or private + CDN
         },
     )
 
@@ -70,5 +72,4 @@ def upload_bytes(
         Key=key,
         Body=data,
         ContentType=content_type,
-        ACL="public-read",  # or private + CDN
     )

@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     INGREDIENT_MATCH_URL: str | None = None
 
     S3_BUCKET: str | None = None
-    S3_REGION: str | None = None
+    S3_REGION: str = "af-south-1"
     S3_ACCESS_KEY: str | None = None
     S3_SECRET_KEY: str | None = None
     AWS_ENDPOINT_URL: str | None = None
