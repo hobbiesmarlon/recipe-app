@@ -68,33 +68,6 @@ async def get_profile_upload_url(
     # Use the specific profile picture bucket
     bucket_name = settings.PROFILE_PICTURE_BUCKET_NAME
     
-    # Create bucket if not exists and ensure policy
-    try:
-        try:
-            storage_service.s3_client.head_bucket(Bucket=bucket_name)
-        except:
-            storage_service.s3_client.create_bucket(Bucket=bucket_name)
-            
-        # Always enforce public read policy to fix existing private buckets
-        policy = {
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Sid": "PublicRead",
-                    "Effect": "Allow",
-                    "Principal": "*",
-                    "Action": ["s3:GetObject"],
-                    "Resource": [f"arn:aws:s3:::{bucket_name}/*"]
-                }
-            ]
-        }
-        storage_service.s3_client.put_bucket_policy(
-            Bucket=bucket_name,
-            Policy=json.dumps(policy)
-        )
-    except Exception as e:
-        logger.error(f"Failed to ensure bucket policy for {bucket_name}: {e}")
-
     presigned = storage_service.generate_presigned_post(
         key=filename,
         content_type=file_type,
