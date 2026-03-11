@@ -62,8 +62,8 @@ async def get_profile_upload_url(
     file_extension = file_type.split("/")[-1]
     if file_extension == "jpeg": file_extension = "jpg"
     
-    # Generate a unique filename
-    filename = f"user_{user.id}_{uuid.uuid4().hex[:8]}.{file_extension}"
+    # Generate a unique filename with a folder prefix
+    filename = f"profiles/user_{user.id}_{uuid.uuid4().hex[:8]}.{file_extension}"
     
     # Use the specific profile picture bucket
     bucket_name = settings.PROFILE_PICTURE_BUCKET_NAME
