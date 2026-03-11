@@ -1,0 +1,36 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    # Production: Use Gunicorn with Uvicorn workers for stability and concurrency
+    command: gunicorn app.main:app -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+    restart: always
+    env_file:
+      - .env
+    environment:
+      # Explicitly disable local overrides for cloud services
+      - AWS_SQS_ENDPOINT_URL=
+      - AWS_ENDPOINT_URL=
+    ports:
+      - "8000:8000"
+    networks:
+      - recipe_net
+
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    # Production: Default prefork pool is best for CPU tasks like video/images on Linux
+    command: celery -A app.celery_app worker --loglevel=info --concurrency=2
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - AWS_SQS_ENDPOINT_URL=
+      - AWS_ENDPOINT_URL=
+    networks:
+      - recipe_net
+
+networks:
+  recipe_net:
