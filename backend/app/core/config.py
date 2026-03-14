@@ -1,3 +1,4 @@
+import json
 from typing import Any
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
@@ -42,7 +43,7 @@ class Settings(BaseSettings):
 
     CELERY_BROKER_URL: str = "sqs://"
     AWS_SQS_ENDPOINT_URL: str | None = None
-    
+
     AWS_ACCESS_KEY_ID: str | None = None
     AWS_SECRET_ACCESS_KEY: str | None = None
 
@@ -54,13 +55,21 @@ class Settings(BaseSettings):
         "http://localhost:3000",
     ]
 
-    @field_validator("CORS_ORIGINS", mode="before")
+    @field_validator("CORS_ORIGINS", mode="before")  # ← indented inside class
     @classmethod
     def assemble_cors_origins(cls, v: Any) -> list[str]:
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
+        if isinstance(v, list):
             return v
+        if isinstance(v, str):
+            v = v.strip()
+            if v.startswith("["):
+                try:
+                    parsed = json.loads(v)
+                    if isinstance(parsed, list):
+                        return parsed
+                except json.JSONDecodeError:
+                    pass
+            return [i.strip() for i in v.split(",") if i.strip()]
         return v
 
     # AWS Cognito
