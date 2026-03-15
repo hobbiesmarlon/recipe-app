@@ -19,7 +19,6 @@ from app.schemas.ingredient import IngredientRead
 from app.api.deps import get_current_user, get_optional_current_user
 from app.models.user import User
 from app.core.config import settings
-from app.services.ingredient_matcher import mock_match_ingredient
 from app.schemas.recipe import PaginatedRecipes
 from app.schemas.media import RecipeMediaRead
 
@@ -56,11 +55,10 @@ async def create_recipe(
     # Batch ingredients
     recipe_ingredients = []
     for ing in data.ingredients:
-        ingredient_id = await mock_match_ingredient(ing.name_text)
         recipe_ingredients.append(
             RecipeIngredient(
                 recipe_id=recipe.id,
-                ingredient_id=ingredient_id,
+                ingredient_id=None,
                 **ing.dict()
             )
         )
@@ -491,11 +489,10 @@ async def update_recipe(
         )
         recipe_ingredients = []
         for ing in data.ingredients:
-            ingredient_id = await mock_match_ingredient(ing.name_text)
             recipe_ingredients.append(
                 RecipeIngredient(
                     recipe_id=recipe.id,
-                    ingredient_id=ingredient_id,
+                    ingredient_id=None,
                     **ing.dict(),
                 )
             )
@@ -723,11 +720,10 @@ async def create_recipe_with_media(
 
     # Ingredients
     for ing in data.ingredients:
-        ingredient_id = await mock_match_ingredient(ing.name_text)
         db.add(
             RecipeIngredient(
                 recipe_id=recipe.id,
-                ingredient_id=ingredient_id,
+                ingredient_id=None,
                 **ing.dict(),
             )
         )
