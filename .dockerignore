@@ -1,0 +1,28 @@
+.git
+.gitignore
+.dockerignore
+.vscode
+.github
+screenshots
+media
+templates
+*.md
+docker-compose*.yml
+
+# Backend exclusions
+backend/.venv
+backend/__pycache__
+backend/.pytest_cache
+backend/tests
+backend/*.pyc
+
+# Frontend exclusions
+frontend/node_modules
+frontend/dist
+frontend/.vite
+frontend/.next
+frontend/coverage
+
+# OS files
+.DS_Store
+Thumbs.db
