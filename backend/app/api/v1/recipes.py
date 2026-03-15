@@ -390,10 +390,11 @@ async def get_recipe(
     if not recipe:
         raise HTTPException(404, "Recipe not found")
 
-    # Record View
-    view = UserRecipeView(recipe_id=recipe.id, user_id=user.id if user else None)
-    db.add(view)
-    await db.commit()
+    # Record View (only if user is logged in)
+    if user:
+        view = UserRecipeView(recipe_id=recipe.id, user_id=user.id)
+        db.add(view)
+        await db.commit()
 
     # Sort media
     recipe.media.sort(key=lambda m: (not m.is_primary, m.display_order))
