@@ -13,7 +13,10 @@ class OAuthAccount(Base, TimestampMixin):
     id = Column(BigInteger, primary_key=True)
     user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
-    provider = Column(Enum(OAuthProvider, native_enum=False), nullable=False)
+    provider = Column(
+        Enum(OAuthProvider, native_enum=False, values_callable=lambda x: [e.value for e in x]),
+        nullable=False
+    )
     provider_user_id = Column(Text, nullable=False)
 
     provider_username = Column(Text)
