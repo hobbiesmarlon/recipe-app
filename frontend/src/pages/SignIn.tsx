@@ -1,10 +1,19 @@
-import React from 'react';
-import { useNavigate } from 'react-router';
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 import { useAuthStore } from '../store/useAuthStore';
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { loginWithCognito, isAuthenticating, isLoggingOut } = useAuthStore();
+
+  // Capture where the user came from
+  useEffect(() => {
+    const from = location.state?.from;
+    if (from) {
+      localStorage.setItem('redirectAfterLogin', from);
+    }
+  }, [location]);
 
   const handleLogin = async (provider: string) => {
     if (provider === 'google' && import.meta.env.VITE_USE_COGNITO === 'true') {

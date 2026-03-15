@@ -21,7 +21,13 @@ const AuthCallback: React.FC = () => {
       if (tokenFromUrl) {
         localStorage.setItem('token', tokenFromUrl);
         
-        if (isNewUser) {
+        const redirectPath = localStorage.getItem('redirectAfterLogin');
+        localStorage.removeItem('redirectAfterLogin'); // Clean up
+
+        if (redirectPath) {
+          navigate(redirectPath, { replace: true });
+        } else if (isNewUser && provider !== 'x') {
+          // Send to edit-profile ONLY if new AND not X
           navigate('/edit-profile', { replace: true });
         } else {
           navigate('/', { replace: true });
@@ -34,11 +40,19 @@ const AuthCallback: React.FC = () => {
         try {
           const token = await fetchSession();
           if (token) {
-            const { pendingUser } = useAuthStore.getState();
-            if (pendingUser) {
-              navigate('/edit-profile', { replace: true });
+            const redirectPath = localStorage.getItem('redirectAfterLogin');
+            localStorage.removeItem('redirectAfterLogin'); // Clean up
+
+            if (redirectPath) {
+              navigate(redirectPath, { replace: true });
             } else {
-              navigate('/', { replace: true });
+              const { pendingUser } = useAuthStore.getState();
+              // pendingUser is only true for new Cognito (Google) signups
+              if (pendingUser) {
+                navigate('/edit-profile', { replace: true });
+              } else {
+                navigate('/', { replace: true });
+              }
             }
           } else {
             navigate('/signin', { replace: true });
