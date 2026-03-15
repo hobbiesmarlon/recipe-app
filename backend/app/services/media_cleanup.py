@@ -4,9 +4,6 @@ from app.services.media_service import list_objects, delete_object
 def cleanup_media(media):
     keys = [
         media.key,
-        media.thumbnail_small_key,
-        media.thumbnail_medium_key,
-        media.thumbnail_large_key,
     ]
 
     for key in keys:
@@ -30,9 +27,6 @@ def cleanup_orphaned_uploads(hours: int = 24):
 def delete_recipe_media_objects(media):
     keys = [
         media.key,
-        media.thumbnail_small_key,
-        media.thumbnail_medium_key,
-        media.thumbnail_large_key,
     ]
 
     for key in keys:

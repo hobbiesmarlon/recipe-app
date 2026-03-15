@@ -30,12 +30,9 @@ class RecipeMediaRead(BaseModel):
     is_primary: bool
     display_order: int
     processed: bool = False
-    
+
     # Internal keys (excluded from JSON output)
     key: str = Field(exclude=True)
-    thumbnail_small_key: Optional[str] = Field(None, exclude=True)
-    thumbnail_medium_key: Optional[str] = Field(None, exclude=True)
-    thumbnail_large_key: Optional[str] = Field(None, exclude=True)
 
     width: Optional[int] = None
     height: Optional[int] = None
@@ -45,18 +42,6 @@ class RecipeMediaRead(BaseModel):
     @computed_field
     def url(self) -> str | None:
         return public_media_url(self.key)
-
-    @computed_field
-    def thumbnail_small_url(self) -> str | None:
-        return public_media_url(self.thumbnail_small_key)
-
-    @computed_field
-    def thumbnail_medium_url(self) -> str | None:
-        return public_media_url(self.thumbnail_medium_key)
-
-    @computed_field
-    def thumbnail_large_url(self) -> str | None:
-        return public_media_url(self.thumbnail_large_key)
 
     class Config:
         from_attributes = True

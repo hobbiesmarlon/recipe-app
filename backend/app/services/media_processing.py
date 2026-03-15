@@ -26,35 +26,12 @@ async def process_recipe_media(
                 with Image.open(io.BytesIO(resp.content)) as img:
                     media.width, media.height = img.size
 
-                # 🖼️ Generate Thumbnails (DISABLED)
-                # base = f"thumbnails/{media.id}"
-
-                # media.thumbnail_small_key = f"{base}_sm.jpg"
-                # media.thumbnail_medium_key = f"{base}_md.jpg"
-                # media.thumbnail_large_key = f"{base}_lg.jpg"
-
-                # generate_thumbnail(media.key, media.thumbnail_small_key, max_size=320)
-                # generate_thumbnail(media.key, media.thumbnail_medium_key, max_size=640)
-                # generate_thumbnail(media.key, media.thumbnail_large_key, max_size=1280)
-
             elif media.type == "video":
                 # 🎥 Extract Metadata
                 meta = get_video_metadata(media.key)
                 media.width = meta["width"]
                 media.height = meta["height"]
                 media.duration_seconds = int(meta["duration"])
-
-                # 🎥 Generate Thumbnails (DISABLED)
-                # base = f"thumbnails/video_{media.id}"
-
-                # thumbs = generate_video_thumbnails(
-                #     video_key=media.key,
-                #     base_key=base,
-                # )
-
-                # media.thumbnail_small_key = thumbs["thumbnail_small_key"]
-                # media.thumbnail_medium_key = thumbs["thumbnail_medium_key"]
-                # media.thumbnail_large_key = thumbs["thumbnail_large_key"]
 
             media.processed = True
 

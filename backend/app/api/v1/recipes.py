@@ -531,9 +531,6 @@ async def update_recipe(
             if mid not in incoming_media_ids:
                 media_cleanup_keys.extend([
                     media.key,
-                    media.thumbnail_small_key,
-                    media.thumbnail_medium_key,
-                    media.thumbnail_large_key,
                 ])
                 # Remove from relationship to trigger delete-orphan cascade
                 recipe.media.remove(media)
@@ -606,9 +603,6 @@ async def delete_recipe(
     for media in recipe.media:
         media_keys.extend([
             media.key,
-            media.thumbnail_small_key,
-            media.thumbnail_medium_key,
-            media.thumbnail_large_key,
         ])
     
     if media_keys:

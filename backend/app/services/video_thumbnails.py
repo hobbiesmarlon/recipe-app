@@ -49,11 +49,7 @@ def generate_video_thumbnails(video_key: str, base_key: str) -> dict:
                     content_type="image/jpeg",
                 )
 
-        return {
-            "thumbnail_small_key": f"{base_key}_sm.jpg",    
-            "thumbnail_medium_key": f"{base_key}_md.jpg",
-            "thumbnail_large_key": f"{base_key}_lg.jpg",
-        }
+        return f"{base_key}_md.jpg"
 
     finally:
         if os.path.exists(tmp.name):
