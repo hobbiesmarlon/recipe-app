@@ -171,9 +171,12 @@ const DiscoveryFeed: React.FC = () => {
     e.preventDefault();
 
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    // Use the backend share endpoint which provides OG tags
+    // Use the backend share endpoint which provides OG tags for social platforms
     const shareUrl = `${apiUrl}/share/recipe/${recipe.id}`;
-    
+    // Use the frontend URL for simple clipboard copying
+    const frontendUrl = window.location.origin;
+    const directUrl = `${frontendUrl}/recipe/${recipe.id}`;
+
     if (navigator.share) {
       navigator.share({
         title: recipe.title,
@@ -183,13 +186,12 @@ const DiscoveryFeed: React.FC = () => {
           console.error("Error sharing:", err);
       });
     } else {
-      navigator.clipboard.writeText(shareUrl).then(() => {
+      navigator.clipboard.writeText(directUrl).then(() => {
         setShareToast({ visible: true, message: 'Share link copied to clipboard!' });
       }).catch(() => {
         setShareToast({ visible: true, message: 'Failed to copy link' });
       });
-    }
-  };
+    }  };
 
   const tabs = [
     { label: 'Latest', value: 'latest' },

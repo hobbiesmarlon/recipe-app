@@ -121,15 +121,17 @@ const UserProfile: React.FC = () => {
     if (!user) return;
 
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    const url = `${apiUrl}/share/user/${user.id}`;
+    const shareUrl = `${apiUrl}/share/user/${user.id}`;
+    const frontendUrl = window.location.origin;
+    const directUrl = `${frontendUrl}/u/${user.id}`;
 
     if (navigator.share) {
       navigator.share({
         title: `Check out ${user.display_name}'s profile`,
-        url: url,
+        url: shareUrl,
       }).catch(console.error);
     } else {
-      navigator.clipboard.writeText(url).then(() => {
+      navigator.clipboard.writeText(directUrl).then(() => {
         setShareToast({ visible: true, message: 'Profile link copied!' });
       }).catch(() => {
         setShareToast({ visible: true, message: 'Failed to copy link' });

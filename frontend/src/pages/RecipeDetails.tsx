@@ -62,10 +62,8 @@ const RecipeDetails: React.FC = () => {
       if (!id) return;
       try {
         setLoading(true);
-        console.log(`Fetching recipe ${id}...`);
         const response = await client.get(`/recipes/${id}`);
         const data = response.data;
-        console.log("Recipe data received:", data);
         setRecipe(data);
         setIsLiked(!!data.is_liked);
         setIsSaved(!!data.is_saved);
@@ -164,6 +162,8 @@ const RecipeDetails: React.FC = () => {
     if (recipe) {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
       const shareUrl = `${apiUrl}/share/recipe/${recipe.id}`;
+      const frontendUrl = window.location.origin;
+      const directUrl = `${frontendUrl}/recipe/${recipe.id}`;
 
       if (navigator.share) {
         navigator.share({
@@ -174,7 +174,7 @@ const RecipeDetails: React.FC = () => {
             console.error("Error sharing:", err);
         });
       } else {
-        navigator.clipboard.writeText(shareUrl).then(() => {
+        navigator.clipboard.writeText(directUrl).then(() => {
           setShareToast({ visible: true, message: 'Share link copied to clipboard!' });
         }).catch(() => {
           setShareToast({ visible: true, message: 'Failed to copy link' });
