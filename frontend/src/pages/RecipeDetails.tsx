@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useParams, useNavigate } from 'react-router';
 import { ImageCarousel } from '../components/ui/ImageCarousel';
 import { Toast } from '../components/ui/Toast';
-import client from '../api/client';
+import client, { API_URL } from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 
 interface RecipeMedia {
@@ -160,8 +160,7 @@ const RecipeDetails: React.FC = () => {
 
   const handleShare = () => {
     if (recipe) {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const shareUrl = `${apiUrl}/share/recipe/${recipe.id}`;
+      const shareUrl = `${API_URL}/share/recipe/${recipe.id}`;
       const frontendUrl = window.location.origin;
       const directUrl = `${frontendUrl}/recipe/${recipe.id}`;
 

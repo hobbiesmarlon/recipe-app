@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuthStore } from '../store/useAuthStore';
+import { API_URL } from '../api/client';
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
@@ -22,8 +23,7 @@ const SignIn: React.FC = () => {
     }
     
     // For X, or if Cognito is disabled, use the backend custom OAuth flow
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    window.location.href = `${apiUrl}/auth/${provider}/login`;
+    window.location.href = `${API_URL}/auth/${provider}/login`;
   };
 
   if (isAuthenticating || isLoggingOut) {

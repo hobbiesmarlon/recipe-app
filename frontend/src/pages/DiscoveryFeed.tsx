@@ -5,7 +5,7 @@ import { PageContainer } from '../components/PageContainer';
 import { ImageCarousel } from '../components/ui/ImageCarousel';
 import { RecipeCard } from '../components/ui/RecipeCard';
 import { Toast } from '../components/ui/Toast';
-import client from '../api/client';
+import client, { API_URL } from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 
 interface RecipeMedia {
@@ -170,9 +170,8 @@ const DiscoveryFeed: React.FC = () => {
     e.stopPropagation();
     e.preventDefault();
 
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
     // Use the backend share endpoint which provides OG tags for social platforms
-    const shareUrl = `${apiUrl}/share/recipe/${recipe.id}`;
+    const shareUrl = `${API_URL}/share/recipe/${recipe.id}`;
     // Use the frontend URL for simple clipboard copying
     const frontendUrl = window.location.origin;
     const directUrl = `${frontendUrl}/recipe/${recipe.id}`;

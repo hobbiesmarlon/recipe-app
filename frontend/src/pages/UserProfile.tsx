@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 import BottomNav from '../components/BottomNav';
 import { PageContainer } from '../components/PageContainer';
-import client from '../api/client';
+import client, { API_URL } from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 
 import { Toast } from '../components/ui/Toast';
@@ -120,8 +120,7 @@ const UserProfile: React.FC = () => {
     setIsMenuOpen(false);
     if (!user) return;
 
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    const shareUrl = `${apiUrl}/share/user/${user.id}`;
+    const shareUrl = `${API_URL}/share/user/${user.id}`;
     const frontendUrl = window.location.origin;
     const directUrl = `${frontendUrl}/u/${user.id}`;
 

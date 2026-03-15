@@ -1,6 +1,16 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Use env var if provided, otherwise derive from current host (assuming backend is on same IP, port 8000)
+const getApiUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl) return envUrl;
+
+  // Fallback: If we are on http://13.247.185.213:3000, backend is likely http://13.247.185.213:8000
+  const { protocol, hostname } = window.location;
+  return `${protocol}//${hostname}:8000`;
+};
+
+export const API_URL = getApiUrl();
 
 const client = axios.create({
   baseURL: API_URL,
