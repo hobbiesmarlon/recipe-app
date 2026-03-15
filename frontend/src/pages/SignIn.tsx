@@ -45,10 +45,10 @@ const SignIn: React.FC = () => {
         <div className="mx-auto max-w-2xl px-4 flex items-center justify-between">
           <button 
             onClick={() => navigate('/', { replace: true })}
-            className="p-2 md:hidden flex items-center justify-center text-primary"
+            className="p-3 md:hidden flex items-center justify-center text-primary -ml-2 rounded-full hover:bg-primary/10 transition-colors"
             aria-label="Close"
           >
-            <span className="material-symbols-outlined">close</span>
+            <span className="material-symbols-outlined text-3xl">close</span>
           </button>
           <h1 className="text-lg font-bold text-center flex-grow md:ml-0 -ml-10 text-black dark:text-white md:hidden">Sign In</h1>
           <div className="w-10 md:hidden"></div>
