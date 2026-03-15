@@ -124,6 +124,8 @@ async def login(provider: str, request: Request):
 # ---------------- Step 2: Callback ----------------
 @router.get("/{provider}/callback")
 async def callback(provider: str, code: str, state: str, request: Request, db: AsyncSession = Depends(get_db)):
+    # Diagnostic log to verify the fix is active
+    logger.info(f"OAuth callback received for provider: {provider}")
     provider = provider.lower()
     if provider not in OAUTH_PROVIDERS:
         raise HTTPException(status_code=400, detail="Unsupported provider")
