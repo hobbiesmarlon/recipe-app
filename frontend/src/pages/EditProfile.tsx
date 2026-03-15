@@ -115,11 +115,19 @@ const EditProfile: React.FC = () => {
   const isSourcedFromProvider = user?.username_sourced_from_provider || false;
   const isPending = !!pendingUser;
 
+  const handleCancel = () => {
+    if (user) {
+      navigate('/profile', { replace: true });
+    } else {
+      navigate('/', { replace: true });
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
       <header className="py-4 sticky top-0 md:top-14 z-10 bg-background-light dark:bg-background-dark">
         <div className="mx-auto max-w-2xl px-4 flex items-center justify-between relative">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-3 text-primary z-20 md:-ml-8 lg:hidden">
+          <button onClick={handleCancel} className="flex items-center gap-3 text-primary z-20 md:-ml-8 lg:hidden">
             <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg>
           </button>
           <span className="font-bold text-black dark:text-white absolute left-0 right-0 text-center pointer-events-none md:hidden">
@@ -134,7 +142,7 @@ const EditProfile: React.FC = () => {
           <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-6">
             <p className="text-sm text-primary font-medium leading-relaxed">
               <span className="font-bold">Note:</span> {isPending 
-                ? "Welcome! Please choose your username and display name to finish signing up."
+                ? "Please choose a username, display name and profile picture to finish setting up."
                 : (isSourcedFromProvider 
                     ? "Your details are synced with X and cannot be edited here."
                     : "Customize your profile details below.")}
@@ -194,7 +202,7 @@ const EditProfile: React.FC = () => {
 
       <footer className="fixed bottom-0 left-0 right-0 border-t border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark pb-safe md:static md:border-none md:mt-10">
         <nav className="mx-auto max-w-2xl flex h-20 items-center justify-between px-4">
-          <button onClick={() => navigate(-1)} disabled={isLoading} className="rounded-xl bg-white/80 dark:bg-gray-800 px-6 py-3 text-sm font-medium text-primary border border-primary/10 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <button onClick={handleCancel} disabled={isLoading} className="rounded-xl bg-white/80 dark:bg-gray-800 px-6 py-3 text-sm font-medium text-primary border border-primary/10 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             {isPending ? 'Cancel signup' : 'Cancel'}
           </button>
           <button onClick={handleSave} disabled={isLoading} className="rounded-xl bg-primary px-8 py-3 text-sm font-bold text-white hover:bg-orange-600 shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-50">

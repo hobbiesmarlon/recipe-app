@@ -35,7 +35,7 @@ const SignIn: React.FC = () => {
       <header className="py-4 sticky top-0 md:top-14 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
         <div className="mx-auto max-w-2xl px-4 flex items-center justify-between">
           <button 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/', { replace: true })}
             className="p-2 md:hidden flex items-center justify-center text-primary"
             aria-label="Close"
           >
