@@ -198,9 +198,11 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
             if profile_pic_url:
                 profile_pic_url = profile_pic_url.replace("_normal", "")
 
+    # Ensure provider name matches database enum (lowercase)
+    db_provider = provider.lower()
     result = await db.execute(
         select(OAuthAccount).where(
-            OAuthAccount.provider == OAuthProvider(provider),
+            OAuthAccount.provider == OAuthProvider(db_provider),
             OAuthAccount.provider_user_id == provider_user_id
         )
     )
@@ -231,7 +233,7 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
         await db.flush()
         oauth_acc = OAuthAccount(
             user_id=user.id,
-            provider=OAuthProvider(provider),
+            provider=OAuthProvider(db_provider),
             provider_user_id=provider_user_id,
             access_token=access_token,
             provider_username=x_username if provider == "x" else None,
