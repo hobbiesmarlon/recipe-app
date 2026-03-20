@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, Navigate, Outlet, useParams } from 'react-router';
 import { useAddRecipeStore } from '../store/useAddRecipeStore';
 
@@ -9,6 +9,13 @@ const AddRecipeGuard: React.FC = () => {
 
   const isEditMode = !!params.recipeId;
   const basePath = isEditMode ? `/edit-recipe/${params.recipeId}` : '/add-recipe';
+
+  // 🔄 SELF-HEALING: Reset store if we are in Add mode but store has Edit data
+  useEffect(() => {
+    if (!isEditMode && store.editId !== null) {
+      store.reset();
+    }
+  }, [isEditMode, store.editId, store.reset]);
 
   const isBasicValid = () => {
      const newImageCount = store.files.filter(f => f.file.type.startsWith('image/')).length;

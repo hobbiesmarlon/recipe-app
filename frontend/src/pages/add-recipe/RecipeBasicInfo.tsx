@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { Toast } from '../../components/ui/Toast';
 import { SortableList } from '../../components/ui/SortableList';
 import { AddRecipeNavigation } from '../../components/forms/AddRecipeNavigation';
@@ -7,7 +7,11 @@ import { useAddRecipeStore } from '../../store/useAddRecipeStore';
 
 const RecipeBasicInfo: React.FC = () => {
   const navigate = useNavigate();
+  const params = useParams<{ recipeId: string }>();
+  const isEditMode = !!params.recipeId;
+
   const { 
+    editId, reset,
     files, setFiles,
     existingMedia, setExistingMedia, markMediaDeleted,
     name, setName,
@@ -15,6 +19,13 @@ const RecipeBasicInfo: React.FC = () => {
     prepTime, setPrepTime,
     servings, setServings
   } = useAddRecipeStore();
+
+  // 🔄 SELF-HEALING: Reset store if we are in Add mode but store has Edit data
+  React.useEffect(() => {
+    if (!isEditMode && editId !== null) {
+      reset();
+    }
+  }, [isEditMode, editId, reset]);
 
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('Please fill in all relevant fields');
