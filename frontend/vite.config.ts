@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['logo.svg', 'PNG/*.png'],
       manifest: {
-        name: 'RecipeApp',
-        short_name: 'RecipeApp',
+        name: 'Recipefy',
+        short_name: 'Recipefy',
         description: 'Discover and share recipes',
         theme_color: '#f48525',
         background_color: '#ffffff',
