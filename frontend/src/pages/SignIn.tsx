@@ -45,7 +45,7 @@ const SignIn: React.FC = () => {
         <div className="mx-auto max-w-2xl px-4 flex items-center justify-between">
           <button 
             onClick={() => navigate('/', { replace: true })}
-            className="p-3 md:hidden flex items-center justify-center text-primary -ml-2 rounded-full hover:bg-primary/10 transition-colors"
+            className="relative z-50 p-5 md:hidden flex items-center justify-center text-primary -ml-4 rounded-full hover:bg-primary/10 transition-colors"
             aria-label="Close"
           >
             <span className="material-symbols-outlined text-3xl">close</span>
