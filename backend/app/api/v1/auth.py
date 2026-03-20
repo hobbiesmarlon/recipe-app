@@ -206,8 +206,8 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
             if profile_pic_url:
                 profile_pic_url = profile_pic_url.replace("_normal", "")
 
-    # Ensure provider name matches database enum (lowercase)
-    db_provider = provider.lower()
+    # 🛡️ IMPROVED USER MATCHING
+    # 1. First, check if this specific social account is already linked
     result = await db.execute(
         select(OAuthAccount).where(
             OAuthAccount.provider == OAuthProvider(db_provider),
@@ -215,16 +215,32 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
         )
     )
     oauth_acc = result.scalars().first()
+    user = None
     is_new_user = False
 
     if oauth_acc:
         user = await db.get(User, oauth_acc.user_id)
-    else:
+    
+    # 2. If not linked, check if a user with this email already exists
+    if not user and email:
+        result = await db.execute(select(User).where(User.email == email))
+        user = result.scalars().first()
+        if user:
+            # Link this social account to the existing user
+            oauth_acc = OAuthAccount(
+                user_id=user.id,
+                provider=OAuthProvider(db_provider),
+                provider_user_id=provider_user_id,
+                access_token=access_token,
+                provider_username=x_username if provider == "x" else None,
+                provider_display_name=name,
+                provider_profile_pic_url=profile_pic_url
+            )
+            db.add(oauth_acc)
+
+    # 3. If still no user, create a new one
+    if not user:
         is_new_user = True
-        
-        # 🛡️ IF COGNITO IS ENABLED: We should not be creating users for Google here.
-        # This custom callback should ideally only be for X. 
-        # But if Google hit this, we force them to finish setup.
         
         if provider == "x":
             username = x_username if x_username else email.split("@")[0]
@@ -236,7 +252,8 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
                 profile_picture_url=profile_pic_url,
                 username_sourced_from_provider=sourced,
                 display_name_sourced_from_provider=sourced,
-                profile_pic_sourced_from_provider=sourced
+                profile_pic_sourced_from_provider=sourced,
+                email=email # Though X email is usually fake/none
             )
             db.add(user)
             await db.flush()
@@ -251,9 +268,6 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
             )
             db.add(oauth_acc)
         else:
-            # For Google (or others), we return is_new_user=true without creating a DB record yet,
-            # OR we create a "Pending" state.
-            # Simpler: Create the user but with a flag that forces redirect.
             username = f"temp_{secrets.token_hex(4)}"
             user = User(
                 username=username,
