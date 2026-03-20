@@ -221,34 +221,60 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
         user = await db.get(User, oauth_acc.user_id)
     else:
         is_new_user = True
+        
+        # 🛡️ IF COGNITO IS ENABLED: We should not be creating users for Google here.
+        # This custom callback should ideally only be for X. 
+        # But if Google hit this, we force them to finish setup.
+        
         if provider == "x":
             username = x_username if x_username else email.split("@")[0]
             sourced = True
+            
+            user = User(
+                username=username, 
+                display_name=name,
+                profile_picture_url=profile_pic_url,
+                username_sourced_from_provider=sourced,
+                display_name_sourced_from_provider=sourced,
+                profile_pic_sourced_from_provider=sourced
+            )
+            db.add(user)
+            await db.flush()
+            oauth_acc = OAuthAccount(
+                user_id=user.id,
+                provider=OAuthProvider(db_provider),
+                provider_user_id=provider_user_id,
+                access_token=access_token,
+                provider_username=x_username if provider == "x" else None,
+                provider_display_name=name,
+                provider_profile_pic_url=profile_pic_url
+            )
+            db.add(oauth_acc)
         else:
-            username = f"temp_user_{secrets.token_hex(4)}"
-            name = "" 
-            sourced = False
-
-        user = User(
-            username=username, 
-            display_name=name,
-            profile_picture_url=profile_pic_url,
-            username_sourced_from_provider=sourced,
-            display_name_sourced_from_provider=sourced,
-            profile_pic_sourced_from_provider=sourced
-        )
-        db.add(user)
-        await db.flush()
-        oauth_acc = OAuthAccount(
-            user_id=user.id,
-            provider=OAuthProvider(db_provider),
-            provider_user_id=provider_user_id,
-            access_token=access_token,
-            provider_username=x_username if provider == "x" else None,
-            provider_display_name=name,
-            provider_profile_pic_url=profile_pic_url
-        )
-        db.add(oauth_acc)
+            # For Google (or others), we return is_new_user=true without creating a DB record yet,
+            # OR we create a "Pending" state.
+            # Simpler: Create the user but with a flag that forces redirect.
+            username = f"temp_{secrets.token_hex(4)}"
+            user = User(
+                username=username,
+                display_name=name,
+                email=email,
+                profile_picture_url=profile_pic_url,
+                username_sourced_from_provider=False,
+                display_name_sourced_from_provider=False,
+                profile_pic_sourced_from_provider=False
+            )
+            db.add(user)
+            await db.flush()
+            oauth_acc = OAuthAccount(
+                user_id=user.id,
+                provider=OAuthProvider(db_provider),
+                provider_user_id=provider_user_id,
+                access_token=access_token,
+                provider_display_name=name,
+                provider_profile_pic_url=profile_pic_url
+            )
+            db.add(oauth_acc)
 
     await db.commit()
     token = create_access_token(subject=str(user.id))

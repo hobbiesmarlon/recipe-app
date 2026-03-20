@@ -17,18 +17,18 @@ const AuthCallback: React.FC = () => {
       const provider = searchParams.get('provider');
       const isNewUser = searchParams.get('is_new_user') === 'true';
 
-      // 🛠️ Custom Local Flow (e.g., from X)
+      // 🛠️ Custom Local Flow (e.g., from X or non-Cognito Google)
       if (tokenFromUrl) {
         localStorage.setItem('token', tokenFromUrl);
         
         const redirectPath = localStorage.getItem('redirectAfterLogin');
         localStorage.removeItem('redirectAfterLogin'); // Clean up
 
-        if (redirectPath) {
-          navigate(redirectPath, { replace: true });
-        } else if (isNewUser && provider !== 'x') {
-          // Send to edit-profile ONLY if new AND not X
+        if (isNewUser) {
+          // If it's a new user, always force them to edit-profile to pick a username/displayName
           navigate('/edit-profile', { replace: true });
+        } else if (redirectPath) {
+          navigate(redirectPath, { replace: true });
         } else {
           navigate('/', { replace: true });
         }
