@@ -7,7 +7,7 @@ from app.api.v1.media import router as media_router
 from app.api.v1.share import router as share_router
 from app.core.config import settings
 
-app = FastAPI(title="Recipe App API")
+app = FastAPI(title="Recipe App API", docs_url=None, redoc_url=None)
 
 app.add_middleware(
     CORSMiddleware,
