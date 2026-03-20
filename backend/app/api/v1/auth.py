@@ -24,11 +24,14 @@ pkce_store = {}
 
 def get_redirect_uri(request: Request, provider: str):
     host = request.headers.get("host")
-    scheme = request.url.scheme
+    # Prefer the X-Forwarded-Proto header set by Nginx/Load Balancer
+    scheme = request.headers.get("x-forwarded-proto", request.url.scheme)
+    
     # X (Twitter) doesn't allow 'localhost' as a redirect URI for OAuth2.
     # We must use 127.0.0.1 instead during local development.
     if provider == "x" and "localhost" in host:
         host = host.replace("localhost", "127.0.0.1")
+        
     return f"{scheme}://{host}/auth/{provider}/callback"
 
 # ---------------- Providers Config ----------------
