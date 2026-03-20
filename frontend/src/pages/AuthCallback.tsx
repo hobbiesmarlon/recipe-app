@@ -24,8 +24,8 @@ const AuthCallback: React.FC = () => {
         const redirectPath = localStorage.getItem('redirectAfterLogin');
         localStorage.removeItem('redirectAfterLogin'); // Clean up
 
-        if (isNewUser) {
-          // If it's a new user, always force them to edit-profile to pick a username/displayName
+        if (isNewUser && provider === 'google') {
+          // If it's a new google user, force them to edit-profile to pick a username/displayName
           navigate('/edit-profile', { replace: true });
         } else if (redirectPath) {
           navigate(redirectPath, { replace: true });
