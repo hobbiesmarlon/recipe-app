@@ -206,6 +206,8 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
             if profile_pic_url:
                 profile_pic_url = profile_pic_url.replace("_normal", "")
 
+    # Ensure provider name matches database enum (lowercase)
+    db_provider = provider.lower()
     # 🛡️ IMPROVED USER MATCHING
     # 1. First, check if this specific social account is already linked
     result = await db.execute(
