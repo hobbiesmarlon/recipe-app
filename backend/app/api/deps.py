@@ -74,7 +74,7 @@ async def get_current_user(
             payload = await verify_cognito_token(token)
             cognito_sub = payload.get("sub")
             email = payload.get("email")
-            profile_picture_url = payload.get("picture")
+            profile_picture_url = payload.get("custom:picture")
             
             from sqlalchemy import select
             stmt = select(User).where(
