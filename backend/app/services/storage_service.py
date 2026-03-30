@@ -9,17 +9,22 @@ logger = logging.getLogger(__name__)
 aws_access_key = settings.AWS_ACCESS_KEY_ID or settings.S3_ACCESS_KEY
 aws_secret_key = settings.AWS_SECRET_ACCESS_KEY or settings.S3_SECRET_KEY
 
-s3_client = boto3.client(
-    "s3",
-    aws_access_key_id=aws_access_key,
-    aws_secret_access_key=aws_secret_key,
-    region_name=settings.S3_REGION,
-    endpoint_url=settings.AWS_ENDPOINT_URL, # Crucial for MinIO/Local dev
-    config=Config(
+# Only provide endpoint_url if it has a valid value (important for production S3)
+client_kwargs = {
+    "service_name": "s3",
+    "aws_access_key_id": aws_access_key,
+    "aws_secret_access_key": aws_secret_key,
+    "region_name": settings.S3_REGION,
+    "config": Config(
         signature_version="s3v4",
         s3={'addressing_style': 'virtual'}
     )
-)
+}
+
+if settings.AWS_ENDPOINT_URL:
+    client_kwargs["endpoint_url"] = settings.AWS_ENDPOINT_URL
+
+s3_client = boto3.client(**client_kwargs)
 
 def head_object(key: str, bucket_name: str = settings.MEDIA_BUCKET_NAME) -> dict:
     """
