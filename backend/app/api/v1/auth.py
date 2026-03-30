@@ -77,6 +77,10 @@ async def cognito_register(
     cognito_sub = cognito_payload.get("sub")
     email = cognito_payload.get("email")
 
+    # Fallback: if frontend didn't send it, try extracting from JWT
+    if not profile_picture_url:
+        profile_picture_url = cognito_payload.get("picture")
+
     # 2. Check if username is taken
     existing = await db.execute(select(User).where(User.username == username))
     if existing.scalars().first():
@@ -87,11 +91,11 @@ async def cognito_register(
         username=username,
         display_name=display_name or username,
         email=email,
-        profile_picture_url=profile_picture_url,
         cognito_sub=cognito_sub,
+        profile_picture_url=profile_picture_url,
+        profile_pic_sourced_from_provider=bool(profile_picture_url),
         username_sourced_from_provider=False,
         display_name_sourced_from_provider=False,
-        profile_pic_sourced_from_provider=bool(profile_picture_url)
     )
     db.add(new_user)
     await db.commit()
