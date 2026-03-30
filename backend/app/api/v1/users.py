@@ -28,8 +28,11 @@ async def update_me(
 ):
     # Prevent updates if sourced from provider (double check, though frontend disables inputs)
     if user_update.username is not None:
-        if user.username_sourced_from_provider:
-             raise HTTPException(status_code=400, detail="Username is managed by your login provider.")
+        if user.username_sourced_from_provider and user_update.username != user.username:
+             # If it was sourced from provider but they are trying to change it, 
+             # we allow it but mark it as no longer sourced from provider
+             user.username_sourced_from_provider = False
+        
         # Check uniqueness if changing
         if user_update.username != user.username:
             result = await db.execute(select(User).where(User.username == user_update.username))
@@ -38,13 +41,14 @@ async def update_me(
             user.username = user_update.username
 
     if user_update.display_name is not None:
-        if user.display_name_sourced_from_provider:
-             raise HTTPException(status_code=400, detail="Display name is managed by your login provider.")
+        if user.display_name_sourced_from_provider and user_update.display_name != user.display_name:
+             user.display_name_sourced_from_provider = False
         user.display_name = user_update.display_name
 
     if user_update.profile_picture_url is not None:
+        # If they are providing a new URL, we allow it and mark as no longer provider-sourced
         if user.profile_pic_sourced_from_provider:
-             raise HTTPException(status_code=400, detail="Profile picture is managed by your login provider.")
+             user.profile_pic_sourced_from_provider = False
         user.profile_picture_url = user_update.profile_picture_url
 
     await db.commit()
