@@ -49,6 +49,37 @@ async def verify_cognito_token(token: str) -> dict:
             detail=f"Invalid Cognito token: {str(e)}",
         )
 
+async def get_verified_cognito_data(
+    token: Optional[str] = Depends(oauth2_scheme),
+) -> dict:
+    """
+    Verifies the Cognito token and returns the payload.
+    Does NOT check if the user exists in our local DB.
+    Useful for registration-time actions like uploading a profile photo.
+    """
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token missing",
+        )
+
+    if not settings.USE_COGNITO:
+        # Fallback to local token check if Cognito is disabled
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            return payload
+        except:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+    try:
+        payload = await verify_cognito_token(token)
+        return payload
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Invalid Cognito token: {str(e)}",
+        )
+
 # --- Dependency ---
 
 async def get_current_user(

@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -5,7 +6,7 @@ from app.core.db import get_db
 from app.core.config import settings
 from app.models.user import User
 from app.schemas.user import UserUpdate, UserResponse, PresignedUrlResponse
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, get_verified_cognito_data, get_optional_current_user
 from app.services import storage_service
 import uuid
 import logging
@@ -53,7 +54,8 @@ async def update_me(
 @router.post("/me/profile-picture-upload-url", response_model=PresignedUrlResponse)
 async def get_profile_upload_url(
     file_type: str = Body(..., embed=True),
-    user: User = Depends(get_current_user)
+    user: Optional[User] = Depends(get_optional_current_user),
+    cognito_data: dict = Depends(get_verified_cognito_data)
 ):
     allowed_types = ["image/jpeg", "image/png", "image/jpg"]
     if file_type not in allowed_types:
@@ -62,8 +64,10 @@ async def get_profile_upload_url(
     file_extension = file_type.split("/")[-1]
     if file_extension == "jpeg": file_extension = "jpg"
     
-    # Generate a unique filename with a folder prefix
-    filename = f"profiles/user_{user.id}_{uuid.uuid4().hex[:8]}.{file_extension}"
+    # Generate a unique filename
+    # If user exists, use user.id, otherwise use cognito sub
+    user_identifier = user.id if user else f"pending_{cognito_data.get('sub')}"
+    filename = f"profiles/user_{user_identifier}_{uuid.uuid4().hex[:8]}.{file_extension}"
     
     # Use the specific profile picture bucket
     bucket_name = settings.PROFILE_PICTURE_BUCKET_NAME
