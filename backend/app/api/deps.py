@@ -74,6 +74,7 @@ async def get_current_user(
             payload = await verify_cognito_token(token)
             cognito_sub = payload.get("sub")
             email = payload.get("email")
+            profile_picture_url = payload.get("picture")
             
             from sqlalchemy import select
             stmt = select(User).where(
@@ -88,7 +89,8 @@ async def get_current_user(
                     detail={
                         "code": "registration_incomplete",
                         "cognito_sub": cognito_sub,
-                        "email": email
+                        "email": email,
+                        "profile_picture_url": profile_picture_url
                     }
                 )
             

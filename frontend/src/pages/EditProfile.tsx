@@ -26,6 +26,7 @@ const EditProfile: React.FC = () => {
       }
     } else if (pendingUser) {
       // 🚀 Handle new Cognito user who hasn't saved yet
+      setPhoto(pendingUser.profile_picture_url || 'https://placehold.co/150');
       setDisplayName('');
       setUsername('');
     }
@@ -56,7 +57,9 @@ const EditProfile: React.FC = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      let finalProfilePicUrl = user?.profile_picture_url;
+      // If a file was selected, we'll upload it. 
+      // Otherwise, keep whatever is currently in the 'photo' state (which could be the Google URL)
+      let finalProfilePicUrl = photo;
 
       // 1. Upload photo if selected
       if (selectedFile) {

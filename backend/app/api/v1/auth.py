@@ -67,6 +67,7 @@ async def cognito_register(
     token = payload.get("token")
     username = payload.get("username")
     display_name = payload.get("display_name")
+    profile_picture_url = payload.get("profile_picture_url")
 
     if not token or not username:
         raise HTTPException(status_code=400, detail="Token and username are required")
@@ -86,10 +87,11 @@ async def cognito_register(
         username=username,
         display_name=display_name or username,
         email=email,
+        profile_picture_url=profile_picture_url,
         cognito_sub=cognito_sub,
         username_sourced_from_provider=False,
         display_name_sourced_from_provider=False,
-        profile_pic_sourced_from_provider=False # Allow manual updates
+        profile_pic_sourced_from_provider=bool(profile_picture_url)
     )
     db.add(new_user)
     await db.commit()

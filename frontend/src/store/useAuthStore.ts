@@ -17,6 +17,7 @@ interface User {
 interface PendingUser {
   email: string;
   cognito_sub: string;
+  profile_picture_url?: string;
 }
 
 interface AuthState {
@@ -97,7 +98,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           user: null, 
           pendingUser: {
             email: error.response.data.detail.email,
-            cognito_sub: error.response.data.detail.cognito_sub
+            cognito_sub: error.response.data.detail.cognito_sub,
+            profile_picture_url: error.response.data.detail.profile_picture_url
           },
           isLoading: false 
         });
