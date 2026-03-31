@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useLocation } from 'react-router';
 import { SortableList } from '../../components/ui/SortableList';
 import { Toast } from '../../components/ui/Toast';
 import { AddRecipeNavigation } from '../../components/forms/AddRecipeNavigation';
@@ -7,6 +7,7 @@ import { useAddRecipeStore, InstructionStep } from '../../store/useAddRecipeStor
 
 const RecipeInstructions: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { instructions: steps, setInstructions: setSteps } = useAddRecipeStore();
   const [isAdding, setIsAdding] = useState(false);
   const [newStepDescription, setNewStepDescription] = useState('');
@@ -25,8 +26,10 @@ const RecipeInstructions: React.FC = () => {
       setShowToast(true);
       return;
     }
-    navigate('/add-recipe/categories');
+    navigate(location.pathname.replace('/instructions', '/categories'));
   };
+
+  const backPath = location.pathname.replace('/instructions', '/ingredients');
 
   const handleAddStep = () => {
     if (newStepDescription.trim()) {
@@ -112,7 +115,7 @@ const RecipeInstructions: React.FC = () => {
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
       <div className="sticky top-0 md:top-14 z-20 bg-background-light dark:bg-background-dark">
         <header className="flex items-center justify-between bg-background-light px-4 py-3 dark:bg-background-dark pb-1">
-          <Link to="/add-recipe/ingredients" className="flex items-center justify-center text-primary lg:hidden" aria-label="Back">
+          <Link to={backPath} className="flex items-center justify-center text-primary lg:hidden" aria-label="Back">
             <span className="material-symbols-outlined text-3xl"> arrow_back </span>
           </Link>
           <div className="hidden lg:block w-8"></div>
@@ -198,7 +201,7 @@ const RecipeInstructions: React.FC = () => {
 
       <AddRecipeNavigation 
         onNext={handleNext}
-        backPath="/add-recipe/ingredients"
+        backPath={backPath}
       />
 
       <Toast

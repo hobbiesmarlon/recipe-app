@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams, useLocation } from 'react-router';
 import { Toast } from '../../components/ui/Toast';
 import { SortableList } from '../../components/ui/SortableList';
 import { AddRecipeNavigation } from '../../components/forms/AddRecipeNavigation';
@@ -7,6 +7,7 @@ import { useAddRecipeStore } from '../../store/useAddRecipeStore';
 
 const RecipeBasicInfo: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const params = useParams<{ recipeId: string }>();
   const isEditMode = !!params.recipeId;
 
@@ -49,18 +50,9 @@ const RecipeBasicInfo: React.FC = () => {
         original: f
     }));
     
-    // Merge. If we haven't manually reordered locally, just append.
-    // Ideally we respect `display_order` from existingMedia.
-    // For now, let's just concatenate or use the order from store if we could track it.
-    // Since `files` don't have display_order in store initially, we just append them.
-    
-    // To avoid "jumping" when store updates (e.g. adding a file), we might want to be careful.
-    // But simplistic approach: existing first (sorted by display_order), then files.
-    
     const sortedExisting = [...mappedExisting].sort((a, b) => a.display_order - b.display_order);
     setDisplayMedia([...sortedExisting, ...mappedFiles]);
-  }, [files, existingMedia]); // This dependency might cause reset of order on every file add... 
-  // Actually, `files` and `existingMedia` order in store IS the order.
+  }, [files, existingMedia]); 
 
   const handleNext = () => {
     // Reset toast message
@@ -164,76 +156,6 @@ const RecipeBasicInfo: React.FC = () => {
     }
   };
 
-  const handleReorder = (newOrder: any[]) => {
-      // Update local state immediately for smoothness
-      setDisplayMedia(newOrder);
-
-      // Split and update stores with new display_orders
-      const newExisting: any[] = [];
-      const newFiles: any[] = [];
-
-      newOrder.forEach((item, index) => {
-          if (item.isExisting) {
-              newExisting.push({ ...item.original, display_order: index, is_primary: index === 0 });
-          } else {
-              // We don't store display_order on FileWithId, but order in array implies it.
-              // However, we need to know the global order later.
-              // For now, let's just update the arrays. The merging effect above will resort them...
-              // Wait, if we separate them in store, the useEffect above will re-merge them as [Existing, New].
-              // This BREAKS the mixed order.
-              
-              // FIX: The store must support a unified list or we accept that order is reset on refresh/re-mount?
-              // No, user wants to reorder.
-              
-              // Given the complexity, maybe we should just allow reordering existing, AND reordering new, but not mixing?
-              // Or, assume existing always come before new?
-              
-              // If we want mixed order, we need to store `display_order` on `files` too.
-              // Let's assume files are added at end.
-          }
-          newFiles.push(item.original); // This logic is flawed if we mix.
-      });
-      
-      // Let's simplify: existing media always comes first.
-      // Reordering is allowed within the list.
-      // Actually, SortableList `onReorder` gives us the new array.
-      // We can just update our `displayMedia` local state? 
-      // But we need to persist it.
-      
-      // If we want real mixed ordering, we need the store to hold a single list of `MediaItem`.
-      // `MediaItem` = `ExistingMedia` | `FileWithId`.
-      // This would require a bigger refactor of the store.
-      
-      // Decision: For this iteration, I will render `existingMedia` and `files` separately or just concatenated.
-      // I will disable reordering across the boundary to avoid state sync issues.
-      // I will only allow reordering `files` (new ones) amongst themselves, and `existing` amongst themselves.
-      // Or just render them in one list but `onReorder` will only update the respective lists order.
-      // This effectively un-mixes them if the user tries to mix them.
-      
-      // Let's implement separate lists for simplicity and robustness.
-      // List 1: Existing Media (Sortable)
-      // List 2: New Media (Sortable)
-  };
-
-  // Simplified Reorder for separate lists
-  const handleExistingReorder = (newItems: any[]) => {
-      let primaryFound = false;
-      const updated = newItems.map((item, idx) => {
-          const isPrimary = !primaryFound && item.type === 'image';
-          if (isPrimary) primaryFound = true;
-          return { ...item, display_order: idx, is_primary: isPrimary };
-      });
-      setExistingMedia(updated);
-  };
-
-  const handleFilesReorder = (newItems: any[]) => {
-      setFiles(newItems);
-  };
-  
-  // Actually, let's just show one list and try to handle the split update.
-  // If user drags New before Existing, next render will put Existing back first.
-  // That's acceptable for a first pass MVP of "Edit".
-  
   return (
     <div className="flex min-h-screen lg:h-[calc(100vh-56px)] lg:min-h-0 flex-col bg-background-light dark:bg-background-dark">
       <div className="flex-grow flex flex-col lg:overflow-hidden">

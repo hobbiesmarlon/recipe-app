@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useLocation } from 'react-router';
 import { SortableList } from '../../components/ui/SortableList';
 import { Toast } from '../../components/ui/Toast';
 import { AddRecipeNavigation } from '../../components/forms/AddRecipeNavigation';
@@ -65,6 +65,7 @@ const CustomSelect: React.FC<{
 
 const RecipeIngredients: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { ingredients, setIngredients } = useAddRecipeStore();
 
   const [name, setName] = useState('');
@@ -173,15 +174,17 @@ const RecipeIngredients: React.FC = () => {
       setShowToast(true);
       return;
     }
-    navigate('/add-recipe/instructions');
+    navigate(location.pathname.replace('/ingredients', '/instructions'));
   };
+
+  const backPath = location.pathname.replace('/ingredients', '/basic');
 
   return (
     <div className="flex min-h-screen lg:h-[calc(100vh-56px)] lg:min-h-0 flex-col bg-background-light dark:bg-background-dark">
       <div className="flex-grow flex flex-col lg:overflow-hidden">
         <div className="sticky top-0 md:top-14 lg:static z-20 bg-background-light dark:bg-background-dark shrink-0">
           <header className="flex items-center justify-between bg-background-light px-4 py-3 dark:bg-background-dark pb-1">
-            <Link to="/add-recipe/basic" className="flex items-center justify-center text-primary lg:hidden" aria-label="Back">
+            <Link to={backPath} className="flex items-center justify-center text-primary lg:hidden" aria-label="Back">
               <span className="material-symbols-outlined text-3xl">arrow_back</span>
             </Link>
             <div className="hidden lg:block w-8"></div>
@@ -343,7 +346,7 @@ const RecipeIngredients: React.FC = () => {
 
       <AddRecipeNavigation 
         onNext={handleNext}
-        backPath="/add-recipe/basic"
+        backPath={backPath}
       />
 
       <Toast 

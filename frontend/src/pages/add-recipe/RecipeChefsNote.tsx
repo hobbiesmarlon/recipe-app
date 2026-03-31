@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useLocation } from 'react-router';
 import { AddRecipeNavigation } from '../../components/forms/AddRecipeNavigation';
 import { useAddRecipeStore } from '../../store/useAddRecipeStore';
 import client from '../../api/client';
@@ -7,6 +7,7 @@ import { Toast } from '../../components/ui/Toast';
 
 const RecipeChefsNote: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const store = useAddRecipeStore();
   const { chefsNote: note, setChefsNote: setNote, editId, existingMedia } = store;
   const [isPublishing, setIsPublishing] = useState(false);
@@ -173,11 +174,13 @@ const RecipeChefsNote: React.FC = () => {
     }
   };
 
+  const backPath = location.pathname.replace('/chefs-note', '/categories');
+
   return (
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark">
       <div className="sticky top-0 md:top-14 z-20 bg-background-light dark:bg-background-dark">
         <header className="flex items-center justify-between bg-background-light px-4 py-3 dark:bg-background-dark pb-1">
-          <Link to="/add-recipe/categories" className="flex items-center justify-center text-primary lg:hidden" aria-label="Back">
+          <Link to={backPath} className="flex items-center justify-center text-primary lg:hidden" aria-label="Back">
             <span className="material-symbols-outlined text-3xl">arrow_back</span>
           </Link>
           <div className="hidden lg:block w-8"></div>
@@ -206,7 +209,7 @@ const RecipeChefsNote: React.FC = () => {
             <textarea 
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary min-h-[200px] resize-none dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400" 
+              className="w-full rounded-lg border-0 bg-stone-200/50 p-4 text-stone-900 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-primary min-h-[120px] lg:min-h-[200px] resize-none dark:bg-stone-800/50 dark:text-stone-100 dark:placeholder:text-stone-400" 
               id="chefs-note" 
               placeholder="Tips, tricks, or a personal story about this dish"
             ></textarea>
@@ -229,7 +232,7 @@ const RecipeChefsNote: React.FC = () => {
 
       <AddRecipeNavigation 
         onNext={handlePublish}
-        backPath="/add-recipe/categories"
+        backPath={backPath}
         nextLabel={isPublishing ? (editId ? "Updating..." : "Publishing...") : (editId ? "Update Recipe" : "Publish Recipe")}
         isLastStep={true}
         isLoading={isPublishing}
