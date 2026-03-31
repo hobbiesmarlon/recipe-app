@@ -7,17 +7,20 @@ const ProtectedRoute: React.FC = () => {
   const token = localStorage.getItem('token');
   const location = useLocation();
 
-  // If there's a token but no user and not loading, try to fetch once
+  // If there's a token but no user/pending state, and we're NOT currently loading,
+  // this is the initial mount after a refresh. Trigger fetch.
   useEffect(() => {
     if (token && !user && !pendingUser && !isLoading) {
       fetchUser();
     }
   }, [token, user, pendingUser, isLoading, fetchUser]);
 
+  // 1. If no token at all, definitely not logged in
   if (!token) {
     return <Navigate to="/signin" state={{ from: location.pathname }} replace />;
   }
 
+  // 2. If we ARE loading (either initial mount or triggered fetch), show spinner
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -26,12 +29,12 @@ const ProtectedRoute: React.FC = () => {
     );
   }
 
-  // If we have a token but fetchUser failed (user and pendingUser are null)
+  // 3. If loading finished and we STILL have no user/pending state, the token was likely invalid
   if (!user && !pendingUser) {
     return <Navigate to="/signin" state={{ from: location.pathname }} replace />;
   }
 
-  // 🛡️ Force registration for new Cognito users
+  // 4. Force registration for new Cognito users
   if (pendingUser && location.pathname !== '/edit-profile') {
     return <Navigate to="/edit-profile" replace />;
   }

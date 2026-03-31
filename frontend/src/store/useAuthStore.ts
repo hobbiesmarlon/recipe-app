@@ -36,7 +36,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   pendingUser: null,
-  isLoading: false,
+  isLoading: !!localStorage.getItem('token'),
   isAuthenticating: false,
   isLoggingOut: false,
   error: null,
