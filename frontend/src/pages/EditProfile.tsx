@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useAuthStore } from '../store/useAuthStore';
 import client from '../api/client';
+import { Toast } from '../components/ui/Toast';
 
 const EditProfile: React.FC = () => {
   const navigate = useNavigate();
@@ -12,6 +13,11 @@ const EditProfile: React.FC = () => {
   const [displayName, setDisplayName] = useState('');
   const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState({ visible: false, message: '' });
+
+  const showToast = (message: string) => {
+    setToast({ visible: true, message });
+  };
 
   useEffect(() => {
     if (user) {
@@ -38,7 +44,7 @@ const EditProfile: React.FC = () => {
       
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
       if (!allowedTypes.includes(file.type)) {
-        alert('Please upload a valid image file (JPG, JPEG, or PNG).');
+        showToast('Please upload a valid image file (JPG, JPEG, or PNG).');
         return;
       }
 
@@ -50,7 +56,7 @@ const EditProfile: React.FC = () => {
 
   const handleSave = async () => {
     if (!displayName.trim() || !username.trim()) {
-        alert("Please fill in both Display Name and Username.");
+        showToast("Please fill in both Display Name and Username.");
         return;
     }
 
@@ -109,7 +115,7 @@ const EditProfile: React.FC = () => {
       navigate('/', { replace: true });
     } catch (error: any) {
       console.error('Failed to update profile:', error);
-      alert(error.response?.data?.detail || 'Failed to update profile. Please try again.');
+      showToast(error.response?.data?.detail || 'Failed to update profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -213,6 +219,12 @@ const EditProfile: React.FC = () => {
           </button>
         </nav>
       </footer>
+
+      <Toast 
+        isVisible={toast.visible}
+        message={toast.message}
+        onClose={() => setToast({ ...toast, visible: false })}
+      />
     </div>
   );
 };
