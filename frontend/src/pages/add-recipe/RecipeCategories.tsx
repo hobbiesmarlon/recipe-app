@@ -10,18 +10,18 @@ interface CategoryItem {
 
 const MEAL_TYPES: CategoryItem[] = [
   { id: 1, name: 'Breakfast' }, { id: 2, name: 'Lunch' }, { id: 3, name: 'Dinner' },
-  { id: 4, name: 'Snack' }, { id: 5, name: 'Appetizer' }, { id: 6, name: 'Dessert' }, { id: 7, name: 'Sauce' },
-  { id: 55, name: 'Condiment' }, { id: 56, name: 'Salad' },
+  { id: 4, name: 'Snack' }, { id: 5, name: 'Appetizer' }, { id: 6, name: 'Dessert' }, 
+  { id: 7, name: 'Sauce' }, { id: 34, name: 'Condiment' }, { id: 35, name: 'Salad' },
 ];
 
 const COOKING_METHODS: CategoryItem[] = [
-  { id: 8, name: 'Baking' }, { id: 9, name: 'Frying' }, { id: 10, name: 'Grilling' },
-  { id: 11, name: 'Roasting' }, { id: 12, name: 'Slow Cook' }, { id: 13, name: 'No-Cook' },
+  { id: 8, name: 'Bake' }, { id: 9, name: 'Fry' }, { id: 10, name: 'Grill' },
+  { id: 11, name: 'Roast' }, { id: 12, name: 'Slow Cook' }, { id: 13, name: 'No-Cook' },
 ];
 
 const DIETARY: CategoryItem[] = [
   { id: 14, name: 'Vegetarian' }, { id: 15, name: 'Vegan' }, { id: 16, name: 'Gluten-Free' },
-  { id: 17, name: 'Dairy-Free' }, { id: 18, name: 'Low-Carb' }, { id: 57, name: 'Fruit-Based' },
+  { id: 17, name: 'Dairy-Free' }, { id: 18, name: 'Low-Carb' }, { id: 36, name: 'Fruit-Based' },
 ];
 
 const FLAVOURS: CategoryItem[] = [
@@ -36,7 +36,7 @@ const BUDGET_EASE: CategoryItem[] = [
 
 const DRINKS: CategoryItem[] = [
   { id: 28, name: 'Cocktail' }, { id: 29, name: 'Mocktail' }, { id: 30, name: 'Coffee/Tea' },
-  { id: 31, name: 'Juice' }, { id: 32, name: 'Milkshake' }, { id: 33, name: 'Smoothiee' },
+  { id: 31, name: 'Juice' }, { id: 32, name: 'Milkshake' }, { id: 33, name: 'Smoothie' },
 ];
 
 const RecipeCategories: React.FC = () => {
