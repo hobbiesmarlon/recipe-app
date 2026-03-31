@@ -23,6 +23,9 @@ const RecipeBasicInfo: React.FC = () => {
 
   // 🔄 SELF-HEALING: Reset store if we are in Add mode but store has Edit data
   React.useEffect(() => {
+    // Also clear completion flag so user can start fresh
+    sessionStorage.removeItem('recipe_flow_completed');
+
     if (!isEditMode && editId !== null) {
       reset();
     }

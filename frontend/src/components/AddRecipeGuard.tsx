@@ -7,6 +7,15 @@ const AddRecipeGuard: React.FC = () => {
   const params = useParams<{ recipeId: string }>(); // Check if we have an ID
   const store = useAddRecipeStore();
 
+  // 🛡️ Prevent going back into the flow if it was just completed
+  // But ALLOW the first step so the 'clear' logic can run there
+  const isFlowCompleted = sessionStorage.getItem('recipe_flow_completed') === 'true';
+  const isFirstStep = location.pathname.endsWith('/basic');
+
+  if (isFlowCompleted && !isFirstStep) {
+    return <Navigate to="/" replace />;
+  }
+
   const isEditMode = !!params.recipeId;
   const basePath = isEditMode ? `/edit-recipe/${params.recipeId}` : '/add-recipe';
 

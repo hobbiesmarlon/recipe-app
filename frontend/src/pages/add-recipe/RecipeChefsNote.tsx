@@ -157,7 +157,13 @@ const RecipeChefsNote: React.FC = () => {
         
         // Wait a bit so user can see success message
         setTimeout(() => {
-            navigate(`/recipe/${response.data.id}`);
+            // Set flag to prevent going back into the form steps
+            sessionStorage.setItem('recipe_flow_completed', 'true');
+
+            navigate(`/recipe/${response.data.id}`, { 
+                replace: true, 
+                state: { fromPublish: true } 
+            });
             // Reset store after a short delay to ensure navigation occurs first
             // and we leave the guarded route before the store is cleared.
             setTimeout(() => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useParams, useNavigate } from 'react-router';
+import { Link, useParams, useNavigate, useLocation } from 'react-router';
 import { ImageCarousel } from '../components/ui/ImageCarousel';
 import { Toast } from '../components/ui/Toast';
 import client, { API_URL } from '../api/client';
@@ -44,6 +44,9 @@ interface FullRecipe {
 const RecipeDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromPublish = (location.state as any)?.fromPublish;
+
   const [recipe, setRecipe] = useState<FullRecipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -182,6 +185,14 @@ const RecipeDetails: React.FC = () => {
     }
   };
 
+  const handleBack = () => {
+    if (fromPublish) {
+      navigate('/', { replace: true });
+    } else {
+      navigate(-1);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -219,7 +230,7 @@ const RecipeDetails: React.FC = () => {
           {/* Top Actions Overlay */}
           <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-10">
             <button 
-              onClick={() => navigate(-1)}
+              onClick={handleBack}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-md text-white transition-all hover:bg-black/40 active:scale-95"
               aria-label="Back"
             >
