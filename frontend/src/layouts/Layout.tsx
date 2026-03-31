@@ -6,11 +6,11 @@ import { useAuthStore } from '../store/useAuthStore';
 const Layout: React.FC = () => {
   const location = useLocation();
   const path = location.pathname;
-  const { fetchUser, user, isLoggingOut } = useAuthStore();
+  const { fetchSession, user, isLoggingOut } = useAuthStore();
 
   useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+    fetchSession();
+  }, [fetchSession]);
 
   if (isLoggingOut) {
     return (

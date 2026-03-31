@@ -62,7 +62,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   fetchSession: async () => {
-    if (import.meta.env.VITE_USE_COGNITO !== 'true') return localStorage.getItem('token');
+    if (import.meta.env.VITE_USE_COGNITO !== 'true') {
+      const token = localStorage.getItem('token');
+      if (token) await get().fetchUser();
+      return token;
+    }
     
     try {
       const session = await fetchAuthSession();
@@ -73,11 +77,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         await get().fetchUser();
         return token;
       }
-      // If Cognito session is missing, but we have a token (maybe local/X), return it
-      return localStorage.getItem('token');
+      // If Cognito session is missing, but we have a token (maybe local/X), still try to fetch user
+      const localToken = localStorage.getItem('token');
+      if (localToken) await get().fetchUser();
+      return localToken;
     } catch (err) {
-      // On error, return existing token if any
-      return localStorage.getItem('token');
+      // On error, try fallback to local fetch
+      const localToken = localStorage.getItem('token');
+      if (localToken) await get().fetchUser();
+      return localToken;
     }
   },
 
