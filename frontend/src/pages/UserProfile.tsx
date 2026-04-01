@@ -214,7 +214,7 @@ const UserProfile: React.FC = () => {
 
       if (activeTab === 'myrecipes') {
           message = 'No recipes created yet.';
-          action = <Link to="/add-recipe" className="text-primary font-bold hover:underline mt-2">Create one now</Link>;
+          action = <Link to="/add-recipe/basic" className="text-primary font-bold hover:underline mt-2">Create one now</Link>;
       } else if (activeTab === 'savedrecipes') {
           icon = 'bookmark_border';
           message = 'No saved recipes yet.';

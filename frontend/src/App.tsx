@@ -16,6 +16,7 @@ import RecipeInstructions from './pages/add-recipe/RecipeInstructions';
 import RecipeCategories from './pages/add-recipe/RecipeCategories';
 import RecipeChefsNote from './pages/add-recipe/RecipeChefsNote';
 import RecipeDetails from './pages/RecipeDetails';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
 import AddRecipeGuard from './components/AddRecipeGuard';
@@ -36,6 +37,7 @@ function App() {
           <Route path="signin" element={<SignIn />} />
           <Route path="callback" element={<AuthCallback />} />
           <Route path="auth/callback" element={<AuthCallback />} />
+          <Route path="privacy" element={<PrivacyPolicy />} />
           
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
