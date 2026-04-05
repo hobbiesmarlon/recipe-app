@@ -2,6 +2,7 @@
 import secrets
 import urllib.parse
 import os
+from datetime import datetime, timedelta
 from fastapi import APIRouter, HTTPException, Depends, Request, Body
 from fastapi.responses import RedirectResponse, JSONResponse
 from app.core.security import generate_code_verifier, generate_code_challenge, create_access_token
@@ -180,6 +181,13 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
 
         token_json = token_resp.json()
         access_token = token_json.get("access_token")
+        refresh_token = token_json.get("refresh_token")
+        expires_in = token_json.get("expires_in") # typically 7200 for X
+        
+        token_expires_at = None
+        if expires_in:
+            token_expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
+
         if not access_token:
             raise HTTPException(status_code=400, detail="No access token returned")
 
@@ -228,6 +236,12 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
 
     if oauth_acc:
         user = await db.get(User, oauth_acc.user_id)
+        # 🔄 UPDATE EXISTING TOKENS
+        oauth_acc.access_token = access_token
+        if refresh_token:
+            oauth_acc.refresh_token = refresh_token
+        if token_expires_at:
+            oauth_acc.token_expires_at = token_expires_at
     
     # 2. If not linked, check if a user with this email already exists
     if not user and email:
@@ -240,6 +254,8 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
                 provider=OAuthProvider(db_provider),
                 provider_user_id=provider_user_id,
                 access_token=access_token,
+                refresh_token=refresh_token,
+                token_expires_at=token_expires_at,
                 provider_username=x_username if provider == "x" else None,
                 provider_display_name=name,
                 provider_profile_pic_url=profile_pic_url
@@ -270,6 +286,8 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
                 provider=OAuthProvider(db_provider),
                 provider_user_id=provider_user_id,
                 access_token=access_token,
+                refresh_token=refresh_token,
+                token_expires_at=token_expires_at,
                 provider_username=x_username if provider == "x" else None,
                 provider_display_name=name,
                 provider_profile_pic_url=profile_pic_url
@@ -293,6 +311,8 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
                 provider=OAuthProvider(db_provider),
                 provider_user_id=provider_user_id,
                 access_token=access_token,
+                refresh_token=refresh_token,
+                token_expires_at=token_expires_at,
                 provider_display_name=name,
                 provider_profile_pic_url=profile_pic_url
             )

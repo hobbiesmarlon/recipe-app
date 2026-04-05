@@ -1,87 +1,76 @@
-# app/services/oauth_service.py
-from httpx import AsyncClient
+import httpx
+from datetime import datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.user import User
 from app.models.oauth_account import OAuthAccount, OAuthProvider
 from app.core.config import settings
-from app.services.jwt_service import create_access_token
 
-async def create_or_get_user(
-    provider: OAuthProvider,
-    provider_user_id: str,
-    username: str | None,
-    display_name: str | None,
-    profile_pic_url: str | None,
-    db: AsyncSession,
-    access_token: str
-):
-    # Check if user exists
-    result = await db.execute(
-    select(OAuthAccount).where(
-        OAuthAccount.provider == OAuthProvider(provider),
-        OAuthAccount.provider_user_id == provider_user_id
-    )
-)
+async def refresh_x_token(db: AsyncSession, oauth_acc: OAuthAccount) -> str:
+    """
+    Uses the 6-month refresh token to get a new 2-hour access token from X.
+    Implements Refresh Token Rotation as required by X.
+    """
+    if not oauth_acc.refresh_token:
+        raise Exception("No refresh token available for this account")
 
-    user = result.scalar_one_or_none()
-
-    if not user:
-        # Create new user
-        user = User(username=username or provider_user_id, display_name=display_name or username)
-        db.add(user)
-        await db.commit()
-        await db.refresh(user)
-
-        oauth_acc = OAuthAccount(
-            user_id=user.id,
-            provider=provider,
-            provider_user_id=provider_user_id,
-            provider_username=username,
-            provider_display_name=display_name,
-            provider_profile_pic_url=profile_pic_url,
-            access_token=access_token
-        )
-        db.add(oauth_acc)
-        await db.commit()
-
-    # Return JWT token
-    token = create_access_token(user.id)
-    return token
-
-async def oauth_google(code: str, db: AsyncSession):
-    async with AsyncClient() as client:
-        # Exchange code for access token
-        token_resp = await client.post(
-            "https://oauth2.googleapis.com/token",
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://api.twitter.com/2/oauth2/token",
             data={
-                "code": code,
-                "client_id": settings.GOOGLE_CLIENT_ID,
-                "client_secret": settings.GOOGLE_CLIENT_SECRET,
-                "redirect_uri": settings.GOOGLE_REDIRECT_URI,
-                "grant_type": "authorization_code",
-            }
+                "grant_type": "refresh_token",
+                "refresh_token": oauth_acc.refresh_token,
+                "client_id": settings.X_CLIENT_ID,
+            },
+            auth=(settings.X_CLIENT_ID, settings.X_CLIENT_SECRET),
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
-        token_data = token_resp.json()
-        access_token = token_data["access_token"]
+        
+        if response.status_code != 200:
+            # If refresh fails, it might be revoked or already used (rotation)
+            raise Exception(f"Failed to refresh X token: {response.text}")
 
-        # Fetch user info
-        user_resp = await client.get(
-            "https://www.googleapis.com/oauth2/v2/userinfo",
-            headers={"Authorization": f"Bearer {access_token}"}
-        )
-        user_info = user_resp.json()
-        return await create_or_get_user(
-            provider=OAuthProvider.GOOGLE,
-            provider_user_id=user_info["id"],
-            username=user_info.get("email"),
-            display_name=user_info.get("name", user_info.get("email")),
-            profile_pic_url=user_info.get("picture"),
-            db=db,
-            access_token=access_token
-        )
+        token_json = response.json()
+        new_access_token = token_json["access_token"]
+        new_refresh_token = token_json.get("refresh_token")
+        expires_in = token_json.get("expires_in", 7200)
 
-async def oauth_x():
-    # X OAuth is handled by app/api/v1/auth.py
-    # This function is kept for backwards compatibility if needed
-    pass
+        # Update the database with the new tokens (Rotation!)
+        oauth_acc.access_token = new_access_token
+        if new_refresh_token:
+            oauth_acc.refresh_token = new_refresh_token
+        oauth_acc.token_expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
+        
+        await db.commit()
+        await db.refresh(oauth_acc)
+        
+        return new_access_token
+
+async def get_valid_x_token(db: AsyncSession, user_id: int) -> str:
+    """
+    Gets a valid access token for X. If the current one is expired or 
+    about to expire (within 5 mins), it automatically refreshes it.
+    """
+    result = await db.execute(
+        select(OAuthAccount).where(
+            OAuthAccount.user_id == user_id,
+            OAuthAccount.provider == OAuthProvider.X
+        )
+    )
+    oauth_acc = result.scalars().first()
+    
+    if not oauth_acc:
+        raise Exception("User is not connected to X")
+
+    # Check if expired or expiring soon (5 min buffer)
+    is_expired = True
+    if oauth_acc.token_expires_at:
+        # Ensure comparison is aware of UTC/timezone if needed, 
+        # but here we use UTC consistently.
+        now = datetime.utcnow()
+        if oauth_acc.token_expires_at > (now + timedelta(minutes=5)):
+            is_expired = False
+
+    if is_expired:
+        return await refresh_x_token(db, oauth_acc)
+    
+    return oauth_acc.access_token
