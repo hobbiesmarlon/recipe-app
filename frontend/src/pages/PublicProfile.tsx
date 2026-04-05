@@ -9,6 +9,7 @@ interface User {
   username: string;
   display_name: string;
   profile_picture_url?: string;
+  username_sourced_from_provider?: boolean;
 }
 
 interface RecipeMedia {
@@ -110,6 +111,11 @@ const PublicProfile: React.FC = () => {
                     <p className="text-[22px] md:text-3xl font-bold text-background-dark dark:text-background-light">{user.display_name}</p>
                     <div className="flex items-center gap-1.5 mt-1">
                     <p className="text-base md:text-lg text-primary">@{user.username}</p>
+                    {user.username_sourced_from_provider && (
+                      <svg className="h-3.5 w-3.5 md:h-4 md:w-4 text-background-dark dark:text-background-light" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932 6.064-6.932zm-1.292 19.494h2.039L6.486 3.24H4.298l13.311 17.407z" />
+                      </svg>
+                    )}
                     </div>
               </div>
             </div>
