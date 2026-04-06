@@ -253,17 +253,19 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
         user = result.scalars().first()
         if user:
             # Link this social account to the existing user
-            oauth_acc = OAuthAccount(
-                user_id=user.id,
-                provider=OAuthProvider(db_provider),
-                provider_user_id=provider_user_id,
-                access_token=access_token,
-                refresh_token=refresh_token,
-                token_expires_at=token_expires_at,
-                provider_username=x_username if provider == "x" else None,
-                provider_display_name=name,
-                provider_profile_pic_url=profile_pic_url
-            )
+            account_data = {
+                "user_id": user.id,
+                "provider": OAuthProvider(db_provider),
+                "provider_user_id": provider_user_id,
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "provider_username": x_username if provider == "x" else None,
+                "provider_display_name": name,
+                "provider_profile_pic_url": profile_pic_url
+            }
+            if token_expires_at:
+                account_data["token_expires_at"] = token_expires_at
+            oauth_acc = OAuthAccount(**account_data)
             db.add(oauth_acc)
 
     # 3. If still no user, create a new one
@@ -285,17 +287,19 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
             )
             db.add(user)
             await db.flush()
-            oauth_acc = OAuthAccount(
-                user_id=user.id,
-                provider=OAuthProvider(db_provider),
-                provider_user_id=provider_user_id,
-                access_token=access_token,
-                refresh_token=refresh_token,
-                token_expires_at=token_expires_at,
-                provider_username=x_username if provider == "x" else None,
-                provider_display_name=name,
-                provider_profile_pic_url=profile_pic_url
-            )
+            account_data = {
+                "user_id": user.id,
+                "provider": OAuthProvider(db_provider),
+                "provider_user_id": provider_user_id,
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "provider_username": x_username if provider == "x" else None,
+                "provider_display_name": name,
+                "provider_profile_pic_url": profile_pic_url
+            }
+            if token_expires_at:
+                account_data["token_expires_at"] = token_expires_at
+            oauth_acc = OAuthAccount(**account_data)
             db.add(oauth_acc)
         else:
             username = f"temp_{secrets.token_hex(4)}"
@@ -310,16 +314,18 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
             )
             db.add(user)
             await db.flush()
-            oauth_acc = OAuthAccount(
-                user_id=user.id,
-                provider=OAuthProvider(db_provider),
-                provider_user_id=provider_user_id,
-                access_token=access_token,
-                refresh_token=refresh_token,
-                token_expires_at=token_expires_at,
-                provider_display_name=name,
-                provider_profile_pic_url=profile_pic_url
-            )
+            account_data = {
+                "user_id": user.id,
+                "provider": OAuthProvider(db_provider),
+                "provider_user_id": provider_user_id,
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "provider_display_name": name,
+                "provider_profile_pic_url": profile_pic_url
+            }
+            if token_expires_at:
+                account_data["token_expires_at"] = token_expires_at
+            oauth_acc = OAuthAccount(**account_data)
             db.add(oauth_acc)
 
     await db.commit()
