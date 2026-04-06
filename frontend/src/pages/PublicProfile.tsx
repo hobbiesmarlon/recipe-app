@@ -30,6 +30,38 @@ const PublicProfile: React.FC = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [shareToast, setShareToast] = useState({ visible: false, message: '' });
+
+  useEffect(() => {
+    if (shareToast.visible) {
+      const timer = setTimeout(() => {
+        setShareToast({ ...shareToast, visible: false });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [shareToast.visible]);
+
+  const handleShareProfile = () => {
+    setIsMenuOpen(false);
+    if (!user) return;
+
+    const frontendUrl = window.location.origin;
+    const directUrl = `${frontendUrl}/u/${user.id}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: `Check out ${user.display_name}'s profile`,
+        url: directUrl,
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(directUrl).then(() => {
+        setShareToast({ visible: true, message: 'Profile link copied!' });
+      }).catch(() => {
+        setShareToast({ visible: true, message: 'Failed to copy link' });
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,7 +123,39 @@ const PublicProfile: React.FC = () => {
           <div className="flex items-center justify-between md:justify-end md:h-10">
             <div className="w-10 md:hidden"></div>
             <h1 className="text-lg font-bold text-background-dark dark:text-background-light md:hidden">Profile</h1>
-            <div className="w-10"></div>
+            <div className="relative">
+              <button 
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="flex size-10 shrink-0 items-center justify-center rounded-full text-primary hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                aria-label="More options"
+              >
+                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                </svg>
+              </button>
+
+              {isMenuOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-10" 
+                    onClick={() => setIsMenuOpen(false)} 
+                  />
+                  <div className="absolute right-0 top-full mt-2 w-52 z-20 rounded-2xl bg-surface-light dark:bg-surface-dark shadow-2xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden animate-fadeIn">
+                    <div className="flex flex-col py-2">
+                      <button 
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-semibold text-text-light dark:text-text-dark hover:bg-primary/10 dark:hover:bg-white/5 transition-colors"
+                        onClick={handleShareProfile}
+                      >
+                        <svg className="h-5 w-5 text-primary" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                        </svg>
+                        Share Profile
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </PageContainer>
       </header>
@@ -159,6 +223,17 @@ const PublicProfile: React.FC = () => {
       <div className="md:hidden">
         <BottomNav />
       </div>
+
+      {shareToast.visible && (
+        <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 animate-fadeInUp">
+          <div className="flex items-center gap-2 rounded-full bg-background-dark/90 px-6 py-3 text-sm font-bold text-white shadow-2xl backdrop-blur-md dark:bg-primary/90">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            {shareToast.message}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
