@@ -67,10 +67,11 @@ async def get_valid_x_token(db: AsyncSession, user_id: int) -> Optional[str]:
         return None
 
     # Check if expired or expiring soon (5 min buffer)
+    # This ensures we refresh BEFORE it actually dies during a request
     is_expired = True
     if oauth_acc.token_expires_at:
-        now = get_now_utc()
-        if oauth_acc.token_expires_at > (now + timedelta(minutes=5)):
+        now_plus_buffer = get_now_utc() + timedelta(minutes=5)
+        if oauth_acc.token_expires_at > now_plus_buffer:
             is_expired = False
 
     if is_expired:
