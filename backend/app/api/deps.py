@@ -1,4 +1,5 @@
 import httpx
+from datetime import datetime, timezone
 from typing import Optional, Any
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -7,11 +8,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.db import get_db
 from app.models.user import User
+from app.services.oauth_service import get_valid_x_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
+def get_now_utc():
+    """Returns modern UTC datetime for Python 3.12+ compatibility."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
 # --- Cognito Public Key Cache ---
-cognito_jwks: Optional[dict] = None
+# ... (rest of Cognito helper code) ...
+
+# ... (rest of Cognito helper code) ...
 
 async def get_cognito_jwks() -> dict:
     global cognito_jwks
@@ -148,6 +156,16 @@ async def get_current_user(
         user = await db.get(User, int(user_id))
         if user is None:
             raise credentials_exception
+        
+        # 🛡️ BULLETPROOF REFRESH: If user has an X account, ensure it's fresh
+        # This keeps the session alive beyond the 2hr X access token limit
+        try:
+            # get_valid_x_token handles the expiry check and refresh silently
+            await get_valid_x_token(db, user.id)
+        except Exception:
+            # Don't let a failed X refresh block the whole app session
+            pass
+            
         return user
     except (JWTError, ValueError):
         raise credentials_exception

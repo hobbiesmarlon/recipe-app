@@ -1,9 +1,13 @@
 import httpx
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.oauth_account import OAuthAccount, OAuthProvider
 from app.core.config import settings
+
+def get_now_utc():
+    """Returns modern UTC datetime for Python 3.12+ compatibility."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 async def refresh_x_token(db: AsyncSession, oauth_acc: OAuthAccount) -> str:
     """
@@ -26,7 +30,6 @@ async def refresh_x_token(db: AsyncSession, oauth_acc: OAuthAccount) -> str:
         )
         
         if response.status_code != 200:
-            # If refresh fails, it might be revoked or already used (rotation)
             raise Exception(f"Failed to refresh X token: {response.text}")
 
         token_json = response.json()
@@ -38,14 +41,15 @@ async def refresh_x_token(db: AsyncSession, oauth_acc: OAuthAccount) -> str:
         oauth_acc.access_token = new_access_token
         if new_refresh_token:
             oauth_acc.refresh_token = new_refresh_token
-        oauth_acc.token_expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
+        
+        oauth_acc.token_expires_at = get_now_utc() + timedelta(seconds=expires_in)
         
         await db.commit()
         await db.refresh(oauth_acc)
         
         return new_access_token
 
-async def get_valid_x_token(db: AsyncSession, user_id: int) -> str:
+async def get_valid_x_token(db: AsyncSession, user_id: int) -> Optional[str]:
     """
     Gets a valid access token for X. If the current one is expired or 
     about to expire (within 5 mins), it automatically refreshes it.
@@ -59,18 +63,19 @@ async def get_valid_x_token(db: AsyncSession, user_id: int) -> str:
     oauth_acc = result.scalars().first()
     
     if not oauth_acc:
-        raise Exception("User is not connected to X")
+        return None
 
     # Check if expired or expiring soon (5 min buffer)
     is_expired = True
     if oauth_acc.token_expires_at:
-        # Ensure comparison is aware of UTC/timezone if needed, 
-        # but here we use UTC consistently.
-        now = datetime.utcnow()
+        now = get_now_utc()
         if oauth_acc.token_expires_at > (now + timedelta(minutes=5)):
             is_expired = False
 
     if is_expired:
-        return await refresh_x_token(db, oauth_acc)
+        try:
+            return await refresh_x_token(db, oauth_acc)
+        except Exception:
+            return None # Fail silently to avoid blocking the main app session
     
     return oauth_acc.access_token
