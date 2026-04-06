@@ -17,9 +17,7 @@ def get_now_utc():
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
 # --- Cognito Public Key Cache ---
-# ... (rest of Cognito helper code) ...
-
-# ... (rest of Cognito helper code) ...
+cognito_jwks: Optional[dict] = None
 
 async def get_cognito_jwks() -> dict:
     global cognito_jwks

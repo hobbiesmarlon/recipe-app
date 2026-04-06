@@ -2,7 +2,11 @@
 import secrets
 import urllib.parse
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
+
+def get_now_utc():
+    """Returns modern UTC datetime for Python 3.12+ compatibility."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 from fastapi import APIRouter, HTTPException, Depends, Request, Body
 from fastapi.responses import RedirectResponse, JSONResponse
 from app.core.security import generate_code_verifier, generate_code_challenge, create_access_token
@@ -186,7 +190,7 @@ async def callback(provider: str, code: str, state: str, request: Request, db: A
         
         token_expires_at = None
         if expires_in:
-            token_expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
+            token_expires_at = get_now_utc() + timedelta(seconds=expires_in)
 
         if not access_token:
             raise HTTPException(status_code=400, detail="No access token returned")
